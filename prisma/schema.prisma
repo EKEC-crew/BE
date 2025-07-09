@@ -18,14 +18,14 @@ model User {
   id  Int @id @default(autoincrement())
   email String  @unique(map: "email") @db.VarChar(40)
   password String @db.VarChar(40)
-  name  String  @db.VarChar(10)
-  nickname  String  @db.VarChar(10)
-  gender  Int 
-  birth DateTime
-  phone String  @unique(map: "phone") @db.VarChar(15)
-  image String  @db.VarChar(50)
+  name  String?  @db.VarChar(10)
+  nickname  String?  @db.VarChar(10)
+  gender  Int?
+  birth DateTime?
+  phone String?  @unique(map: "phone") @db.VarChar(15)
+  image String?  @db.VarChar(50)
   createdAt DateTime  @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
 
   crew Crew[]
   crewRegister CrewRegister[]
@@ -62,10 +62,10 @@ model Crew {
   score Float
   crewCapacity  Int @map("crew_capacity")
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   noticeCount Int @default(0) @map("notice_count")
   postCount Int @default(0) @map("post_count")
-  bannerImage String @map("banner_image") @db.VarChar(50)
+  bannerImage String? @map("banner_image") @db.VarChar(50)
   ageLimit  Int @map("age_limit")
   genderLimit Int @map("gender_limit")
   userId Int @map("user_id")
@@ -92,7 +92,7 @@ model Crew {
 model CrewPlan {
   id  Int @id @default(autoincrement())
   day DateTime
-  title String @db.VarChar(30)
+  title String? @db.VarChar(30)
   content String @db.Text
   type Int
   createdAt DateTime @map("created_at")
@@ -109,7 +109,7 @@ model CrewPlan {
 model CrewRegister {
   id  Int @id @default(autoincrement())
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   userId Int @map("user_id")
   crewId Int @map("crew_id")
 
@@ -123,7 +123,7 @@ model CrewMember {
   id  Int @id @default(autoincrement())
   role  Int
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   userId Int @map("user_id")
   crewId Int @map("crew_id")
 
@@ -157,7 +157,7 @@ model CrewPost {
   content String @db.Text
   commentCount Int @map("comment_count") @default(0)
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   crewId  Int @map("crew_id")
   crewMemberId Int @map("crew_member_id")
 
@@ -174,7 +174,7 @@ model CrewPostComment {
   id  Int @id @default(autoincrement())
   content String @db.Text
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   isPublic Int @map("is_public")
   crewMemberId Int @map("crew_member_id")
   postId  Int @map("post_id")
@@ -190,7 +190,7 @@ model CrewNotice {
   title String @db.VarChar(50)
   content String @db.Text
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   crewId  Int @map("crew_id")
   crewMemberId Int @map("crew_member_id")
 
@@ -207,7 +207,7 @@ model CrewNoticeComment {
   id  Int @id @default(autoincrement())
   content String @db.Text
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   crewMemberId Int @map("crew_member_id")
   crewNoticeId  Int @map("crew_notice_id")
 
@@ -221,7 +221,7 @@ model CrewAlbum {
   id  Int @id @default(autoincrement())
   image String  @db.VarChar(50)
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   crewId  Int @map("crew_id")
   crewMemberId Int @map("crew_member_id")
 
@@ -243,7 +243,7 @@ model Activity {
 model CrewActivity {
   id  Int @id @default(autoincrement())
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   crewId  Int @map("crew_id")
   activityId Int @map("activity_id")
 
@@ -263,7 +263,7 @@ model Style {
 model CrewStyle {
   id  Int @id @default(autoincrement())
   createdAt DateTime @map("created_at")
-  modifiedAt DateTime @map("modified_at")
+  modifiedAt DateTime? @map("modified_at")
   crewId  Int @map("crew_id")
   styleId Int @map("style_id")
 

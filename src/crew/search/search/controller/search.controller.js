@@ -12,6 +12,12 @@ export const handleDefaultSearch = async (req, res, next) => {
             required:true,
             example:"모임"
         }
+        #swagger.parameters['page'] = {
+            in: 'query',
+            description: "페이지 번호",
+            required:true,
+            example:"1"
+        }
         #swagger.responses[200] = {
             description: "크루 이름으로 검색 성공 응답",
             content: {
@@ -71,33 +77,44 @@ export const handleDefaultSearch = async (req, res, next) => {
         description: "크루 이름으로 검색 실패 응답 (올바르지 않은 검색어)",
         content:{
             "application/json": {
-            schema: {
-                type: "object",
-                properties: {
-                resultType: { type: "string", example: "FAIL"},
-                error: {
-                    type: "object",
-                    properties: {
-                    errorCode: {type:"string", example:"I001"},
-                    reason: {type:"string", example:"올바른 검색어를 입력해주세요."},
-                    data: {
-                        type: "object",
-                        properties: {
-                            name:{type:"string", example:""}
+            examples:{
+                InvaildSearchQuery :{
+                    summary:"올바르지 않은 검색어",
+                    value:{
+                        resultType: "FAIL",
+                        "error": {
+                            errorCode : "I001",
+                            reason: "올바른 검색어를 입력해주세요.",
+                            "data": {
+                                "name": "",
+                                "page": "1"
+                            }
                         }
                     }
+                },
+               InvaildPage : {
+                    summary:"올바르지 않은 페이지 번호",
+                    value:{
+                        resultType: "FAIL",
+                        "error": {
+                            errorCode : "I001",
+                            reason: "올바른 페이지를 지정해주세요.",
+                            "data": {
+                                "name":""
+                            }
+                        }
                     }
                 },
-                success: { type: "object", nullable: true, example: null }
-                }
-            },
+            }
             }
         }
         };
     */
     console.log("크루명 검색이 요청되었습니다!")
     console.log("query:", req.query);
-
+    if (req.query.page == undefined || isNaN(Number(req.query.page))) {
+        throw new InvaildInputValueError("올바른 페이지를 지정해주세요.", req.query);
+    }
     if (req.query.name == undefined || req.query.name == "") {
         throw new InvaildInputValueError("올바른 검색어를 입력해주세요.", req.query);
     }

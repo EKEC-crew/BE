@@ -1,6 +1,7 @@
 export const bodyToDefaultSearch = (query) => {
     return {
-        name: query.name
+        name: query.name,
+        page: parseInt(query.page)
     }
 }
 export const bodyToAdvancedSearch = (query) => {

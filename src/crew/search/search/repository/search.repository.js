@@ -53,7 +53,12 @@ export const findCrewsByName = async (data) => {
             title: {
                 contains: data.name
             }
-        }
+        },
+        orderBy: {
+            id: 'asc'
+        },
+        skip: 10 * (data.page - 1),
+        take: 10
     })
 
     return crews;

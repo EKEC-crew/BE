@@ -68,4 +68,25 @@ export const createNotice = async (crewId, userId, noticeData) => {
   if (!crewMember) {
     throw new Error("공지 작성 권한이 없습니다. 크루 멤버인지 확인하세요.");
   }
+
+  // 3. 공지를 생성하고, 작성자(crewMember) 정보를 연결합니다.
+  const newNotice = await prisma.crewNotice.create({
+    data: {
+      title: noticeData.title,
+      content: noticeData.content,
+      crew: {
+        // crewId를 이용해 Crew와 연결
+        connect: {
+          id: parseInt(crewId, 10),
+        },
+      },
+      crewMember: {
+        // 위에서 찾은 crewMember의 id를 이용해 작성자와 연결
+        connect: {
+          id: crewMember.id,
+        },
+      },
+    },
+  });
+  return newNotice;
 };

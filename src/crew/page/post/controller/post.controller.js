@@ -57,6 +57,7 @@ export const createCrewPost = async (req, res, next) => {
   console.log("특정 크루 게시글 작성을 요청했습니다.");
 
   const { crewId } = req.params;
+  const { userId } = req.
   console.log(req.params);
 
   const response = await addCrewPost(crewId, createCrewPostRequest(req.body));

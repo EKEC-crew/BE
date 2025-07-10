@@ -21,11 +21,6 @@ import routes from "./route/route.js";
 const app = express();
 const port = process.env.PORT;
 
-<<<<<<< HEAD
-app.use("/api", routes);
-=======
->>>>>>> develop
-
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
  */
@@ -70,7 +65,7 @@ app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형
 // 미들웨어 설정
 app.use(express.json()); // JSON 본문 파싱
 
-app.use('/api', routes); // 라우터 연결
+app.use("/api", routes); // 라우터 연결
 
 //전역 에러 처리 미들웨어는 모든 미들웨어와 라우터 등록 이후에 맨 마지막에 위치해야 합니다.
 /**

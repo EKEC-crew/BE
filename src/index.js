@@ -27,14 +27,14 @@ const port = process.env.PORT;
  */
 app.use((req, res, next) => {
   res.success = (success) => {
-    return res.json({ resultType: "SUCCESS", error: null, success });
+    return res.json({ resultType: "SUCCESS", error: null, data:success });
   };
 
   res.error = ({ errorCode = "unknown", reason = null, data = null }) => {
     return res.json({
       resultType: "FAIL",
       error: { errorCode, reason, data },
-      success: null,
+      data: null,
     });
   };
 

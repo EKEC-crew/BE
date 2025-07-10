@@ -10,6 +10,12 @@ import express from "express"; // -> ES Module
 import swaggerAutogen from "swagger-autogen";
 import swaggerUiExpress from "swagger-ui-express";
 
+//session, passport 세팅
+import { prisma } from "./db.config.js";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import session from "express-session";
+import passport from "passport";
+
 import routes from './route/route.js'
 
 const app = express();
@@ -34,6 +40,24 @@ app.use((req, res, next) => {
 
   next();
 });
+/** session */
+app.use(
+    session({
+      cookie: {
+        maxAge: 7 * 24 * 60 * 60 * 1000, // ms
+      },
+      resave: false,
+      saveUninitialized: false,
+      secret: process.env.EXPRESS_SESSION_SECRET,
+      store: new PrismaSessionStore(prisma, {
+        checkPeriod: 2 * 60 * 1000, // ms
+        dbRecordIdIsSessionId: true,
+        dbRecordIdFunction: undefined,
+      }),
+    })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors()); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
@@ -98,15 +122,35 @@ app.get("/openapi.json", async (req, res, next) => {
   res.json(result ? result.data : null);
 });
 
+/**logger setting*/
+const myLogger = (req, res, next) => {
+  console.log("LOGGED");
+  next();
+}
+
+app.use(myLogger);
+
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(err.statusCode || 500).error({
+    errorCode: err.errorCode || "unknown",
+    reason: err.reason || err.message || null,
+    data: err.data || null,
+  });
+});
+
 //app.listen() : 서버를 특정포트에서 실행하는 함수
 //서버가 성공적으로 시작되었을때 콜백함수 실행
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
 
-// // "/" 경로의 미들웨어
-// app.get("/", (req, res) => {
-//   // #swagger.ignore = true
-//   console.log("/");
-//   res.send("Hello UMC!");
-// });
+// "/" 경로의 미들웨어
+app.get("/", (req, res) => {
+  // #swagger.ignore = true
+  console.log("/");
+  res.send("Hello UMC!");
+});

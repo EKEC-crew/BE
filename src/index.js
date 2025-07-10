@@ -16,12 +16,13 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
 
-import routes from './route/route.js'
+import routes from "./route/route.js";
 
 const app = express();
 const port = process.env.PORT;
 
-app.use('/api', routes);
+app.use("/api", routes);
+
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
  */
@@ -42,19 +43,19 @@ app.use((req, res, next) => {
 });
 /** session */
 app.use(
-    session({
-      cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000, // ms
-      },
-      resave: false,
-      saveUninitialized: false,
-      secret: process.env.EXPRESS_SESSION_SECRET,
-      store: new PrismaSessionStore(prisma, {
-        checkPeriod: 2 * 60 * 1000, // ms
-        dbRecordIdIsSessionId: true,
-        dbRecordIdFunction: undefined,
-      }),
-    })
+  session({
+    cookie: {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // ms
+    },
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.EXPRESS_SESSION_SECRET,
+    store: new PrismaSessionStore(prisma, {
+      checkPeriod: 2 * 60 * 1000, // ms
+      dbRecordIdIsSessionId: true,
+      dbRecordIdFunction: undefined,
+    }),
+  })
 );
 app.use(passport.initialize());
 app.use(passport.session());
@@ -124,7 +125,7 @@ app.get("/openapi.json", async (req, res, next) => {
 const myLogger = (req, res, next) => {
   console.log("LOGGED");
   next();
-}
+};
 
 app.use(myLogger);
 

@@ -24,8 +24,8 @@ model User {
   birth DateTime?
   phone String?  @unique(map: "phone") @db.VarChar(15)
   image String?  @db.VarChar(50)
-  createdAt DateTime  @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
 
   crew Crew[]
   crewRegister CrewRegister[]
@@ -61,8 +61,8 @@ model Crew {
   introduction String @db.Text
   score Float
   crewCapacity  Int @map("crew_capacity")
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   noticeCount Int @default(0) @map("notice_count")
   postCount Int @default(0) @map("post_count")
   bannerImage String? @map("banner_image") @db.VarChar(50)
@@ -95,7 +95,7 @@ model CrewPlan {
   title String? @db.VarChar(30)
   content String @db.Text
   type Int
-  createdAt DateTime @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
   crewId Int @map("crew_id")
 
   crew Crew @relation(fields: [crewId], references: [id])
@@ -108,8 +108,8 @@ model CrewPlan {
 
 model CrewRegister {
   id  Int @id @default(autoincrement())
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   userId Int @map("user_id")
   crewId Int @map("crew_id")
 
@@ -122,8 +122,8 @@ model CrewRegister {
 model CrewMember {
   id  Int @id @default(autoincrement())
   role  Int
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   userId Int @map("user_id")
   crewId Int @map("crew_id")
 
@@ -156,8 +156,8 @@ model CrewPost {
   title String @db.VarChar(50)
   content String @db.Text
   commentCount Int @map("comment_count") @default(0)
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId  Int @map("crew_id")
   crewMemberId Int @map("crew_member_id")
 
@@ -173,8 +173,8 @@ model CrewPost {
 model CrewPostComment {
   id  Int @id @default(autoincrement())
   content String @db.Text
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   isPublic Int @map("is_public")
   crewMemberId Int @map("crew_member_id")
   postId  Int @map("post_id")
@@ -189,8 +189,8 @@ model CrewNotice {
   id  Int @id @default(autoincrement())
   title String @db.VarChar(50)
   content String @db.Text
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId  Int @map("crew_id")
   crewMemberId Int @map("crew_member_id")
 
@@ -206,8 +206,8 @@ model CrewNotice {
 model CrewNoticeComment {
   id  Int @id @default(autoincrement())
   content String @db.Text
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   crewMemberId Int @map("crew_member_id")
   crewNoticeId  Int @map("crew_notice_id")
 
@@ -220,8 +220,8 @@ model CrewNoticeComment {
 model CrewAlbum {
   id  Int @id @default(autoincrement())
   image String  @db.VarChar(50)
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId  Int @map("crew_id")
   crewMemberId Int @map("crew_member_id")
 
@@ -242,8 +242,8 @@ model Activity {
 
 model CrewActivity {
   id  Int @id @default(autoincrement())
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId  Int @map("crew_id")
   activityId Int @map("activity_id")
 
@@ -262,8 +262,8 @@ model Style {
 }
 model CrewStyle {
   id  Int @id @default(autoincrement())
-  createdAt DateTime @map("created_at")
-  modifiedAt DateTime? @map("modified_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId  Int @map("crew_id")
   styleId Int @map("style_id")
 
@@ -289,7 +289,7 @@ model Alarm {
   content String @db.Text
   status Int @default(0)
   type AlarmType
-  createdAt DateTime @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
   userId Int @map("user_id")
   crewId Int @map("crew_id")
   noticeId Int @map("notice_id")

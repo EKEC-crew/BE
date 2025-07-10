@@ -21,7 +21,10 @@ import routes from "./route/route.js";
 const app = express();
 const port = process.env.PORT;
 
+<<<<<<< HEAD
 app.use("/api", routes);
+=======
+>>>>>>> develop
 
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
@@ -67,6 +70,8 @@ app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형
 // 미들웨어 설정
 app.use(express.json()); // JSON 본문 파싱
 
+app.use('/api', routes); // 라우터 연결
+
 //전역 에러 처리 미들웨어는 모든 미들웨어와 라우터 등록 이후에 맨 마지막에 위치해야 합니다.
 /**
  * 전역 오류를 처리하기 위한 미들웨어
@@ -111,8 +116,8 @@ app.get("/openapi.json", async (req, res, next) => {
   const routes = ["./src/index.js"];
   const doc = {
     info: {
-      title: "UMC 8th",
-      description: "UMC 8th Node.js 테스트 프로젝트입니다.",
+      title: "EKEC 이크에크",
+      description: "EKEC 이크에크 프로젝트입니다.",
     },
     host: "localhost:3000",
   };

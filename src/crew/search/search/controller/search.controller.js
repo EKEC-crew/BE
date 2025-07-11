@@ -198,7 +198,7 @@ export const handleAdvancedSearch = async (req, res, next) => {
                                             noticeCount:{type:"number", example:1},
                                             postCount:{type:"number", example:5},
                                             bannerImage:{type:"string", example:"banner.jpg"},
-                                            ageLimit:{type:"number", example:20},
+                                            ageLimit:{type:"number", example:1},
                                             genderLimit:{type:"number", example:1},
                                             ownerName:{type:"string", example:"홍길동"},
                                             crewCategory:{type:"string", example:"스터디"},

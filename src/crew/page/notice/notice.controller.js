@@ -7,27 +7,35 @@ import * as noticeService from "./notice.service.js";
 export const getNotices = async (req, res, next) => {
   try {
     const { crewId } = req.params;
-    //const result = await noticeService.getNotices(crewId);
-    //res.success(result); //성공 응답
+    const result = await noticeService.getNotices(crewId);
 
-    res.success({ message: "Crew ${crewId}의 공지사항 목록입니다." });
+    res.success(result); //성공 응답
+
+    res.success({ message: `Crew ${crewId}의 공지사항 목록입니다.` });
   } catch (err) {
     next(err); // 에러 발생 시 전역 에러 핸들러로 전달
   }
 };
 
 /*
- * 2. 특정 크루 공지 작성
+ * 2. 공지 작성
  */
 export const createNotice = async (req, res, next) => {
   try {
-    const { crewId } = req.params;
-    const noticeData = req.body;
-    console.log("Creating notice for crew: ${crewId", noticeData);
+    // 1. 요청(request)에서 필요한 정보를 가져옵니다.
+    const { crewId } = req.params; // URL 경로에서 crewId 획득
+    const noticeData = req.body; // 요청 본문에서 title, content 획득
 
-    // const result = await noticeService.createNotice(crewId, noticeData);
-    // res.success(result);
-    res.success({ message: "Crew ${crewId}에 새로운 공지가 작성되었습니다." });
+    // 2. 테스트를 위해 임시로 사용자 ID를 1로 설정
+    //const userId = req.user.id;
+    const userId = 1;
+
+    const newNotice = await noticeService.createNotice(
+      crewId,
+      userId,
+      noticeData
+    );
+    res.success(newNotice);
   } catch (err) {
     next(err);
   }

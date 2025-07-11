@@ -49,6 +49,8 @@ export const createNotice = async (crewId, userId, noticeData) => {
   // 2. 크루 맴버가 아니라면 에러 발생
   if (!crewMember) {
     throw new Error("공지 작성 권한이 없습니다. 크루 멤버인지 확인하세요.");
+    err.statusCode = 403;
+    throw err;
   }
 
   // 3. 공지를 생성하고, 작성자(crewMember) 정보를 연결합니다.

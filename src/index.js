@@ -21,6 +21,12 @@ import routes from "./route/route.js";
 const app = express();
 const port = process.env.PORT;
 
+//테스트용
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} --- request received`);
+  next();
+});
+
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
  */

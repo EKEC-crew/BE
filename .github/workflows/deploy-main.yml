@@ -34,7 +34,7 @@ jobs:
       - name: Copy Workspace
         run: |
           ssh EKEC_EC2 'sudo mkdir -p /opt/app/EKEC'
-          ssh EKEC_EC2'sudo chown ubuntu:ubuntu /opt/app/EKEC'
+          ssh EKEC_EC2 'sudo chown ubuntu:ubuntu /opt/app/EKEC'
           scp -r ./[!.]* EKEC_EC2:/opt/app/EKEC
 
       - name: Install dependencies

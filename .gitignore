@@ -7,3 +7,4 @@ node_modules/
 
 #generated 무시
 src/generated/
+prisma/migrations

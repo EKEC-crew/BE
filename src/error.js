@@ -21,3 +21,15 @@ export class InvaildInputValueError extends Error {
     this.data = data;
   }
 }
+
+// 지원하지 않는 정렬 방식
+export class UnsupportedSortTypeError extends Error {
+  errorCode = "S001";
+  statusCode = 400
+
+  constructor(reason = "지원하지 않는 정렬 방식입니다.", data = null) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}

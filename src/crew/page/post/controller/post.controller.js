@@ -1,4 +1,4 @@
-import {StatusCodes} from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import * as postRequest from "../dto/request/post.request.dto.js";
 import * as postService from "../service/post.service.js";
 
@@ -7,7 +7,7 @@ export const readPostsByCrew = async (req, res, next) => {
 
   const { crewId } = req.params;
 
-  const response = await postService.getPostsByCrew(crewId);
+  const response = await postService.getPostsByCrew(postRequest.useCrewIdRequest(crewId));
   // #region Swagger: 게시글 리스트 조회 API
   /*
     #swagger.summary = '게시글 리스트 조회 API';
@@ -60,9 +60,9 @@ export const createCrewPost = async (req, res, next) => {
 
   const { crewId } = req.params;
   const { userId } = req.user;
-  console.log("user : ", userId, "\n","params: ", req.params);
+  console.log("user : ", userId, "\n", "params: ", req.params);
 
-  const response = await postService.addCrewPost(userId, crewId, postRequest.createCrewPostRequest(req.body));
+  const response = await postService.addCrewPost(postRequest.createCrewPostRequest(userId, crewId, req.body));
 
   res.status(StatusCodes.OK).success(response);
 }
@@ -73,7 +73,7 @@ export const readCrewPost = async (req, res, next) => {
   const { crewId, postId } = req.params;
   console.log(req.params);
 
-  const response = await postService.getCrewPost(crewId, postId);
+  const response = await postService.getCrewPost(postRequest.useCrewAndPostIdRequest(crewId, postId));
 
   res.status(StatusCodes.OK).success(response);
 }
@@ -82,9 +82,11 @@ export const updateCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 수정을 요청했습니다.");
 
   const { crewId, postId } = req.params;
+  const { userId } = req.user;
+
   console.log(req.params);
 
-  const response = await postService.modifyCrewPost(crewId, postId, updateCrewPostRequest(req.body));
+  const response = await postService.modifyCrewPost(postRequest.updateCrewPostRequest(userId, crewId, postId, req.body));
 
   res.status(StatusCodes.OK).success(response);
 }
@@ -93,6 +95,8 @@ export const deleteCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 삭제를 요청했습니다.");
 
   const { crewId, postId } = req.params;
+  const { userId } = req.user;
+
   console.log(req.params);
 
   const response = await postService.removeCrewPost(crewId, postId);
@@ -147,7 +151,7 @@ export const updateCrewPostComment = async (req, res, next) => {
 export const deleteCrewPostComment = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 특정 댓글 삭제를 요청했습니다.");
 
-  const { crewId, postId , commentId} = req.params;
+  const { crewId, postId, commentId } = req.params;
   console.log(req.params);
 
   const response = await postService.removeCrewPostComment(crewId, postId, commentId);

@@ -1,18 +1,18 @@
 import express from 'express';
-import {verifyToken} from "../../../../middleware/authMiddleware.js";
-import {readPostsByCrew, createCrewPost, readCrewPost, updateCrewPost, deleteCrewPost, toggleCrewPostLike, readCommentsByCrewPost, createCrewPostComment, updateCrewPostComment, deleteCrewPostComment} from "../controller/post.controller.js";
+import { verifyToken } from "../../../../middleware/authMiddleware.js";
+import * as postController from "../controller/post.controller.js";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
-router.get('/list', readPostsByCrew);
-router.post('/', verifyToken, createCrewPost);
-router.get('/{postId}', readCrewPost);
-router.put('/{postId}', verifyToken, updateCrewPost);
-router.delete('/{postId}', verifyToken, deleteCrewPost);
-router.post('/{postId}/like', verifyToken, toggleCrewPostLike);
-router.get('/{postId}/comment/list', readCommentsByCrewPost);
-router.post('/{postId}/comment', createCrewPostComment);
-router.put('/{postId}/comment/{commentId}', updateCrewPostComment);
-router.delete('/{postId}/comment/{commentId}', deleteCrewPostComment);
+router.get('/list', postController.readPostsByCrew);
+router.post('/', verifyToken, postController.createCrewPost);
+router.get('/:postId', postController.readCrewPost);
+router.put('/:postId', verifyToken, postController.updateCrewPost);
+router.delete('/:postId', verifyToken, postController.deleteCrewPost);
+router.post('/:postId/like', verifyToken, postController.toggleCrewPostLike);
+router.get('/:postId/comment/list', postController.readCommentsByCrewPost);
+router.post('/:postId/comment', postController.createCrewPostComment);
+router.put('/:postId/comment/:commentId', postController.updateCrewPostComment);
+router.delete('/:postId/comment/:commentId', postController.deleteCrewPostComment);
 
 export default router;

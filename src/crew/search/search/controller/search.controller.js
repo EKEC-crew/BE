@@ -27,7 +27,7 @@ export const handleDefaultSearch = async (req, res, next) => {
         }
         #swagger.parameters['sort'] = {
             in: 'query',
-            description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순)",
+            description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
             required:true,
             example:"1"
         },
@@ -216,7 +216,7 @@ export const handleAdvancedSearch = async (req, res, next) => {
     }
     #swagger.parameters['sort'] = {
         in: 'query',
-        description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순)",
+        description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
         required:true,
         example:"1"
     },

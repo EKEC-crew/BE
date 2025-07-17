@@ -1,12 +1,12 @@
-import {prisma} from "../../../../db.config.js";
+import { prisma } from "../../../../db.config.js";
 
 export const getPostsByCrewId = async (crewId) => {
-	try{
+	try {
 		const postList = await prisma.crewPost.findMany({
-			where:{
+			where: {
 				crewId: crewId,
 			},
-			orderBy:{
+			orderBy: {
 				createdAt: 'desc',
 			}
 		});
@@ -15,17 +15,17 @@ export const getPostsByCrewId = async (crewId) => {
 		}
 		console.log(postList);
 		return postList;
-	} catch(err){
+	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
 		)
 	}
 }
 
-export const createCrewPost = async ({crewMemberId, crewId, title, content}) => {
-	try{
+export const createCrewPost = async ({ crewMemberId, crewId, title, content }) => {
+	try {
 		const post = await prisma.crewPost.create({
-			data:{
+			data: {
 				title,
 				content,
 				commentCount: 0,
@@ -35,25 +35,43 @@ export const createCrewPost = async ({crewMemberId, crewId, title, content}) => 
 			}
 		})
 		return post;
-	}catch (err){
+	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
 		)
 	}
 }
 
-export const findCrewMemberId = async({userId, crewId}) => {
-	try{
+export const findCrewMemberId = async ({ userId, crewId }) => {
+	try {
 		const isExist = await prisma.crewMember.findFirstOrThrow(
 			{
-				where:{
+				where: {
 					userId: userId,
 					crewId: crewId,
 				}
 			}
 		)
 		return isExist.id;
-	}catch (err){
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const isExistCrew = async ({ crewId }) => {
+	try {
+		const crew = await prisma.crew.findUnique(
+			{
+				where: {
+					id: crewId,
+				}
+			}
+		)
+
+		return crew !== null;
+	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
 		)

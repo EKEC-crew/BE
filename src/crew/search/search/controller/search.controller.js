@@ -100,12 +100,13 @@ export const handleDefaultSearch = async (req, res, next) => {
                             reason: "올바른 검색어를 입력해주세요.",
                             "data": {
                                 "name": "",
-                                "page": "1"
+                                "page": "1",
+                                "sort": "1",
                             }
                         }
                     }
                 },
-               InvalidPage : {
+                InvalidPage : {
                     summary:"올바르지 않은 페이지 번호",
                     value:{
                         resultType: "FAIL",
@@ -113,7 +114,9 @@ export const handleDefaultSearch = async (req, res, next) => {
                             errorCode : "I001",
                             reason: "올바른 페이지를 지정해주세요.",
                             "data": {
-                                "name":""
+                                "name":"모임",
+                                "page":"abc",
+                                "sort":"1",
                             }
                         }
                     }
@@ -126,6 +129,7 @@ export const handleDefaultSearch = async (req, res, next) => {
                             errorCode : "I001",
                             reason: "올바른 정렬 방식을 지정해주세요.",
                             "data": {
+                                "name": "모임",
                                 "page": "1",
                                 "sort": "abc"
                             }

@@ -2,30 +2,35 @@ import { } from "../../../../error.js";
 import * as postResponse from "../dto/response/post.response.dto.js"
 import * as postRepository from "../repository/post.repository.js"
 
-export const getPostsByCrew = async (crewId) => {
+
+export const readPostsByCrew = async ({ crewId }) => {
 	try {
-		const isExistCrew = postRepository.isExistCrew(crewId);
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {
-			throw new Error;
+			throw new Error('존재하지 않는 크루입니다.');
 		}
-		const postList = await postRepository.getPostsByCrewId(crewId);
+		const postList = await postRepository.getPostsByCrewId({ crewId });
 		return postResponse.CrewPostListResponse(postList);
 	} catch (err) {
 		throw err;
 	}
 }
 
-export const addCrewPost = async (userId, crewId, data) => {
+export const createCrewPost = async ({ userId, crewId, title, content }) => {
 	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
 		const crewMemberId = await postRepository.findCrewMemberId({
-			userId: userId,
-			crewId: crewId,
+			userId,
+			crewId,
 		})
 		const post = await postRepository.createCrewPost({
-			crewMemberId: crewMemberId,
-			crewId: crewId,
-			title: data.title,
-			content: data.content,
+			crewMemberId,
+			crewId,
+			title,
+			content,
 		})
 
 		return postResponse.CrewPostResponse(post);
@@ -34,16 +39,63 @@ export const addCrewPost = async (userId, crewId, data) => {
 	}
 }
 
-export const getCrewPost = async (data) => {
+export const readCrewPost = async ({ crewId, postId }) => {
+	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
 
+		const post = await postRepository.getPostByPostId({ postId });
+		return postResponse.CrewPostResponse(post);
+	} catch (err) {
+		throw err;
+	}
 }
 
-export const modifyCrewPost = async (data) => {
+export const updateCrewPost = async ({ userId, crewId, postId, title, content }) => {
+	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
+		const crewMemberId = await postRepository.findCrewMemberId({
+			userId,
+			crewId,
+		})
 
+		const post = await postRepository.updatePostBypostId({
+			crewMemberId: crewMemberId,
+			postId,
+			title,
+			content,
+		});
+		return postResponse.CrewPostResponse(post);
+	} catch (err) {
+		throw err;
+	}
 }
 
-export const removeCrewPost = async (data) => {
+export const deleteCrewPost = async ({ userId, crewId, postId }) => {
+	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
+		const crewMemberId = await postRepository.findCrewMemberId({
+			userId,
+			crewId,
+		})
 
+		const post = await postRepository.removeCrewPostBypostId({
+			crewMemberId: crewMemberId,
+			postId,
+		})
+
+		return postResponse.CrewPostResponse(post);
+	} catch (err) {
+		throw err;
+	}
 }
 
 export const likeCrewPost = async (data) => {

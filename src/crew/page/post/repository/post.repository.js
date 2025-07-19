@@ -1,10 +1,10 @@
 import { prisma } from "../../../../db.config.js";
 
-export const getPostsByCrewId = async (crewId) => {
+export const getPostsByCrewId = async ({ crewId }) => {
 	try {
 		const postList = await prisma.crewPost.findMany({
 			where: {
-				crewId: crewId,
+				crewId,
 			},
 			orderBy: {
 				createdAt: 'desc',
@@ -98,6 +98,110 @@ export const updatePostBypostId = async ({ crewMemberId, postId, title, content 
 			}
 		})
 		return updatedPost;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const removeCrewPostBypostId = async ({ crewMemberId, postId }) => {
+	try {
+		const post = await prisma.crewPost.findUnique({
+			where: {
+				id: postId
+			}
+		})
+		if (post.crewMemberId !== crewMemberId) {
+			throw message('작성자가 아닙니다')
+		}
+		const deletedPost = await prisma.crewPost.delete({
+			where: {
+				id: postId,
+			},
+		})
+		if (!deletedPost) {
+			throw message('해당 게시글은 없습니다.')
+		} else {
+			return deletedPost
+		}
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const likeCrewPost = async ({ crewMemberId, postId }) => {
+	try {
+		const post = await prisma.crewPost.findUnique({
+			where: { id: postId },
+		});
+
+		const existingLiked = await prisma.crewPostLike.findUnique({
+			where: {
+				postId_crewMemberId: {
+					crewMemberId: crewMemberId,
+					postId: postId,
+				}
+			}
+		})
+
+		if (!existingLiked) {
+			const newLikeCount = post.likeCount + 1;
+
+			await prisma.crewPost.update({
+				where: { id: postId },
+				data: {
+					likeCount: newLikeCount,
+				},
+			});
+
+			const likeInfo = await prisma.crewPostLike.create({
+				include: {
+					crewPost: {
+						select: {
+							likeCount: true
+						}
+					}
+				},
+				data: {
+					crewMemberId: crewMemberId,
+					postId: postId,
+				}
+			})
+			return likeInfo;
+		} else {
+			const toggledIsLiked = existingLiked.isLiked === 1 ? 0 : 1;
+			const newLikeCount = toggledIsLiked === 1 ? post.likeCount + 1 : post.likeCount - 1;
+
+			await prisma.crewPost.update({
+				where: { id: postId },
+				data: {
+					likeCount: newLikeCount,
+				},
+			});
+
+			const likeInfo = await prisma.crewPostLike.update({
+				where: {
+					postId_crewMemberId: {
+						crewMemberId: crewMemberId,
+						postId: postId,
+					}
+				},
+				include: {
+					crewPost: {
+						select: {
+							likeCount: true
+						}
+					}
+				},
+				data: {
+					isLiked: toggledIsLiked,
+				}
+			})
+			return likeInfo;
+		}
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

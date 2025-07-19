@@ -5,14 +5,14 @@ import * as postController from "../controller/post.controller.js";
 const router = express.Router({ mergeParams: true });
 
 router.get('/list', postController.readPostsByCrew);
-router.post('/', verifyToken, postController.createCrewPost);
+router.post('/', postController.createCrewPost); //인증 필요
 router.get('/:postId', postController.readCrewPost);
-router.put('/:postId', verifyToken, postController.updateCrewPost);
-router.delete('/:postId', verifyToken, postController.deleteCrewPost);
-router.post('/:postId/like', verifyToken, postController.toggleCrewPostLike);
+router.put('/:postId', postController.updateCrewPost); //인증 필요
+router.delete('/:postId', postController.deleteCrewPost); //인증 필요
+router.post('/:postId/like', postController.toggleCrewPostLike); //인증 필요
 router.get('/:postId/comment/list', postController.readCommentsByCrewPost);
-router.post('/:postId/comment', postController.createCrewPostComment);
-router.put('/:postId/comment/:commentId', postController.updateCrewPostComment);
-router.delete('/:postId/comment/:commentId', postController.deleteCrewPostComment);
+router.post('/:postId/comment', postController.createCrewPostComment); //인증 필요
+router.put('/:postId/comment/:commentId', postController.updateCrewPostComment); //인증 필요
+router.delete('/:postId/comment/:commentId', postController.deleteCrewPostComment); //인증 필요
 
 export default router;

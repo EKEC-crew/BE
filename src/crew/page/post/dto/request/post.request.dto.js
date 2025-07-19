@@ -1,24 +1,37 @@
-export const createCrewPostRequest = (userId, crewId, body) => {
+export const createCrewPostRequest = (crewId, body) => {
     return {
-        userId: Number(userId),
         crewId: Number(crewId),
+        userId: Number(body.userId),
         title: body.title,
         content: body.content,
     };
 }
 
-export const updateCrewPostRequest = (userId, crewId, postId, body) => {
+export const createCrewPostCommentRequest = (body) => {
     return {
-        userId: Number(userId),
-        crewId: Number(crewId),
-        postId: Number(postId),
-        title: body.title,
         content: body.content,
     }
 }
 
-export const createCrewPostCommentRequest = (body) => {
+export const readPostListRequest = (crewId) => {
     return {
+        crewId: Number(crewId),
+    }
+}
+
+export const readPostRequest = (crewId, postId) => {
+    return {
+        crewId: Number(crewId),
+        postId: Number(postId),
+    }
+}
+
+export const updateCrewPostRequest = (crewId, postId, body) => {
+    return {
+        crewId: Number(crewId),
+        postId: Number(postId),
+        userId: Number(body.userId),
+        title: body.title,
         content: body.content,
     }
 }
@@ -29,15 +42,18 @@ export const updateCrewPostCommentRequest = (body) => {
     }
 }
 
-export const useCrewIdRequest = (crewId) => {
-    return {
-        crewId: Number(crewId),
-    }
-}
-
-export const useCrewAndPostIdRequest = (crewId, postId) => {
+export const deleteCrewPostRequest = (crewId, postId, body) => {
     return {
         crewId: Number(crewId),
         postId: Number(postId),
+        userId: Number(body.userId),
+    }
+}
+
+export const toggleCrewPostLikeRequest = (crewId, postId, body) => {
+    return {
+        crewId: Number(crewId),
+        postId: Number(postId),
+        userId: Number(body.userId),
     }
 }

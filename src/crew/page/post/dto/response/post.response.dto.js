@@ -24,3 +24,25 @@ export const CrewPostResponse = (body) => {
 
 	return response;
 }
+
+export const likeCrewPostResponse = (body) => {
+	const likeInfo = body;
+
+	const response = {
+		postId: likeInfo.postId,
+		isLiked: likeInfo.isLiked == 1 ? true : false,
+		likeCount: likeInfo.crewPost.likeCount,
+	}
+
+	return response;
+}
+
+export const CrewPostIdResponse = (body) => {
+	const post = body;
+
+	const response = {
+		postId: post.id,
+	}
+
+	return response;
+}

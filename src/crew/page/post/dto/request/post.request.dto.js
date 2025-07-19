@@ -49,3 +49,11 @@ export const deleteCrewPostRequest = (crewId, postId, body) => {
         userId: Number(body.userId),
     }
 }
+
+export const toggleCrewPostLikeRequest = (crewId, postId, body) => {
+    return {
+        crewId: Number(crewId),
+        postId: Number(postId),
+        userId: Number(body.userId),
+    }
+}

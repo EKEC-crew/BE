@@ -98,8 +98,24 @@ export const deleteCrewPost = async ({ userId, crewId, postId }) => {
 	}
 }
 
-export const likeCrewPost = async (data) => {
-
+export const toggleCrewPostLike = async ({ userId, crewId, postId }) => {
+	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
+		const crewMemberId = await postRepository.findCrewMemberId({
+			userId,
+			crewId,
+		})
+		const likeInfo = await postRepository.likeCrewPost({
+			crewMemberId: crewMemberId,
+			postId,
+		})
+		return postResponse.likeCrewPostResponse(likeInfo);
+	} catch (err) {
+		throw err;
+	}
 }
 export const getCommentsByCrewPost = async (data) => {
 

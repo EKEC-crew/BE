@@ -132,6 +132,83 @@ export const removeCrewPostBypostId = async ({ crewMemberId, postId }) => {
 	}
 }
 
+export const likeCrewPost = async ({ crewMemberId, postId }) => {
+	try {
+		const post = await prisma.crewPost.findUnique({
+			where: { id: postId },
+		});
+
+		const existingLiked = await prisma.crewPostLike.findUnique({
+			where: {
+				postId_crewMemberId: {
+					crewMemberId: crewMemberId,
+					postId: postId,
+				}
+			}
+		})
+
+		if (!existingLiked) {
+			const newLikeCount = post.likeCount + 1;
+
+			await prisma.crewPost.update({
+				where: { id: postId },
+				data: {
+					likeCount: newLikeCount,
+				},
+			});
+
+			const likeInfo = await prisma.crewPostLike.create({
+				include: {
+					crewPost: {
+						select: {
+							likeCount: true
+						}
+					}
+				},
+				data: {
+					crewMemberId: crewMemberId,
+					postId: postId,
+				}
+			})
+			return likeInfo;
+		} else {
+			const toggledIsLiked = existingLiked.isLiked === 1 ? 0 : 1;
+			const newLikeCount = toggledIsLiked === 1 ? post.likeCount + 1 : post.likeCount - 1;
+
+			await prisma.crewPost.update({
+				where: { id: postId },
+				data: {
+					likeCount: newLikeCount,
+				},
+			});
+
+			const likeInfo = await prisma.crewPostLike.update({
+				where: {
+					postId_crewMemberId: {
+						crewMemberId: crewMemberId,
+						postId: postId,
+					}
+				},
+				include: {
+					crewPost: {
+						select: {
+							likeCount: true
+						}
+					}
+				},
+				data: {
+					isLiked: toggledIsLiked,
+				}
+			})
+			return likeInfo;
+		}
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
 export const findCrewMemberId = async ({ userId, crewId }) => {
 	try {
 		const isExist = await prisma.crewMember.findFirstOrThrow(

@@ -333,7 +333,11 @@ export const deleteCrewPost = async (req, res, next) => {
               success: {
                 type: "string", example: 
                 {
-                  "message": "게시글이 삭제되었습니다."
+                  "postId": 7,
+                  "title": "게시글 작성 테스트 제목입니다.",
+                  "content": "게시글 작성 테스트 내용입니다.",
+                  "createdAt": "2025-07-18T03:41:07.805Z",
+                  "commentCount": 0
                 }
               }
             }
@@ -373,9 +377,73 @@ export const toggleCrewPostLike = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 좋아요를 요청했습니다.");
 
   const { crewId, postId } = req.params;
-  console.log(req.params);
+  console.log("user : ", req.body.userId, "params: ", req.params);
 
-  const response = await postService.likeCrewPost(crewId, postId);
+  const response = await postService.toggleCrewPostLike(postRequest.toggleCrewPostLikeRequest(crewId, postId, req.body));
+  // #region Swagger: 특정 크루 특정 게시글 좋아요 API
+  /*
+    #swagger.summary = '특정 크루 특정 게시글 좋아요 API';
+
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              userId: { type: "number", example: "1" }
+            },
+            required: ["userId"]
+          }
+        }
+      }
+    }
+    #swagger.responses[200] = {
+      description: "특정 크루 특정 게시글 좋아요 성공 응답",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "SUCCESS" },
+              error: { type: "object", nullable: true, example: null },
+              success: {
+                type: "string", example: 
+                {
+                  "postId": 2,
+                  "isLiked": true,
+                  "likeCount": 3,
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+    #swagger.responses[400] = {
+      description: "특정 크루 특정 게시글 좋아요 실패 응답",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "FAIL" },
+              error: {
+                type: "object",
+                properties: {
+                  errorCode: { type: "string", example: "400" },
+                  reason: { type: "string" },
+                  data: { type: "object" }
+                }
+              },
+              success: { type: "object", nullable: true, example: null }
+            }
+          }
+        }
+      }
+    };
+  */
+  // #endregion
 
   res.status(StatusCodes.OK).success(response);
 }

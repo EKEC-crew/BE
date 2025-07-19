@@ -5,7 +5,7 @@ import creationRoutes from '../creation/route/creation.route.js'
 import listRoutes from '../list/route/list.route.js'
 import pageRoutes from '../page/route/page.route.js'
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 router.use('/search', searchRoutes);
 router.use('/sort', sortRoutes);
 router.use('/create', creationRoutes);

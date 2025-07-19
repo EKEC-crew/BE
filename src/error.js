@@ -11,7 +11,12 @@ export class DuplicateUserEmailError extends Error {
     this.data = data;
   }
 }
-export class InvaildInputValueError extends Error {
+/**
+ * **\<Error\>**
+ * ***InvalidInputValueError***
+ * 올바르지 않은 값이 입력되었을때 발생하는 에러
+ */
+export class InvalidInputValueError extends Error {
   errorCode = "I001";
   statusCode = 400
 

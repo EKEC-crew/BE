@@ -136,6 +136,7 @@ model CrewMember {
   crewNotice CrewNotice[]
   crewNoticeComment CrewNoticeComment[]
   crewAlbum CrewAlbum[]
+  crewPostLike CrewPostLike[]
 
   @@map("crew_member")
 }
@@ -156,6 +157,7 @@ model CrewPost {
   title String @db.VarChar(50)
   content String @db.Text
   commentCount Int @map("comment_count") @default(0)
+  likeCount Int @map("like_count") @default(0)
   createdAt DateTime @default(now()) @map("created_at")
   modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId  Int @map("crew_id")
@@ -165,9 +167,23 @@ model CrewPost {
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
 
   crewPostComment CrewPostComment[]
+  crewPostLike CrewPostLike[]
   alarm Alarm[]
 
   @@map("crew_post")
+}
+
+model CrewPostLike {
+  id  Int @id @default(autoincrement())
+  isLiked Int @map("is_liked") @default(1)
+  crewMemberId Int @map("crew_member_id")
+  postId  Int @map("post_id")
+
+  crewPost CrewPost @relation(fields: [postId], references: [id])
+  crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
+
+  @@unique([postId, crewMemberId])
+  @@map("crew_post_like")
 }
 
 model CrewPostComment {

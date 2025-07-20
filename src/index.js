@@ -118,9 +118,19 @@ app.get("/openapi.json", async (req, res, next) => {
   const doc = {
     info: {
       title: "EKEC 이크에크",
+      version: '1.0.0',
       description: "EKEC 이크에크 프로젝트입니다.",
     },
-    host: "localhost:3000",
+    servers: [
+      {
+        url: 'http://localhost:3000',
+        description: "개발 서버",
+      },
+      {
+        url: "http://43.203.63.31:3000",
+        description: "라이브 서버",
+      }
+    ],
   };
 
   const result = await swaggerAutogen(options)(outputFile, routes, doc);

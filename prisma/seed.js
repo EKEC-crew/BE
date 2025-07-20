@@ -59,6 +59,21 @@ async function main() {
     },
   });
 
+  // 5. 공지사항 더미 데이터 삽입
+  await prisma.crewNotice.create({
+    data: {
+      title: "테스트 공지",
+      content: "API 작동 테스트",
+      createdAt: new Date(),
+      crew: {
+        connect: { id: crew1.id },
+      },
+      crewMember: {
+        connect: { id: member1.id },
+      },
+    },
+  });
+
   console.log("✅ 시드 데이터 생성 완료:");
   console.log(`- 유저: ${user1.nickname} (ID: ${user1.id})`);
   console.log(`- 크루: ${crew1.title} (ID: ${crew1.id})`);

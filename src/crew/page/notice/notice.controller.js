@@ -9,9 +9,12 @@ export const getNotices = async (req, res, next) => {
     const { crewId } = req.params;
     const result = await noticeService.getNotices(crewId);
 
-    res.success(result); //성공 응답
+    //res.success(result); //성공 응답
 
-    res.success({ message: `Crew ${crewId}의 공지사항 목록입니다.` });
+    res.success({
+      message: `Crew ${crewId}의 공지사항 목록입니다.`,
+      data: result,
+    });
   } catch (err) {
     next(err); // 에러 발생 시 전역 에러 핸들러로 전달
   }
@@ -20,6 +23,23 @@ export const getNotices = async (req, res, next) => {
 /*
  * 2. 공지 작성
  */
+// #swagger.tags = ['Notice']
+// #swagger.description = '공지 생성 API'
+// #swagger.requestBody = {
+//   required: true,
+//   content: {
+//     "application/json": {
+//       schema: {
+//         type: "object",
+//         properties: {
+//           title: { type: "string", example: "공지 제목" },
+//           content: { type: "string", example: "공지 내용" }
+//         },
+//         required: ["title", "content"]
+//       }
+//     }
+//   }
+// }
 export const createNotice = async (req, res, next) => {
   try {
     // 1. 요청(request)에서 필요한 정보를 가져옵니다.
@@ -63,10 +83,13 @@ export const updateNotice = async (req, res, next) => {
     const noticeUpdateData = req.body; // { title, content }
 
     // 인증 미들웨어로부터 사용자 ID 획득
-    const userId = req.user.id;
+    const userId = req.user?.id;
 
     if (!userId) {
-      return res.fail({ message: "사용자 인증이 필요합니다." }, 401);
+      return res.status(401).error({
+        errorCode: "UNAUTHORIZED",
+        reason: "사용자 인증이 필요합니다.",
+      });
     }
 
     const updatedNotice = await noticeService.updateNotice(
@@ -88,10 +111,13 @@ export const deleteNotice = async (req, res, next) => {
     const { noticeId } = req.params;
 
     // 인증 미들웨어로부터 사용자 ID 획득
-    const userId = req.user.id;
+    const userId = req.user?.id;
 
     if (!userId) {
-      return res.fail({ message: "사용자 인증이 필요합니다." }, 401);
+      return res.status(401).error({
+        errorCode: "UNAUTHORIZED",
+        reason: "사용자 인증이 필요합니다.",
+      });
     }
 
     const result = await noticeService.deleteNotice(noticeId, userId);

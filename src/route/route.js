@@ -7,5 +7,4 @@ const router = express.Router();
 router.use("/crew", crewRoutes);
 router.use("/auth", authRoutes);
 router.use("/alarm", alarmRoutes);
-router.use("/crew/:crewId/notice", noticeRouter);
 export default router;

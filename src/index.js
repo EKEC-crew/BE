@@ -15,6 +15,7 @@ import { prisma } from "./db.config.js";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
+import fs from "fs"; // 추가
 
 import routes from "./route/route.js";
 
@@ -26,6 +27,11 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} --- request received`);
   next();
 });
+
+// ✅ swagger-output.json 읽기
+const swaggerFile = JSON.parse(
+  fs.readFileSync(new URL("./swagger-output.json", import.meta.url))
+);
 
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
@@ -45,6 +51,7 @@ app.use((req, res, next) => {
 
   next();
 });
+
 /** session */
 app.use(
   session({
@@ -73,23 +80,20 @@ app.use(express.json()); // JSON 본문 파싱
 
 app.use("/api", routes); // 라우터 연결
 
-//전역 에러 처리 미들웨어는 모든 미들웨어와 라우터 등록 이후에 맨 마지막에 위치해야 합니다.
-/**
- * 전역 오류를 처리하기 위한 미들웨어
-=> 이 미들웨어는 Controller 내에서 별도로 처리하지 않은 오류가 발생할 경우, 
-모두 잡아서 공통된 오류 응답으로 내려주게 됩니다.
- */
-app.use((err, req, res, next) => {
-  if (res.headersSent) {
-    return next(err);
-  }
-
-  res.status(err.statusCode || 500).error({
-    errorCode: err.errorCode || "unknown",
-    reason: err.reason || err.message || null,
-    data: err.data || null,
-  });
+// "/" 경로의 미들웨어 (app.listen 앞으로 이동)
+app.get("/", (req, res) => {
+  // #swagger.ignore = true
+  console.log("/");
+  res.send("Hello UMC!");
 });
+
+/**logger setting*/
+const myLogger = (req, res, next) => {
+  console.log("LOGGED");
+  next();
+};
+
+app.use(myLogger);
 
 //Swagger 세팅
 app.use(
@@ -127,13 +131,19 @@ app.get("/openapi.json", async (req, res, next) => {
   res.json(result ? result.data : null);
 });
 
-/**logger setting*/
-const myLogger = (req, res, next) => {
-  console.log("LOGGED");
-  next();
-};
+app.use("/docs", swaggerUiExpress.serve, swaggerUiExpress.setup(swaggerFile)); //추가
 
-app.use(myLogger);
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(err.statusCode || 500).error({
+    errorCode: err.errorCode || "unknown",
+    reason: err.reason || err.message || null,
+    data: err.data || null,
+  });
+});
 
 app.use((err, req, res, next) => {
   if (res.headersSent) {
@@ -151,11 +161,4 @@ app.use((err, req, res, next) => {
 //서버가 성공적으로 시작되었을때 콜백함수 실행
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
-});
-
-// "/" 경로의 미들웨어
-app.get("/", (req, res) => {
-  // #swagger.ignore = true
-  console.log("/");
-  res.send("Hello UMC!");
 });

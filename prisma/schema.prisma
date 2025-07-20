@@ -189,7 +189,7 @@ model CrewNotice {
   id  Int @id @default(autoincrement())
   title String @db.VarChar(50)
   content String @db.Text
-  createdAt DateTime @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at") //수정함
   modifiedAt DateTime? @map("modified_at")
   crewId  Int @map("crew_id")
   crewMemberId Int @map("crew_member_id")

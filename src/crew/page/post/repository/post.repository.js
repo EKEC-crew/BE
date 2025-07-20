@@ -209,6 +209,36 @@ export const likeCrewPost = async ({ crewMemberId, postId }) => {
 	}
 }
 
+//크루 게시글 댓글 관련
+export const addCrewPostComment = async ({ crewMemberId, postId, content, isPublic }) => {
+	try {
+		const comment = await prisma.crewPostComment.create({
+			data: {
+				content: content,
+				isPublic: isPublic,
+				crewMemberId: crewMemberId,
+				postId: postId,
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true
+							}
+						}
+					}
+				}
+			}
+		})
+		return comment;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
 export const findCrewMemberId = async ({ userId, crewId }) => {
 	try {
 		const isExist = await prisma.crewMember.findFirstOrThrow(
@@ -233,6 +263,24 @@ export const isExistCrew = async ({ crewId }) => {
 			{
 				where: {
 					id: crewId,
+				}
+			}
+		)
+
+		return !!isExist;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const isExistPost = async ({ postId }) => {
+	try {
+		const isExist = await prisma.crewPost.findUnique(
+			{
+				where: {
+					id: postId,
 				}
 			}
 		)

@@ -7,9 +7,13 @@ export const createCrewPostRequest = (crewId, body) => {
     };
 }
 
-export const createCrewPostCommentRequest = (body) => {
+export const createCrewPostCommentRequest = (crewId, postId, body) => {
     return {
+        crewId: Number(crewId),
+        postId: Number(postId),
+        userId: Number(body.userId),
         content: body.content,
+        isPublic: body.isPublic,
     }
 }
 
@@ -57,3 +61,4 @@ export const toggleCrewPostLikeRequest = (crewId, postId, body) => {
         userId: Number(body.userId),
     }
 }
+

@@ -39,7 +39,18 @@ export const likeCrewPostResponse = (body) => {
 	return response;
 }
 
-export const CrewPostCommentResponse = (body) => {
+export const CrewCommentListResponse = (body) => {
+	const response = body.map(comment => ({
+		commentId: comment.id,
+		content: comment.content,
+		nickname: comment.crewMember.user.nickname,
+		createdAt: format(toZonedTime(comment.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+	}))
+
+	return response;
+}
+
+export const CrewCommentResponse = (body) => {
 	const comment = body;
 
 	const response = {

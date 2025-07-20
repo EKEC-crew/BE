@@ -21,9 +21,6 @@ export const getPostsByCrewId = async ({ crewId }) => {
 				}
 			}
 		});
-		if (!postList || postList.length === 0) {
-			throw new Error("게시글이 존재하지 않습니다.");
-		}
 		return postList;
 	} catch (err) {
 		throw new Error(
@@ -210,6 +207,35 @@ export const likeCrewPost = async ({ crewMemberId, postId }) => {
 }
 
 //크루 게시글 댓글 관련
+
+export const getCommentsByPostId = async ({ postId }) => {
+	try {
+		const commentList = await prisma.crewPostComment.findMany({
+			where: {
+				postId: postId,
+			},
+			orderBy: {
+				createdAt: 'asc',
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true
+							}
+						}
+					}
+				}
+			}
+		})
+		return commentList;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
 export const addCrewPostComment = async ({ crewMemberId, postId, content, isPublic }) => {
 	try {
 		const comment = await prisma.crewPostComment.create({

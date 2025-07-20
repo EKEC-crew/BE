@@ -454,7 +454,65 @@ export const readCommentsByCrewPost = async (req, res, next) => {
   const { crewId, postId } = req.params;
   console.log(req.params);
 
-  const response = await postService.getCommentsByCrewPost(crewId, postId);
+  const response = await postService.readCommentsByCrewPost(postRequest.readCommentListRequest(crewId, postId));
+  // #region Swagger: 게시글 댓글 리스트 조회 API
+  /*
+    #swagger.summary = '게시글 댓글 리스트 조회 API';
+    #swagger.responses[200] = {
+      description: "게시글 댓글 리스트 조회 성공 응답",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "SUCCESS" },
+              error: { type: "object", nullable: true, example: null },
+              data: {
+                type: "string", example:  
+                [
+                  {
+                    "commentId": 1,
+                    "content": "게시글 작성 테스트 내용1 입니다.",
+                    "nickname": "철수짱1",
+                    "createdAt": "2025-07-20 12:13:07"
+                  },
+                  {
+                    "commentId": 2,
+                    "content": "게시글 작성 테스트 내용2 입니다.",
+                    "nickname": "철수짱2",
+                    "createdAt": "2025-07-20 12:13:24"
+                  },
+                ]
+              }
+            }
+          }
+        }
+      }
+    };
+    #swagger.responses[400] = {
+      description: "게시글 리스트 조회 실패 응답",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "FAIL" },
+              error: {
+                type: "object",
+                properties: {
+                  errorCode: { type: "string", example: "400" },
+                  reason: { type: "string" },
+                  data: { type: "object" }
+                }
+              },
+              success: { type: "object", nullable: true, example: null }
+            }
+          }
+        }
+      }
+    };
+  */
+  // #endregion
 
   res.status(StatusCodes.OK).success(response);
 }

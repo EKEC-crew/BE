@@ -30,6 +30,13 @@ export const readPostRequest = (crewId, postId) => {
     }
 }
 
+export const readCommentListRequest = (crewId, postId) => {
+    return {
+        crewId: Number(crewId),
+        postId: Number(postId),
+    }
+}
+
 export const updateCrewPostRequest = (crewId, postId, body) => {
     return {
         crewId: Number(crewId),

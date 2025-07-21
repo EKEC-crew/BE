@@ -127,7 +127,7 @@ app.get("/openapi.json", async (req, res, next) => {
         description: "개발 서버",
       },
       {
-        url: "http://43.203.63.31:3000",
+        url: "https://api.ekec.site",
         description: "라이브 서버",
       }
     ],

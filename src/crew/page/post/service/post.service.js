@@ -45,6 +45,10 @@ export const readCrewPost = async ({ crewId, postId }) => {
 		if (!isExistCrew) {
 			throw new Error('존재하지 않는 크루입니다.');
 		}
+		const isExistPost = await postRepository.isExistPost({ postId });
+		if (!isExistPost) {
+			throw new Error('존재하지 않는 게시글입니다.');
+		}
 
 		const post = await postRepository.getPostByPostId({ postId });
 		return postResponse.CrewPostResponse(post);
@@ -58,6 +62,10 @@ export const updateCrewPost = async ({ userId, crewId, postId, title, content })
 		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {
 			throw new Error('존재하지 않는 크루입니다.');
+		}
+		const isExistPost = await postRepository.isExistPost({ postId });
+		if (!isExistPost) {
+			throw new Error('존재하지 않는 게시글입니다.');
 		}
 		const crewMemberId = await postRepository.findCrewMemberId({
 			userId,
@@ -82,6 +90,11 @@ export const deleteCrewPost = async ({ userId, crewId, postId }) => {
 		if (!isExistCrew) {
 			throw new Error('존재하지 않는 크루입니다.');
 		}
+		const isExistPost = await postRepository.isExistPost({ postId });
+		if (!isExistPost) {
+			throw new Error('존재하지 않는 게시글입니다.');
+		}
+
 		const crewMemberId = await postRepository.findCrewMemberId({
 			userId,
 			crewId,
@@ -104,6 +117,11 @@ export const toggleCrewPostLike = async ({ userId, crewId, postId }) => {
 		if (!isExistCrew) {
 			throw new Error('존재하지 않는 크루입니다.');
 		}
+		const isExistPost = await postRepository.isExistPost({ postId });
+		if (!isExistPost) {
+			throw new Error('존재하지 않는 게시글입니다.');
+		}
+
 		const crewMemberId = await postRepository.findCrewMemberId({
 			userId,
 			crewId,
@@ -117,16 +135,99 @@ export const toggleCrewPostLike = async ({ userId, crewId, postId }) => {
 		throw err;
 	}
 }
-export const getCommentsByCrewPost = async (data) => {
+export const readCommentsByCrewPost = async ({ crewId, postId }) => {
+	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
+		const isExistPost = await postRepository.isExistPost({ postId });
+		if (!isExistPost) {
+			throw new Error('존재하지 않는 게시글입니다.');
+		}
 
+		const commentList = await postRepository.getCommentsByPostId({ postId });
+		return postResponse.CrewCommentListResponse(commentList);
+	} catch (err) {
+		throw err;
+	}
 }
-export const addCrewPostComment = async (data) => {
+export const createCrewPostComment = async ({ crewId, postId, userId, content, isPublic }) => {
+	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
+		const isExistPost = await postRepository.isExistPost({ postId });
+		if (!isExistPost) {
+			throw new Error('존재하지 않는 게시글입니다.');
+		}
+		const crewMemberId = await postRepository.findCrewMemberId({
+			userId,
+			crewId,
+		})
+		const comment = await postRepository.addCrewPostComment({
+			crewMemberId,
+			postId,
+			content,
+			isPublic
+		})
 
+		return postResponse.CrewCommentResponse(comment);
+	} catch (err) {
+		throw err;
+	}
 }
-export const modifyCrewPostComment = async (data) => {
+export const updateCrewPostComment = async ({ crewId, postId, userId, commentId, content, isPublic }) => {
+	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
+		const isExistPost = await postRepository.isExistPost({ postId });
+		if (!isExistPost) {
+			throw new Error('존재하지 않는 게시글입니다.');
+		}
 
+		const crewMemberId = await postRepository.findCrewMemberId({
+			userId,
+			crewId,
+		})
+		const comment = await postRepository.updateCommentByCommentId({
+			crewMemberId,
+			commentId,
+			content,
+			isPublic,
+		})
+
+		return postResponse.CrewCommentResponse(comment);
+	} catch (err) {
+		throw err;
+	}
 }
 
-export const removeCrewPostComment = async (data) => {
+export const deleteCrewPostComment = async ({ crewId, postId, userId, commentId, }) => {
+	try {
+		const isExistCrew = await postRepository.isExistCrew({ crewId });
+		if (!isExistCrew) {
+			throw new Error('존재하지 않는 크루입니다.');
+		}
+		const isExistPost = await postRepository.isExistPost({ postId });
+		if (!isExistPost) {
+			throw new Error('존재하지 않는 게시글입니다.');
+		}
 
+		const crewMemberId = await postRepository.findCrewMemberId({
+			userId,
+			crewId,
+		})
+		const comment = await postRepository.removeCrewPostCommentByCommentId({
+			crewMemberId,
+			commentId,
+		})
+
+		return postResponse.CrewCommentResponse(comment);
+	} catch (err) {
+		throw err;
+	}
 }

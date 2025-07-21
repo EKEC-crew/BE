@@ -21,9 +21,6 @@ export const getPostsByCrewId = async ({ crewId }) => {
 				}
 			}
 		});
-		if (!postList || postList.length === 0) {
-			throw new Error("게시글이 존재하지 않습니다.");
-		}
 		return postList;
 	} catch (err) {
 		throw new Error(
@@ -209,6 +206,141 @@ export const likeCrewPost = async ({ crewMemberId, postId }) => {
 	}
 }
 
+//크루 게시글 댓글 관련
+
+export const getCommentsByPostId = async ({ postId }) => {
+	try {
+		const commentList = await prisma.crewPostComment.findMany({
+			where: {
+				postId: postId,
+			},
+			orderBy: {
+				createdAt: 'asc',
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true
+							}
+						}
+					}
+				}
+			}
+		})
+		return commentList;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+export const addCrewPostComment = async ({ crewMemberId, postId, content, isPublic }) => {
+	try {
+		const comment = await prisma.crewPostComment.create({
+			data: {
+				content: content,
+				isPublic: isPublic,
+				crewMemberId: crewMemberId,
+				postId: postId,
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true
+							}
+						}
+					}
+				}
+			}
+		})
+		return comment;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const updateCommentByCommentId = async ({ crewMemberId, commentId, content, isPublic }) => {
+	try {
+		const validateComment = await prisma.crewPostComment.findFirst({
+			where: {
+				id: commentId
+			}
+		})
+		if (validateComment.crewMemberId !== crewMemberId) {
+			throw new Error('댓글 작성자가 아닙니다!')
+		}
+		const comment = await prisma.crewPostComment.update({
+			where: {
+				id: commentId,
+			},
+			data: {
+				content: content,
+				isPublic: isPublic,
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true
+							}
+						}
+					}
+				}
+			}
+		})
+
+		return comment;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const removeCrewPostCommentByCommentId = async ({ crewMemberId, commentId }) => {
+	try {
+		const validateComment = await prisma.crewPostComment.findFirst({
+			where: {
+				id: commentId
+			}
+		})
+		if (validateComment.crewMemberId !== crewMemberId) {
+			throw new Error('댓글 작성자가 아닙니다!')
+		}
+
+		const comment = await prisma.crewPostComment.delete({
+			where: {
+				id: commentId,
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true
+							}
+						}
+					}
+				}
+			}
+		})
+
+		return comment;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+// 유저 아이디로 크루멤버아이디 찾기(인증)
 export const findCrewMemberId = async ({ userId, crewId }) => {
 	try {
 		const isExist = await prisma.crewMember.findFirstOrThrow(
@@ -227,12 +359,32 @@ export const findCrewMemberId = async ({ userId, crewId }) => {
 	}
 }
 
+// 비즈니스 유효성 검사
+
 export const isExistCrew = async ({ crewId }) => {
 	try {
 		const isExist = await prisma.crew.findUnique(
 			{
 				where: {
 					id: crewId,
+				}
+			}
+		)
+
+		return !!isExist;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const isExistPost = async ({ postId }) => {
+	try {
+		const isExist = await prisma.crewPost.findUnique(
+			{
+				where: {
+					id: postId,
 				}
 			}
 		)

@@ -47,9 +47,14 @@ export const updateCrewPostRequest = (crewId, postId, body) => {
     }
 }
 
-export const updateCrewPostCommentRequest = (body) => {
+export const updateCrewPostCommentRequest = (crewId, postId, commentId, body) => {
     return {
+        crewId: Number(crewId),
+        postId: Number(postId),
+        commentId: Number(commentId),
+        userId: Number(body.userId),
         content: body.content,
+        isPublic: body.isPublic,
     }
 }
 
@@ -57,6 +62,15 @@ export const deleteCrewPostRequest = (crewId, postId, body) => {
     return {
         crewId: Number(crewId),
         postId: Number(postId),
+        userId: Number(body.userId),
+    }
+}
+
+export const deleteCrewPostCommentRequest = (crewId, postId, commentId, body) => {
+    return {
+        crewId: Number(crewId),
+        postId: Number(postId),
+        commentId: Number(commentId),
         userId: Number(body.userId),
     }
 }

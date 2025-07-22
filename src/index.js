@@ -27,7 +27,7 @@ const port = process.env.PORT;
  */
 app.use((req, res, next) => {
   res.success = (success) => {
-    return res.json({ resultType: "SUCCESS", error: null, data:success });
+    return res.json({ resultType: "SUCCESS", error: null, data: success });
   };
 
   res.error = ({ errorCode = "unknown", reason = null, data = null }) => {
@@ -42,24 +42,29 @@ app.use((req, res, next) => {
 });
 /** session */
 app.use(
-    session({
-      cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000, // ms
-      },
-      resave: false,
-      saveUninitialized: false,
-      secret: process.env.EXPRESS_SESSION_SECRET,
-      store: new PrismaSessionStore(prisma, {
-        checkPeriod: 2 * 60 * 1000, // ms
-        dbRecordIdIsSessionId: true,
-        dbRecordIdFunction: undefined,
-      }),
-    })
+  session({
+    cookie: {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // ms
+    },
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.EXPRESS_SESSION_SECRET,
+    store: new PrismaSessionStore(prisma, {
+      checkPeriod: 2 * 60 * 1000, // ms
+      dbRecordIdIsSessionId: true,
+      dbRecordIdFunction: undefined,
+    }),
+  })
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cors()); // cors 방식 허용
+const corsOptions = {
+  origin: [process.env.LOCAL_ORIGIN, process.env.PROD_ORIGIN],
+  credentials: true,
+};
+
+app.use(cors(corsOptions)); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
 app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함 (JSON 형태의 요청 body를 파싱하기 위함)
 app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
@@ -113,9 +118,19 @@ app.get("/openapi.json", async (req, res, next) => {
   const doc = {
     info: {
       title: "EKEC 이크에크",
+      version: '1.0.0',
       description: "EKEC 이크에크 프로젝트입니다.",
     },
-    host: "localhost:3000",
+    servers: [
+      {
+        url: 'http://localhost:3000',
+        description: "개발 서버",
+      },
+      {
+        url: "https://api.ekec.site",
+        description: "라이브 서버",
+      }
+    ],
   };
 
   const result = await swaggerAutogen(options)(outputFile, routes, doc);

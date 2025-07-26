@@ -12,7 +12,7 @@ import { InvalidInputValueError } from "../../../error.js";
 export const handleCreateCrew = async (req, res, next) => {
     // #region 📚 Swagger: 크루 생성
     /*
-        #swagger.summary = "크루 생성"
+        #swagger.summary = "크루 생성 (로그인 필요)"
         #swagger.tags = ["Crew Creation"]
         #swagger.requestBody = {
             required: true,
@@ -586,7 +586,148 @@ export const handleCreateCrew = async (req, res, next) => {
                                     }
                                 },
                                 "data": null
-                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #swagger.responses[422] = {
+            description : "크루 생성 실패 응답 (유효하지 않은 입력값)",
+            content:{
+                "application/json":{
+                    examples:{
+                        UnprocessableCrewCategory :{
+                            summary: "유효하지 않는 카테고리",
+                            value:{
+                                "resultType": "FAIL",
+                                "error": {
+                                    "errorCode": "I002",
+                                    "reason": "유효하지 않은 카테고리 입니다.",
+                                    "data": {
+                                    "name": "새로운 크루",
+                                    "description": "가족같은 분위기의 크루",
+                                    "maxCapacity": 10,
+                                    "category": 100,
+                                    "activities": [1,2],
+                                    "styles": [1,2],
+                                    "region": 1,
+                                    "age": 1,
+                                    "gender": 0,
+                                    "recruitMessage": "선택해주셔서 감사합니다!",
+                                    "applicationForm": [
+                                        {
+                                        "question": "어떤경로로 이 크루를 가입하시게 되셨나요?",
+                                        "type": 0,
+                                        "choices": ["지인 추천"],
+                                        "etc": 1,
+                                        "required": 1
+                                        }
+                                    ],
+                                    "admin": 1
+                                    }
+                                },
+                                "data": null
+                            }
+                        },
+                        UnprocessableCrewActivities :{
+                            summary: "유효하지 않은 활동",
+                            value: {
+                                "resultType": "FAIL",
+                                "error": {
+                                    "errorCode": "I002",
+                                    "reason": "유효하지 않은 활동 분류 입니다.",
+                                    "data": {
+                                    "name": "새로운 크루",
+                                    "description": "가족같은 분위기의 크루",
+                                    "maxCapacity": 10,
+                                    "category": 1,
+                                    "activities": [99,100],
+                                    "styles": [1,2],
+                                    "region": 1,
+                                    "age": 1,
+                                    "gender": 0,
+                                    "recruitMessage": "선택해주셔서 감사합니다!",
+                                    "applicationForm": [
+                                        {
+                                        "question": "어떤경로로 이 크루를 가입하시게 되셨나요?",
+                                        "type": 0,
+                                        "choices": ["지인 추천"],
+                                        "etc": 1,
+                                        "required": 1
+                                        }
+                                    ],
+                                    "admin": 1
+                                    }
+                                },
+                                "data": null
+                            }
+                        },
+                        UnprocessableCrewStyles :{
+                            summary: "유효하지 않은 스타일",
+                            value:{
+                                "resultType": "FAIL",
+                                "error": {
+                                    "errorCode": "I002",
+                                    "reason": "유효하지 않은 스타일 분류 입니다.",
+                                    "data": {
+                                    "name": "새로운 크루",
+                                    "description": "가족같은 분위기의 크루",
+                                    "maxCapacity": 10,
+                                    "category": 1,
+                                    "activities": [1,2],
+                                    "styles": [99,100],
+                                    "region": 1,
+                                    "age": 1,
+                                    "gender": 0,
+                                    "recruitMessage": "선택해주셔서 감사합니다!",
+                                    "applicationForm": [
+                                        {
+                                        "question": "어떤경로로 이 크루를 가입하시게 되셨나요?",
+                                        "type": 0,
+                                        "choices": ["지인 추천"],
+                                        "etc": 1,
+                                        "required": 1
+                                        }
+                                    ],
+                                    "admin": 1
+                                    }
+                                },
+                                "data": null
+                            }
+                        },
+                        UnprocessableCrewRegion :{
+                            summary: "유효하지 않은 지역",
+                            value:{
+                                "resultType": "FAIL",
+                                "error": {
+                                    "errorCode": "I002",
+                                    "reason": "유효하지 않은 지역 입니다.",
+                                    "data": {
+                                    "name": "새로운 크루",
+                                    "description": "가족같은 분위기의 크루",
+                                    "maxCapacity": 10,
+                                    "category": 1,
+                                    "activities": [1,2],
+                                    "styles": [1,2],
+                                    "region": 100000,
+                                    "age": 1,
+                                    "gender": 0,
+                                    "recruitMessage": "선택해주셔서 감사합니다!",
+                                    "applicationForm": [
+                                        {
+                                        "question": "어떤경로로 이 크루를 가입하시게 되셨나요?",
+                                        "type": 0,
+                                        "choices": ["지인 추천"],
+                                        "etc": 1,
+                                        "required": 1
+                                        }
+                                    ],
+                                    "admin": 1
+                                    }
+                                },
+                                "data": null
+                            }
                         }
                     }
                 }

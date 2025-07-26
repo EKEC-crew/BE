@@ -8,6 +8,50 @@ import { prisma } from "../../../db.config.js";
  * @returns {number}
  */
 export const createCrew = async (body) => {
+    // ✅ 유효성 검사 (카테고리)
+    const isCategoryValid = await prisma.crewCategory.findFirst({
+        select: {
+            id: true
+        },
+        where: {
+            id: body.category
+        }
+    }) !== null;
+    if (!isCategoryValid) return -1;
+    // ✅ 유효성 검사 (활동)
+    const isActivitiesValid = (await prisma.activity.aggregate({
+        _count: {
+            id: true
+        },
+        where: {
+            id: {
+                in: body.activities
+            }
+        }
+    }))._count.id === body.activities.length;
+    if (!isActivitiesValid) return -2;
+    // ✅ 유효성 검사 (스타일)
+    const isStylesValid = (await prisma.style.aggregate({
+        _count: {
+            id: true
+        },
+        where: {
+            id: {
+                in: body.styles
+            }
+        }
+    }))._count.id === body.styles.length;
+    if (!isStylesValid) return -3;
+    // ✅ 유효성 검사 (지역)
+    const isRegionValid = await prisma.region.findFirst({
+        select: {
+            id: true
+        },
+        where: {
+            id: body.region
+        }
+    }) !== null;
+    if (!isRegionValid) return -4;
     // 크루 테이블에 새로운 크루 레코드 추가
     const crew = await prisma.crew.create({
         data: {

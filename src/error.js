@@ -13,7 +13,7 @@ export class DuplicateUserEmailError extends Error {
 }
 
 /**
- * **\<Error\>**
+ * **\<💥 Error\>**
  * ***InvalidInputValueError***
  * 올바르지 않은 값이 입력되었을때 발생하는 에러
  */

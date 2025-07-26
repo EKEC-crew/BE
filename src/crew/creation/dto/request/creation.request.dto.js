@@ -1,3 +1,12 @@
+/**
+ * **[Crew Creation]**
+ * **\<🧺⬇️ Request DTO\>**
+ * ***bodyToCreateNewCrew***
+ * '크루 생성'기능의 요청 값을 서비스 레이어로 옮기기 위한 DTO
+ * @param {Object} body
+ * @param {Object} file
+ * @returns {Object}
+ */
 export const bodyToCreateNewCrew = (body, file) => {
     return {
         name: body.crewInfo.name,

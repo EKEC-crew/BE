@@ -30,6 +30,8 @@ model User {
   crew Crew[]
   crewRegister CrewRegister[]
   crewUser CrewMember[]
+  crewRecruitAppliedStep1 CrewRecruitAppliedStep1[]
+  crewRecruitAppliedStep2 CrewRecruitAppliedStep2[]
   alarm Alarm[]
 
   @@map("user")
@@ -50,13 +52,14 @@ model CrewCategory {
   content String @db.VarChar(20)
 
   crew Crew[]
+  crewRecruitAppliedStep1 CrewRecruitAppliedStep1[]
 
   @@map("crew_category")
 }
 
 model Crew {
   id  Int @id @default(autoincrement())
-  title String @unique(map: "title") @db.VarChar(30)
+  title String @db.VarChar(30)
   content String  @db.VarChar(50)
   introduction String @db.Text
   score Float
@@ -71,6 +74,7 @@ model Crew {
   userId Int @map("user_id")
   categoryId Int @map("category_id")
   regionId Int @map("region_id")
+  recruitMessage String @map("recruit_message") @db.Text
 
   user User @relation(fields: [userId], references: [id])
   crewCategory CrewCategory @relation(fields: [categoryId], references: [id])
@@ -84,6 +88,8 @@ model Crew {
   crewAlbum CrewAlbum[]
   crewActivity CrewActivity[]
   crewStyle CrewStyle[]
+  crewRecruitForm CrewRecruitForm[]
+  crewRecruitAppliedStep1 CrewRecruitAppliedStep1[]
   alarm Alarm[]
 
   @@map("crew")
@@ -295,6 +301,55 @@ model CrewStyle {
   style Style @relation(fields: [styleId], references: [id])
 
   @@map("crew_style")
+}
+
+model CrewRecruitForm {
+  id  Int @id @default(autoincrement())
+  question String @db.VarChar(40)
+  questionType Int @map("question_type")
+  choiceList Json? @map("choice_list")
+  isEtc Int @map("is_etc")
+  required Int
+  crewId Int @map("crew_id")
+
+  crew Crew @relation(fields: [crewId], references: [id])
+
+  crewRecruitAppliedStep2 CrewRecruitAppliedStep2[]
+
+  @@map("crew_recruit_form")
+}
+
+model CrewRecruitAppliedStep1 {
+  id  Int @id @default(autoincrement())
+  activityList Json @map("activity_list")
+  styleList Json @map("style_list")
+  region Int
+  age Int
+  gender Int
+  createdAt DateTime @default(now()) @map("created_at")
+  crewId Int @map("crew_id")
+  userId Int @map("user_id")
+  categoryId Int @map("category_id")
+
+  crew Crew @relation(fields: [crewId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  crewCategory CrewCategory @relation(fields: [categoryId], references: [id])
+
+  @@map("crew_recruit_applied_step1")
+}
+
+model CrewRecruitAppliedStep2 {
+  id  Int @id @default(autoincrement())
+  checkedChoices Json? @map("checked_choices")
+  answer String?
+  createdAt DateTime @default(now()) @map("created_at")
+  recruitFormId Int @map("recruit_form_id")
+  userId Int @map("user_id")
+
+  crewRecruitForm CrewRecruitForm @relation(fields: [recruitFormId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("crew_recruit_applied_step2")
 }
 
 enum AlarmType {

@@ -27,7 +27,8 @@
     "multer-s3": "^3.0.1",
     "passport": "^0.7.0",
     "swagger-autogen": "^2.23.7",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "http-proxy-middleware": "^3.0.5",

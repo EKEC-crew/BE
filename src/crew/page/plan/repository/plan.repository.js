@@ -7,8 +7,8 @@ export const CrewPlanRepository = {
 
         return await prisma.crewPlan.create({
           data: {
-            crewId: crewId, //URL에서 받기
-            data: new Date(day), //날짜 세팅
+            crewId: Number(crewId), //URL에서 받기
+            day: new Date(day), //날짜 세팅
             ...rest, // 나머지 정보는 DTO에서 받기
             crewPlanRequest: {
               create: {
@@ -38,5 +38,96 @@ export const CrewPlanRepository = {
             },
           },
         });
+    },
+
+    findPlanById: async (crewId, planId) => {
+      return await prisma.crewPlan.findFirst({
+        where: {
+          id: Number(planId),
+          crewId: Number(crewId)
+        },
+        include: {
+          crew: {
+            select: {
+              title: true,
+            },
+          },
+          crewPlanRequest: {
+            include: {
+              crewMember: {
+                include: {
+                  user: {
+                    select: {
+                      nickname: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    },
+
+    findPlanListByCrewId: async (crewId) => {
+      return await prisma.crewPlan.findMany({
+        where: {
+          crewId: Number(crewId),
+        },
+        orderBy: {
+          day: 'desc',
+        },
+        include: {
+          crew: {
+            select: {
+              title: true,
+            },
+          },
+          crewPlanRequest: {
+            include: {
+              crewMember: {
+                include: {
+                  user: {
+                    select: {
+                      nickname: true,
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      })
+    },
+
+    updatePlanById: async (crewId, planId, data) => {
+      const updatedData = {};
+
+      for (const key in data) {
+        if (data[key] !== undefined) {
+          updatedData[key] = data[key];
+        }
+      }
+
+      return await prisma.crewPlan.update({
+        where: { id: Number(planId) },
+        data: updateData,
+        include: {
+          crew: { select: { title: true } },
+          crewPlanRequest: {
+            include: {
+              crewMember: {
+                include: {
+                  user: { select: { nickname: true } },
+                },
+              },
+            },
+          },
+        },
+      })
     }
+
+
+    
 }
+

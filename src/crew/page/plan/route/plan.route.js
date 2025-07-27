@@ -1,10 +1,19 @@
 import express from 'express';
-import { createPlan } from "../controller/plan.controller.js";
-const router = express.Router();
+import * as planController from "../controller/plan.controller.js";
 
-//page.router.js를 통해 /crew/:crewId/plan으로 호출됨
+// crew.route.js 에서 '/:crewId/plan' 으로 mount되므로, 반드시 mergeParams: true
+const router = express.Router({ mergeParams: true });
 
 // 크루 일정 등록
-router.post('/', createPlan);
+router.post('/', planController.createPlan);
+
+// 크루 일정 조회
+router.get('/:planId', planController.getPlanById);
+
+// 크루 일정 리스트 조회`
+router.get('/list', planController.getPlanList);
+
+// 크루 일정 수정
+router.put('/:planId', planController.updatePlan);
 
 export default router;

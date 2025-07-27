@@ -1,10 +1,14 @@
-import { } from "../../../../error.js";
+import { prisma } from "../../../../db.config.js";
+import { InvalidInputValueError } from "../../../../error.js";
+
 import * as planRepository from "../repository/plan.repository.js";
 import * as planResponse from "../dto/response/plan.response.dto.js";
 import * as planRequest from "../dto/request/plan.request.dto.js";
 
 //함수이름 : 함수정의
 export const CrewPlanService = {
+    
+    //일정 생성 서비스
     createPlan: async (crewId, requestDto) => {
         const req = new planRequest.CreateCrewPlanRequest(requestDto);
 
@@ -12,7 +16,65 @@ export const CrewPlanService = {
             throw new InvalidInputValueError("필수 항목(title, day, type, content, crewMemberId)이 누락되었습니다.")
         }
 
+        const crew = await prisma.crew.findUnique({ where: { id: crewId } });
+        if (!crew) {
+            throw new InvalidInputValueError("존재하지 않는 crewId입니다.", { crewId });
+        }
+
         const plan = await planRepository.CrewPlanRepository.createPlan(crewId, req);
         return new planResponse.CreateCrewPlanResponse(plan);
+    },
+
+    //특정 일정 조회 서비스
+    getPlanById: async (crewId, planId) => {
+        if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
+            throw new InvalidInputValueError("crewId 또는 planId가 올바르지 않습니다.");
+        }
+
+        const plan = await planRepository.CrewPlanRepository.findPlanById(crewId, planId);
+
+        if (!plan) {
+            throw new NotFoundPlanError("해당 일정이 존재하지 않습니다.", {crewId, planId});
+        }
+        
+        return new planResponse.GetCrewPlanResponse(plan);
+    },
+
+    //일정 리스트로 조회 서비스
+    getPlanListByCrewId: async (crewId) => {
+        if (!crewId || isNaN(crewId)) {
+            throw new InvalidInputValueError("crewId가 올바르지 않습니다.");
     }
+
+    const crew = await prisma.crew.findUnique({ where: {id: crewId} });
+    if (!crew) {
+        throw new InvalidInputValueError("존재하지 않는 crewId입니다.", {crewId});
+    }
+
+    const plans = await planRepository.CrewPlanRepository.findPlanListByCrewId(crewId);
+    
+    return plans.map((plan) => new planResponse.GetCrewPlanResponse(plan));
+    },
+
+    //일정 수정 서비스
+    updatePlanById: async (crewId, planId, requestDto) => {
+        const req = new planRequest.UpdateCrewPlanRequest(requestDto);
+        if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
+            throw new InvalidInputValueError("crewId 또는 planId가 올바르지 않습니다.");
+        }
+        const crew= await prisma.crew.findUnique({ where: {id: crewId} });
+        
+        if (!crew) {
+            throw new InvalidInputValueError("존재하지 않는 crewId입니다.", {crewId});
+        }
+        const plan = await planRepository.CrewPlanRepository.findPlanById(crewId, planId);
+        if (!plan) {
+            throw new NotFoundPlanError("해당 일정이 존재하지 않습니다.", {crewId, planId});
+        }
+
+        const updatedPlan = await planRepository.CrewPlanRepository.updatePlanById(crewId, planId, req);
+        return new planResponse.GetCrewPlanResponse(updatedPlan);
+    }
+
+
 }

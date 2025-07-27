@@ -1,6 +1,6 @@
 import { createApplicationForm, createCrew, updateCrewBanner } from "../repository/creation.repository.js";
 import { responseFromCreateNewCrew } from "../dto/response/creation.response.dto.js";
-import { uploadBannerImage } from "../../image/service/image.service.js"
+import { uploadBannerImage } from "../../../image/service/image.service.js"
 import { UnprocessableInputValueError } from "../../../error.js";
 /**
  * **[Crew Creation]**

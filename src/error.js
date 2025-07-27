@@ -42,6 +42,21 @@ export class UnprocessableInputValueError extends Error {
     this.data = data;
   }
 }
+/**
+ * **\<💥 Error\>**
+ * ***UnavailableImageError***
+ * 접근할 수 없는 S3 이미지의 URL에 요청이 발생했을때 발생하는 에러
+ */
+export class UnavailableImageError extends Error {
+  errorCode = "M001";
+  statusCode = 502
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
 
 
 //찾을 수 없는 크루

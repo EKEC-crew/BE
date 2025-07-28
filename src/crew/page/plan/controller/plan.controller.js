@@ -1,0 +1,316 @@
+import * as planService from "../service/plan.service.js";
+
+export const createPlan = async (req, res, next) => {
+  /*
+    #swagger.summary = "크루 일정 생성"
+    #swagger.tags = ["Crew Plan"]
+    #swagger.parameters['crewId'] = {
+      in: 'path',
+      required: true,
+      type: "integer",
+      description: "크루 ID"
+    }
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["crewMemberId", "title", "content", "type"],
+            properties: {
+              crewMemberId: { type: "integer", example: 3 },
+              title: { type: "string", example: "저녁 모임" },
+              content: { type: "string", example: "7시 강남역" },
+              day: { type: "string", format: "date-time", example: "2025-07-20T19:00:00.000Z" },
+              type: { type: "integer", example: 0 },
+              isRequired: { type: "boolean", example: false },
+              allowComments: { type: "boolean", example: true },
+              allowPrivateComments: { type: "boolean", example: true },
+              allowExternalShare: { type: "boolean", example: false },
+              hasFee: { type: "boolean", example: true },
+              fee: { type: "integer", example: 5000 },
+              feePurpose: { type: "string", example: "회식비" }
+            }
+          }
+        }
+      }
+    }
+    #swagger.responses[200] = {
+      description: "일정 생성 성공",
+      ...
+    }
+    #swagger.responses[400] = {
+      description: "입력값 오류",
+      ...
+    }
+  */
+
+    try {
+      const crewId = parseInt(req.params.crewId);
+      if (isNaN(crewId)) {
+        console.error("잘못된 crewId:", req.params.crewId);
+        throw new InvalidInputValueError("유효하지 않은 crewId입니다.");
+      }
+  
+      const response = await planService.CrewPlanService.createPlan(crewId, req.body);
+      return res.success(response);
+    } catch (err) {
+      next(err);
+    }
+};
+
+export const getPlanById = async (req, res, next) => {
+/**
+ * #swagger.summary = "특정 크루 일정 조회"
+ * #swagger.tags = ["Crew Plan"]
+ * #swagger.parameters['crewId'] = {
+ *   in: 'path',
+ *   required: true,
+ *   type: "integer",
+ *   description: "크루 ID"
+ * }
+ * #swagger.parameters['planId'] = {
+ *   in: 'path',
+ *   required: true,
+ *   type: "integer",
+ *   description: "일정 ID"
+ * }
+ * #swagger.responses[200] = {
+ *   description: "일정 조회 성공",
+ *   content: {
+ *     "application/json": {
+ *       schema: {
+ *         type: "object",
+ *         properties: {
+ *           resultType: { type: "string", example: "SUCCESS" },
+ *           error: { type: "object", nullable: true, example: null },
+ *           data: {
+ *             type: "object",
+ *             properties: {
+ *               id: { type: "number", example: 12 },
+ *               crew_name: { type: "string", example: "코딩 크루" },
+ *               writer: { type: "string", example: "비쿠" },
+ *               title: { type: "string", example: "저녁 모임" },
+ *               content: { type: "string", example: "7시 강남역" },
+ *               day: { type: "string", format: "date-time" },
+ *               type: { type: "number", example: 0 },
+ *               isRequired: { type: "boolean" },
+ *               allowComments: { type: "boolean" },
+ *               allowPrivateComments: { type: "boolean" },
+ *               allowExternalShare: { type: "boolean" },
+ *               hasFee: { type: "boolean" },
+ *               fee: { type: "integer" },
+ *               feePurpose: { type: "string" },
+ *               createdAt: { type: "string", format: "date-time" },
+ *               updatedAt: { type: "string", format: "date-time" }
+ *             }
+ *           }
+ *         }
+ *       }
+ *     }
+ *   }
+ * }
+ * #swagger.responses[404] = {
+ *   description: "일정이 존재하지 않음",
+ *   content: {
+ *     "application/json": {
+ *       schema: {
+ *         type: "object",
+ *         properties: {
+ *           resultType: { type: "string", example: "FAIL" },
+ *           error: {
+ *             type: "object",
+ *             properties: {
+ *               errorCode: { type: "string", example: "P001" },
+ *               reason: { type: "string", example: "해당하는 일정이 존재하지 않습니다." },
+ *               data: {
+ *                 type: "object",
+ *                 properties: {
+ *                   crewId: { type: "integer", example: 1 },
+ *                   planId: { type: "integer", example: 5 }
+ *                 }
+ *               }
+ *             }
+ *           },
+ *           data: { type: "null", example: null }
+ *         }
+ *       }
+ *     }
+ *   }
+ */
+
+  try {
+    const crewId = parseInt(req.params.crewId);
+    const planId = parseInt(req.params.planId);
+    const plan = await planService.CrewPlanService.getPlanById(crewId, planId);
+    return res.success(plan);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export const getPlanList = async (req, res, next) => {
+    /*
+    #swagger.summary = "특정 크루 일정 전체 조회"
+    #swagger.tags = ["Crew Plan"]
+    #swagger.parameters['crewId'] = {
+      in: 'path',
+      required: true,
+      type: "integer",
+      description: "크루 ID"
+    }
+    #swagger.responses[200] = {
+      description: "일정 목록 조회 성공",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "SUCCESS" },
+              error: { type: "object", nullable: true, example: null },
+              data: {
+                type: "array",
+                items: {
+                  $ref: "#/components/schemas/GetCrewPlanResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  */
+
+  try {
+    const crewId = parseInt(req.params.crewId);
+    const plans = await planService.CrewPlanService.getPlanListByCrewId(crewId);
+    return res.success(plans);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updatePlan = async (req, res, next) => {
+  /*
+    #swagger.summary = "특정 크루 일정 수정"
+    #swagger.tags = ["Crew Plan"]
+    #swagger.parameters['crewId'] = {
+      in: 'path',
+      required: true,
+      type: "integer",
+      description: "크루 ID"
+    }
+    #swagger.parameters['planId'] = {
+      in: 'path',
+      required: true,
+      type: "integer",
+      description: "일정 ID"
+    }
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              title: { type: "string", example: "수정된 제목" },
+              content: { type: "string", example: "수정된 내용" },
+              day: { type: "string", format: "date-time", example: "2025-08-01T19:00:00.000Z" },
+              type: { type: "integer", example: 1 },
+              isRequired: { type: "boolean" },
+              allowComments: { type: "boolean" },
+              allowPrivateComments: { type: "boolean" },
+              allowExternalShare: { type: "boolean" },
+              hasFee: { type: "boolean" },
+              fee: { type: "integer" },
+              feePurpose: { type: "string" }
+            }
+          }
+        }
+      }
+    }
+  */
+  try {
+    const {crewId} = req.params;
+    const {planId} = req.params; 
+    const plan = await planService.CrewPlanService.updatePlan(crewId, planId, req.body);
+    return res.success(plan);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export const deletePlan = async (req, res, next) => {
+  /*
+  #swagger.summary = "특정 크루 일정 삭제"
+  #swagger.tags = ["Crew Plan"]
+  #swagger.parameters['crewId'] = {
+    in: 'path',
+    required: true,
+    type: "integer",
+    description: "크루 ID"
+  }
+  #swagger.parameters['planId'] = {
+    in: 'path',
+    required: true,
+    type: "integer",
+    description: "일정 ID"
+  }
+   #swagger.responses[200] = {
+    description: "일정 삭제 성공",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            resultType: { type: "string", example: "SUCCESS" },
+            error: { type: "null", example: null },
+            data: {
+              type: "object",
+              properties: {
+                message: { type: "string", example: "일정이 삭제되었습니다." }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  #swagger.responses[404] = {
+    description: "삭제할 일정이 없음",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            resultType: { type: "string", example: "FAIL" },
+            error: {
+              type: "object",
+              properties: {
+                errorCode: { type: "string", example: "P001" },
+                reason: { type: "string", example: "삭제할 일정이 존재하지 않습니다." },
+                data: {
+                  type: "object",
+                  properties: {
+                    crewId: { type: "integer", example: 1 },
+                    planId: { type: "integer", example: 10 }
+                  }
+                }
+              }
+            },
+            data: { type: "null", example: null }
+          }
+        }
+      }
+    }
+  }
+*/
+  try {
+    const {crewId} = req.params;
+    const {planId} = req.params;
+    await planService.CrewPlanService.deletePlan(crewId, planId);
+    return res.success({message: "일정이 삭제되었습니다."});
+  } catch (err) {
+    next(err);
+  }
+}

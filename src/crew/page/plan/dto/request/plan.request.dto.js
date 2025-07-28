@@ -1,0 +1,57 @@
+// 일정 생성 요청 DTO 및 일정 수정 요청 DTO
+export class CreateCrewPlanRequest {
+    constructor({
+      crewMemberId,
+      title, content, type,
+      day = new Date(), // 기본값 오늘 날짜
+      isRequired = false,
+      allowComments = true,
+      allowPrivateComments = true,
+      allowExternalShare = false,
+      hasFee = false,
+      fee = 0,
+      feePurpose = null,
+    }) {
+      this.crewMemberId = crewMemberId;
+      this.title = title;
+      this.content = content;
+      this.day = day;
+      this.type = type;
+      this.isRequired = isRequired;
+      this.allowComments = allowComments;
+      this.allowPrivateComments = allowPrivateComments;
+      this.allowExternalShare = allowExternalShare;
+      this.hasFee = hasFee;
+      this.fee = fee;
+      this.feePurpose = feePurpose;
+    }
+  }
+
+  // 일정 수정 요청 DTO 
+export class UpdateCrewPlanRequest {
+  constructor({
+    crewMemberId,
+    title, content, type,
+    day = new Date(day), // day 명시적으로 입력해야함
+    isRequired = false,
+    allowComments = true,
+    allowPrivateComments = true,
+    allowExternalShare = false,
+    hasFee = false,
+    fee = 0,
+    feePurpose = null,
+  }) {
+    this.crewMemberId = crewMemberId;
+    this.title = title;
+    this.content = content;
+    this.day = day;
+    this.type = type;
+    this.isRequired = isRequired;
+    this.allowComments = allowComments;
+    this.allowPrivateComments = allowPrivateComments;
+    this.allowExternalShare = allowExternalShare;
+    this.hasFee = hasFee;
+    this.fee = fee;
+    this.feePurpose = feePurpose;
+  }
+}

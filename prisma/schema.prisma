@@ -96,21 +96,31 @@ model Crew {
 }
 
 model CrewPlan {
-  id  Int @id @default(autoincrement())
-  day DateTime
-  title String? @db.VarChar(30)
-  content String @db.Text
-  type Int
-  createdAt DateTime @default(now()) @map("created_at")
-  crewId Int @map("crew_id")
+  id                       Int           @id @default(autoincrement())
+  day                      DateTime
+  title                    String        @db.VarChar(30)
+  content                  String        @db.Text
+  type                     Int           @default(0) //0이 번개모임이고 1이 정기모임
+  isRequired               Boolean       @default(false) @map("is_required") // 필참 여부
+  allowComments            Boolean       @default(false) @map("allow_comments") // 댓글 허용
+  allowPrivateComments     Boolean       @default(false) @map("allow_private_comments") // 비공개 댓글 허용
+  allowExternalShare       Boolean       @default(false) @map("allow_external_share") // 외부 공유 허용
+  hasFee                   Boolean       @default(false) @map("has_fee") // 회비 여부
+  fee                      Int?          @default(0)
+  feePurpose               String?       @db.VarChar(100) @map("fee_purpose") // 회비 목적
+  createdAt                DateTime      @default(now()) @map("created_at")
+  crewId                   Int           @map("crew_id")
 
-  crew Crew @relation(fields: [crewId], references: [id])
-
-  crewPlanRequest CrewPlanRequest[]
-  alarm Alarm[]
+  // 관계
+  crew                     Crew          @relation(fields: [crewId], references: [id])
+  crewPlanRequest          CrewPlanRequest[]
+  alarm                    Alarm[]
 
   @@map("crew_plan")
+
+  @@unique([id, crewId]) //복합 키
 }
+
 
 model CrewRegister {
   id  Int @id @default(autoincrement())

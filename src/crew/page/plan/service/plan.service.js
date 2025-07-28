@@ -28,7 +28,7 @@ export const CrewPlanService = {
     //특정 일정 조회 서비스
     getPlanById: async (crewId, planId) => {
         if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
-            throw new InvalidInputValueError("crewId 또는 planId가 올바르지 않습니다.");
+            throw new InvalidInputValueError("crewId 또는 planId가 올바르지 않습니다.", {crewId, planId});
         }
 
         const plan = await planRepository.CrewPlanRepository.findPlanById(crewId, planId);
@@ -43,7 +43,7 @@ export const CrewPlanService = {
     //일정 리스트로 조회 서비스
     getPlanListByCrewId: async (crewId) => {
         if (!crewId || isNaN(crewId)) {
-            throw new InvalidInputValueError("crewId가 올바르지 않습니다.");
+            throw new InvalidInputValueError("crewId가 올바르지 않습니다.", {crewId});
     }
 
     const crew = await prisma.crew.findUnique({ where: {id: crewId} });
@@ -60,7 +60,7 @@ export const CrewPlanService = {
     updatePlanById: async (crewId, planId, requestDto) => {
         const req = new planRequest.UpdateCrewPlanRequest(requestDto);
         if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
-            throw new InvalidInputValueError("crewId 또는 planId가 올바르지 않습니다.");
+            throw new InvalidInputValueError("crewId 또는 planId가 올바르지 않습니다.", {crewId, planId});
         }
         const crew= await prisma.crew.findUnique({ where: {id: crewId} });
         
@@ -79,7 +79,7 @@ export const CrewPlanService = {
     //일정 삭제 서비스
     deletePlan: async (crewId, planId) => {
         if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
-            throw new InvalidInputValueError("유효하지 않은 crewId 또는 planId입니다.");
+            throw new InvalidInputValueError("유효하지 않은 crewId 또는 planId입니다.", {crewId, planId});
           }
       
           const deleted = await planRepository.CrewPlanRepository.deletePlanByCrewAndId(crewId, planId);
@@ -91,6 +91,29 @@ export const CrewPlanService = {
         if (!deletedPlan) {
             throw new InvalidInputValueError("삭제할 일정이 존재하지 않습니다.", { crewId, planId });
         }
+    },
+
+    //일정 댓글 생성 서비스
+    createComment: async (crewId, planId, requestDto) => {
+        const {crewMemberId, content} = requestDto;
+        
+        // 유효성 검사
+        if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
+            throw new InvalidInputValueError("유효하지 않은 crewId 또는 planId입니다.", {crewId, planId});
+          }
+
+        if (!content || content.trim().length === 0) {
+            throw new InvalidInputValueError("댓글 내용은 필수입니다.", content);
+        }
+
+        const plan = await planRepository.CrewPlanRepository.findPlanById(crewId, planId);
+
+        if (!plan) {
+            throw new InvalidInputValueError("해당 크루 일정이 존재하지 않습니다.", {crewId, planId});
+        }
+
+        const comment = await planRepository.CrewPlanCommentRepository.createComment(crewId, planId, crewMemberId, content);
+        return new planResponse.CrewPlanCommentResponse(comment);
     }
 
 

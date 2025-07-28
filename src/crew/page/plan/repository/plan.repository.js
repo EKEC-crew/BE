@@ -135,10 +135,18 @@ export const CrewPlanRepository = {
         }
       })
     }
-
-
-
-
     
+}
+
+export const CrewPlanCommentRepository = {
+  
+  /**
+   * 댓글 생성
+   */
+  createComment: async (crewId, planId, crewMemberId, content) => {
+    return await prisma.crewPlanComment.create({
+      
+    })
+  }
 }
 

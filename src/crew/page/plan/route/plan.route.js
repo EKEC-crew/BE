@@ -15,7 +15,7 @@ router.get('/list', planController.getPlanList);
 
 // 크루 일정 수정
 router.put('/:planId', planController.updatePlan);
-
+    
 // 크루 일정 삭제
 router.delete('/:planId', planController.deletePlan);
 

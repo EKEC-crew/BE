@@ -314,3 +314,21 @@ export const deletePlan = async (req, res, next) => {
     next(err);
   }
 }
+
+export const createPlanComment = async (req, res, next) => {
+  try {
+    const {crewId, planId} = req.params;
+    const reqDto = new CreateCrewPlanCommentRequest(req.body);
+
+    //객체 리터럴 방식 : {a : 1, b : 2} => a,b라는 key와 각각 1,2라는 value를 가진 객체
+    const comment = await planService.CrewPlanService.createComment({
+      crewId: Number(crewId),
+      planId: Number(planId),
+      requestDto: reqDto
+    });
+
+    return res.success(comment);
+  } catch (err) {
+    next(err);
+  }
+}

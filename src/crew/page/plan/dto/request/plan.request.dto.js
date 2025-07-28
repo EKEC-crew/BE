@@ -55,3 +55,14 @@ export class UpdateCrewPlanRequest {
     this.feePurpose = feePurpose;
   }
 }
+
+// 일정 댓글 생성 요청 DTO
+export class CreateCrewPlanCommentRequest {
+  constructor({
+    crewMemberId,
+    content
+  }) {
+    this.crewMemberId = crewMemberId;
+    this.content = content;
+  }
+}

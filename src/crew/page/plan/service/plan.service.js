@@ -74,6 +74,23 @@ export const CrewPlanService = {
 
         const updatedPlan = await planRepository.CrewPlanRepository.updatePlanById(crewId, planId, req);
         return new planResponse.GetCrewPlanResponse(updatedPlan);
+    },
+    
+    //일정 삭제 서비스
+    deletePlan: async (crewId, planId) => {
+        if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
+            throw new InvalidInputValueError("유효하지 않은 crewId 또는 planId입니다.");
+          }
+      
+          const deleted = await planRepository.CrewPlanRepository.deletePlanByCrewAndId(crewId, planId);
+          if (!deleted) {
+            throw new InvalidInputValueError("삭제할 일정이 존재하지 않습니다.", { crewId, planId });
+          }
+
+        const deletedPlan = await planRepository.CrewPlanRepository.deletePlanById(crewId, planId);
+        if (!deletedPlan) {
+            throw new InvalidInputValueError("삭제할 일정이 존재하지 않습니다.", { crewId, planId });
+        }
     }
 
 

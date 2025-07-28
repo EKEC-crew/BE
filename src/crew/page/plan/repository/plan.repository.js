@@ -125,7 +125,18 @@ export const CrewPlanRepository = {
           },
         },
       })
+    },
+
+    deletePlanById: async (crewId, planId) => {
+      return await prisma.crewPlan.delete({
+        where: {
+          id: Number(planId),
+          crewId: Number(crewId)
+        }
+      })
     }
+
+
 
 
     

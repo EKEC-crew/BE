@@ -239,3 +239,78 @@ export const updatePlan = async (req, res, next) => {
     next(err);
   }
 }
+
+export const deletePlan = async (req, res, next) => {
+  /*
+  #swagger.summary = "특정 크루 일정 삭제"
+  #swagger.tags = ["Crew Plan"]
+  #swagger.parameters['crewId'] = {
+    in: 'path',
+    required: true,
+    type: "integer",
+    description: "크루 ID"
+  }
+  #swagger.parameters['planId'] = {
+    in: 'path',
+    required: true,
+    type: "integer",
+    description: "일정 ID"
+  }
+   #swagger.responses[200] = {
+    description: "일정 삭제 성공",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            resultType: { type: "string", example: "SUCCESS" },
+            error: { type: "null", example: null },
+            data: {
+              type: "object",
+              properties: {
+                message: { type: "string", example: "일정이 삭제되었습니다." }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  #swagger.responses[404] = {
+    description: "삭제할 일정이 없음",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            resultType: { type: "string", example: "FAIL" },
+            error: {
+              type: "object",
+              properties: {
+                errorCode: { type: "string", example: "P001" },
+                reason: { type: "string", example: "삭제할 일정이 존재하지 않습니다." },
+                data: {
+                  type: "object",
+                  properties: {
+                    crewId: { type: "integer", example: 1 },
+                    planId: { type: "integer", example: 10 }
+                  }
+                }
+              }
+            },
+            data: { type: "null", example: null }
+          }
+        }
+      }
+    }
+  }
+*/
+  try {
+    const {crewId} = req.params;
+    const {planId} = req.params;
+    await planService.CrewPlanService.deletePlan(crewId, planId);
+    return res.success({message: "일정이 삭제되었습니다."});
+  } catch (err) {
+    next(err);
+  }
+}

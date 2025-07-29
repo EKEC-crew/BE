@@ -1,0 +1,67 @@
+name: deploy-main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          cat >>~/.ssh/config <<END
+          Host EKEC_EC2
+            HostName $EC2_HOST
+            User $EC2_USER
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking no
+          END
+        env:
+          EC2_USER: ubuntu
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Copy Workspace
+        run: |
+          ssh EKEC_EC2 'sudo mkdir -p /opt/app/EKEC'
+          ssh EKEC_EC2 'sudo chown ubuntu:ubuntu /opt/app/EKEC'
+          scp -r ./[!.]* EKEC_EC2:/opt/app/EKEC
+
+      - name: Install dependencies
+        run: |
+          ssh EKEC_EC2 'npm install --prefix /opt/app/EKEC'
+
+      - name: Copy systemd service file
+        run: |
+          ssh EKEC_EC2 '
+            echo "[Unit]
+            Description=EKEC
+            After=network.target
+
+            [Service]
+            User=${USER}
+            ExecStart=/usr/bin/npm run start --prefix /opt/app/EKEC
+            Restart=always
+
+            [Install]
+            WantedBy=multi-user.target" | sudo tee /etc/systemd/system/EKEC.service
+          '
+
+      - name: Enable systemd service
+        run: |
+          ssh EKEC_EC2 'sudo systemctl daemon-reload'
+          ssh EKEC_EC2 'sudo systemctl enable EKEC'
+
+      - name: Restart systemd service
+        run: |
+          ssh EKEC_EC2 'sudo systemctl restart EKEC'

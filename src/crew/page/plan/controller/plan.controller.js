@@ -310,52 +310,10 @@ export const deletePlan = async (req, res, next) => {
     description: "일정 ID"
   }
    #swagger.responses[200] = {
-    description: "일정 삭제 성공",
-    content: {
-      "application/json": {
-        schema: {
-          type: "object",
-          properties: {
-            resultType: { type: "string", example: "SUCCESS" },
-            error: { type: "null", example: null },
-            data: {
-              type: "object",
-              properties: {
-                message: { type: "string", example: "일정이 삭제되었습니다." }
-              }
-            }
-          }
-        }
-      }
-    }
+    description: "일정 삭제 성공"
   }
   #swagger.responses[404] = {
-    description: "삭제할 일정이 없음",
-    content: {
-      "application/json": {
-        schema: {
-          type: "object",
-          properties: {
-            resultType: { type: "string", example: "FAIL" },
-            error: {
-              type: "object",
-              properties: {
-                errorCode: { type: "string", example: "P001" },
-                reason: { type: "string", example: "삭제할 일정이 존재하지 않습니다." },
-                data: {
-                  type: "object",
-                  properties: {
-                    crewId: { type: "integer", example: 1 },
-                    planId: { type: "integer", example: 10 }
-                  }
-                }
-              }
-            },
-            data: { type: "null", example: null }
-          }
-        }
-      }
-    }
+    description: "삭제할 일정이 없음"
   }
 */
   try {

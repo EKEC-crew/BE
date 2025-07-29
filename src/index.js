@@ -131,8 +131,6 @@ app.get("/openapi.json", async (req, res, next) => {
   res.json(result ? result.data : null);
 });
 
-app.use("/docs", swaggerUiExpress.serve, swaggerUiExpress.setup(swaggerFile)); //추가
-
 app.use((err, req, res, next) => {
   if (res.headersSent) {
     return next(err);

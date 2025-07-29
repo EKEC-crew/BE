@@ -91,7 +91,10 @@ export const CrewPlanService = {
         if (!deletedPlan) {
             throw new InvalidInputValueError("삭제할 일정이 존재하지 않습니다.", { crewId, planId });
         }
-    },
+    }
+}
+
+export const CrewPlanCommentService = {
 
     //일정 댓글 생성 서비스
     createComment: async (crewId, planId, requestDto) => {
@@ -99,15 +102,17 @@ export const CrewPlanService = {
         
         // 유효성 검사
         if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
-            throw new InvalidInputValueError("유효하지 않은 crewId 또는 planId입니다.", {crewId, planId});
-          }
-
+            throw new InvalidInputValueError("유효하지 않은 crewId 또는 planId입니다.", { crewId, planId });
+        }
+        if (!crewMemberId || typeof crewMemberId !== 'number') {
+            throw new InvalidInputValueError("유효하지 않은 crewMemberId입니다.");
+        }
         if (!content || content.trim().length === 0) {
-            throw new InvalidInputValueError("댓글 내용은 필수입니다.", content);
+            throw new InvalidInputValueError("댓글 내용은 필수입니다.");
         }
 
+        //일정 존재 확인
         const plan = await planRepository.CrewPlanRepository.findPlanById(crewId, planId);
-
         if (!plan) {
             throw new InvalidInputValueError("해당 크루 일정이 존재하지 않습니다.", {crewId, planId});
         }
@@ -115,6 +120,8 @@ export const CrewPlanService = {
         const comment = await planRepository.CrewPlanCommentRepository.createComment(crewId, planId, crewMemberId, content);
         return new planResponse.CrewPlanCommentResponse(comment);
     }
+
+    //
 
 
 }

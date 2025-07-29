@@ -1,10 +1,8 @@
-import { toZonedTime, format } from 'date-fns-tz';
-
 export const CrewPostListResponse = (body) => {
 	const response = body.map(post => ({
 		postId: post.id,
 		title: post.title,
-		createdAt: format(toZonedTime(post.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+		createdAt: post.createdAt,
 		nickname: post.crewMember.user.nickname,
 		commentCount: post.commentCount,
 	}))
@@ -19,7 +17,7 @@ export const CrewPostResponse = (body) => {
 		postId: post.id,
 		title: post.title,
 		content: post.content,
-		createdAt: format(toZonedTime(post.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+		createdAt: post.createdAt,
 		nickname: post.crewMember?.user?.nickname,
 		commentCount: post.commentCount,
 	}
@@ -44,7 +42,7 @@ export const CrewCommentListResponse = (body) => {
 		commentId: comment.id,
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
-		createdAt: format(toZonedTime(comment.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+		createdAt: post.createdAt,
 	}))
 
 	return response;
@@ -57,7 +55,7 @@ export const CrewCommentResponse = (body) => {
 		commentId: comment.id,
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
-		createdAt: format(toZonedTime(comment.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+		createdAt: post.createdAt,
 	}
 
 	return response;

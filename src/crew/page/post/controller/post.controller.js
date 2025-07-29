@@ -7,7 +7,9 @@ export const readPostsByCrew = async (req, res, next) => {
 
   const { crewId } = req.params;
 
-  const response = await postService.readPostsByCrew(postRequest.readPostListRequest(crewId));
+  const response = await postService.readPostsByCrew(
+    postRequest.readPostListRequest(crewId)
+  );
   // #region Swagger: 게시글 리스트 조회 API
   /*
     #swagger.summary = '게시글 리스트 조회 API';
@@ -69,7 +71,7 @@ export const readPostsByCrew = async (req, res, next) => {
   */
   // #endregion
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const createCrewPost = async (req, res, next) => {
   console.log("특정 크루 게시글 작성을 요청했습니다.");
@@ -77,7 +79,9 @@ export const createCrewPost = async (req, res, next) => {
   const { crewId } = req.params;
   console.log("user : ", req.body.userId, "params: ", req.params);
 
-  const response = await postService.createCrewPost(postRequest.createCrewPostRequest(crewId, req.body));
+  const response = await postService.createCrewPost(
+    postRequest.createCrewPostRequest(crewId, req.body)
+  );
   // #region Swagger: 게시글 작성 API
   /*
     #swagger.summary = '게시글 작성 API';
@@ -148,7 +152,7 @@ export const createCrewPost = async (req, res, next) => {
   // #endregion
 
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const readCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 상세 조회를 요청했습니다.");
@@ -156,7 +160,9 @@ export const readCrewPost = async (req, res, next) => {
   const { crewId, postId } = req.params;
   console.log(req.params);
 
-  const response = await postService.readCrewPost(postRequest.readPostRequest(crewId, postId));
+  const response = await postService.readCrewPost(
+    postRequest.readPostRequest(crewId, postId)
+  );
   // #region Swagger: 특정 크루 특정 게시글 상세 조회 API
   /*
     #swagger.summary = '특정 크루 특정 게시글 상세 조회 API';
@@ -212,7 +218,7 @@ export const readCrewPost = async (req, res, next) => {
   // #endregion
 
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const updateCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 수정을 요청했습니다.");
@@ -221,8 +227,9 @@ export const updateCrewPost = async (req, res, next) => {
 
   console.log("user : ", req.body.userId, "params: ", req.params);
 
-
-  const response = await postService.updateCrewPost(postRequest.updateCrewPostRequest(crewId, postId, req.body));
+  const response = await postService.updateCrewPost(
+    postRequest.updateCrewPostRequest(crewId, postId, req.body)
+  );
   // #region Swagger: 특정 크루 특정 게시글 수정 API
   /*
     #swagger.summary = '특정 크루 특정 게시글 수정 API';
@@ -293,7 +300,7 @@ export const updateCrewPost = async (req, res, next) => {
   // #endregion
 
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const deleteCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 삭제를 요청했습니다.");
@@ -302,7 +309,9 @@ export const deleteCrewPost = async (req, res, next) => {
 
   console.log("user : ", req.body.userId, "params: ", req.params);
 
-  const response = await postService.deleteCrewPost(postRequest.deleteCrewPostRequest(crewId, postId, req.body));
+  const response = await postService.deleteCrewPost(
+    postRequest.deleteCrewPostRequest(crewId, postId, req.body)
+  );
   // #region Swagger: 특정 크루 특정 게시글 삭제 API
   /*
     #swagger.summary = '특정 크루 특정 게시글 삭제 API';
@@ -371,7 +380,7 @@ export const deleteCrewPost = async (req, res, next) => {
   // #endregion
 
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const toggleCrewPostLike = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 좋아요를 요청했습니다.");
@@ -379,7 +388,9 @@ export const toggleCrewPostLike = async (req, res, next) => {
   const { crewId, postId } = req.params;
   console.log("user : ", req.body.userId, "params: ", req.params);
 
-  const response = await postService.toggleCrewPostLike(postRequest.toggleCrewPostLikeRequest(crewId, postId, req.body));
+  const response = await postService.toggleCrewPostLike(
+    postRequest.toggleCrewPostLikeRequest(crewId, postId, req.body)
+  );
   // #region Swagger: 특정 크루 특정 게시글 좋아요 API
   /*
     #swagger.summary = '특정 크루 특정 게시글 좋아요 API';
@@ -446,7 +457,7 @@ export const toggleCrewPostLike = async (req, res, next) => {
   // #endregion
 
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const readCommentsByCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 댓글 리스트 조회를 요청했습니다.");
@@ -454,7 +465,9 @@ export const readCommentsByCrewPost = async (req, res, next) => {
   const { crewId, postId } = req.params;
   console.log(req.params);
 
-  const response = await postService.readCommentsByCrewPost(postRequest.readCommentListRequest(crewId, postId));
+  const response = await postService.readCommentsByCrewPost(
+    postRequest.readCommentListRequest(crewId, postId)
+  );
   // #region Swagger: 게시글 댓글 리스트 조회 API
   /*
     #swagger.summary = '게시글 댓글 리스트 조회 API';
@@ -515,7 +528,7 @@ export const readCommentsByCrewPost = async (req, res, next) => {
   // #endregion
 
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const createCrewPostComment = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 댓글 작성을 요청했습니다.");
@@ -523,7 +536,9 @@ export const createCrewPostComment = async (req, res, next) => {
   const { crewId, postId } = req.params;
   console.log("user : ", req.body.userId, "params: ", req.params);
 
-  const response = await postService.createCrewPostComment(postRequest.createCrewPostCommentRequest(crewId, postId, req.body));
+  const response = await postService.createCrewPostComment(
+    postRequest.createCrewPostCommentRequest(crewId, postId, req.body)
+  );
   // #region Swagger: 댓글 작성 API
   /*
     #swagger.summary = '댓글 작성 API';
@@ -593,7 +608,7 @@ export const createCrewPostComment = async (req, res, next) => {
   // #endregion
 
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const updateCrewPostComment = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 댓글 수정을 요청했습니다.");
@@ -601,7 +616,14 @@ export const updateCrewPostComment = async (req, res, next) => {
   const { crewId, postId, commentId } = req.params;
   console.log("user : ", req.body.userId, "params: ", req.params);
 
-  const response = await postService.updateCrewPostComment(postRequest.updateCrewPostCommentRequest(crewId, postId, commentId, req.body));
+  const response = await postService.updateCrewPostComment(
+    postRequest.updateCrewPostCommentRequest(
+      crewId,
+      postId,
+      commentId,
+      req.body
+    )
+  );
   // #region Swagger: 특정 댓글 수정 API
   /*
     #swagger.summary = '특정 댓글 수정 API';
@@ -670,7 +692,7 @@ export const updateCrewPostComment = async (req, res, next) => {
   */
   // #endregion
   res.status(StatusCodes.OK).success(response);
-}
+};
 
 export const deleteCrewPostComment = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 특정 댓글 삭제를 요청했습니다.");
@@ -678,7 +700,14 @@ export const deleteCrewPostComment = async (req, res, next) => {
   const { crewId, postId, commentId } = req.params;
   console.log("user : ", req.body.userId, "params: ", req.params);
 
-  const response = await postService.deleteCrewPostComment(postRequest.deleteCrewPostCommentRequest(crewId, postId, commentId, req.body));
+  const response = await postService.deleteCrewPostComment(
+    postRequest.deleteCrewPostCommentRequest(
+      crewId,
+      postId,
+      commentId,
+      req.body
+    )
+  );
   // #region Swagger: 특정 댓글 삭제 API
   /*
     #swagger.summary = '특정 댓글 삭제 API';
@@ -746,4 +775,4 @@ export const deleteCrewPostComment = async (req, res, next) => {
   // #endregion
 
   res.status(StatusCodes.OK).success(response);
-}
+};

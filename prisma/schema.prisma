@@ -121,6 +121,21 @@ model CrewPlan {
   @@unique([id, crewId]) //복합 키
 }
 
+model CrewPlanComment {
+  id            Int       @id @default(autoincrement())
+  content       String    @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  modifiedAt    DateTime? @updatedAt @map("modified_at")
+
+  crewPlanId    Int       @map("crew_plan_id")
+  crewMemberId  Int       @map("crew_member_id")
+
+  crewPlan      CrewPlan  @relation(fields: [crewPlanId], references: [id])
+  crewMember    CrewMember @relation(fields: [crewMemberId], references: [id])
+
+  @@map("crew_plan_comment")
+}
+
 
 model CrewRegister {
   id  Int @id @default(autoincrement())

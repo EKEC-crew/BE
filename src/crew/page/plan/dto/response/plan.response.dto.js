@@ -40,3 +40,15 @@ export class CreateCrewPlanResponse {
       this.updatedAt = plan.updatedAt;
     }
   }
+
+    // 일정 댓글 응답 DTO
+    export class CrewPlanCommentResponse {
+      constructor(comment) {
+        this.id = comment.id;
+        this.content = comment.content;
+        this.writer = comment.crewMember.user.nickname;
+        this.writerImage = comment.crewMember.user.image;
+        this.createdAt = comment.createdAt;
+        this.updatedAt = comment.updatedAt;
+      }
+    }

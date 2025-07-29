@@ -107,6 +107,18 @@ export class NotCrewMemberError extends Error {
   }
 }
 
+//해당 일정이 존재하지 않음
+export class NotFoundPlanError extends Error {
+  errorCode = "N005";
+  statusCode = 405;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+
 //권한이 없는 유저
 export class PermissionDeniedError extends Error {
   errorCode = "P001";

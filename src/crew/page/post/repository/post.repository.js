@@ -1,6 +1,6 @@
 import { prisma } from "../../../../db.config.js";
 
-export const getPostsByCrewId = async ({ crewId }) => {
+export const getPostsByCrewId = async ({ crewId, page, size }) => {
 	try {
 		const postList = await prisma.crewPost.findMany({
 			where: {
@@ -9,6 +9,8 @@ export const getPostsByCrewId = async ({ crewId }) => {
 			orderBy: {
 				createdAt: 'desc',
 			},
+			skip: (page - 1) * size,
+			take: size,
 			include: {
 				crewMember: {
 					include: {
@@ -39,6 +41,18 @@ export const createCrewPost = async ({ crewMemberId, crewId, title, content }) =
 				createdAt: new Date(),
 				crewId,
 				crewMemberId: crewMemberId,
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true,
+								image: true,
+							}
+						}
+					}
+				}
 			}
 		})
 		return post;
@@ -60,7 +74,8 @@ export const getPostByPostId = async ({ postId }) => {
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
@@ -84,6 +99,18 @@ export const updatePostBypostId = async ({ postId, title, content }) => {
 			data: {
 				title: title,
 				content: content,
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true,
+								image: true,
+							}
+						}
+					}
+				}
 			}
 		})
 		return updatedPost;
@@ -100,6 +127,18 @@ export const removeCrewPostBypostId = async ({ postId }) => {
 			where: {
 				id: postId,
 			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true,
+								image: true,
+							}
+						}
+					}
+				}
+			}
 		})
 		return deletedPost;
 	} catch (err) {
@@ -188,7 +227,7 @@ export const likeCrewPost = async ({ crewMemberId, postId }) => {
 
 //크루 게시글 댓글 관련
 
-export const getCommentsByPostId = async ({ postId }) => {
+export const getCommentsByPostId = async ({ postId, page, size }) => {
 	try {
 		const commentList = await prisma.crewPostComment.findMany({
 			where: {
@@ -197,12 +236,15 @@ export const getCommentsByPostId = async ({ postId }) => {
 			orderBy: {
 				createdAt: 'asc',
 			},
+			skip: (page - 1) * size,
+			take: size,
 			include: {
 				crewMember: {
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
@@ -230,13 +272,15 @@ export const addCrewPostComment = async ({ crewMemberId, postId, content, isPubl
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
 				}
 			}
 		})
+		await prisma.crewPost.update({ where: { id: postId }, data: { commentCount: { increment: 1 } } });
 		return comment;
 	} catch (err) {
 		throw new Error(
@@ -260,7 +304,8 @@ export const updateCommentByCommentId = async ({ commentId, content, isPublic })
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
@@ -276,7 +321,7 @@ export const updateCommentByCommentId = async ({ commentId, content, isPublic })
 	}
 }
 
-export const removeCrewPostCommentByCommentId = async ({ commentId }) => {
+export const removeCrewPostCommentByCommentId = async ({ commentId, postId }) => {
 	try {
 		const comment = await prisma.crewPostComment.delete({
 			where: {
@@ -287,14 +332,15 @@ export const removeCrewPostCommentByCommentId = async ({ commentId }) => {
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
 				}
 			}
 		})
-
+		await prisma.crewPost.update({ where: { id: postId }, data: { commentCount: { decrement: 1 } } });
 		return comment;
 	} catch (err) {
 		throw new Error(

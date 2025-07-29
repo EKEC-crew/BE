@@ -3,13 +3,13 @@ import * as postResponse from "../dto/response/post.response.dto.js"
 import * as postRepository from "../repository/post.repository.js"
 import * as baseError from "../../../../error.js"
 
-export const readPostsByCrew = async ({ crewId }) => {
+export const readPostsByCrew = async ({ crewId, page, size }) => {
 	try {
 		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {
 			throw new baseError.NotFoundCrewError("존재하지 않는 크루입니다.", { crewId })
 		}
-		const postList = await postRepository.getPostsByCrewId({ crewId });
+		const postList = await postRepository.getPostsByCrewId({ crewId, page, size });
 		return postResponse.CrewPostListResponse(postList);
 	} catch (err) {
 		throw err;
@@ -151,7 +151,7 @@ export const toggleCrewPostLike = async ({ userId, crewId, postId }) => {
 		throw err;
 	}
 }
-export const readCommentsByCrewPost = async ({ crewId, postId }) => {
+export const readCommentsByCrewPost = async ({ crewId, postId, page, size }) => {
 	try {
 		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {
@@ -162,7 +162,7 @@ export const readCommentsByCrewPost = async ({ crewId, postId }) => {
 			throw new baseError.NotFoundPostError("존재하지 않는 게시글입니다.", { postId });
 		}
 
-		const commentList = await postRepository.getCommentsByPostId({ postId });
+		const commentList = await postRepository.getCommentsByPostId({ postId, page, size });
 		return postResponse.CrewCommentListResponse(commentList);
 	} catch (err) {
 		throw err;
@@ -237,7 +237,7 @@ export const updateCrewPostComment = async ({ crewId, postId, userId, commentId,
 	}
 }
 
-export const deleteCrewPostComment = async ({ crewId, postId, userId, commentId, }) => {
+export const deleteCrewPostComment = async ({ crewId, postId, userId, commentId }) => {
 	try {
 		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {
@@ -265,6 +265,7 @@ export const deleteCrewPostComment = async ({ crewId, postId, userId, commentId,
 
 		const comment = await postRepository.removeCrewPostCommentByCommentId({
 			commentId,
+			postId,
 		})
 
 		return postResponse.CrewCommentResponse(comment);

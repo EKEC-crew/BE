@@ -136,6 +136,7 @@ model CrewMember {
   crewNotice CrewNotice[]
   crewNoticeComment CrewNoticeComment[]
   crewAlbum CrewAlbum[]
+  crewNoticeLike CrewNoticeLike[]
 
   @@map("crew_member")
 }
@@ -198,6 +199,7 @@ model CrewNotice {
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
 
   crewNoticeComment CrewNoticeComment[]
+  crewNoticeLike CrewNoticeLike[]
   alarm Alarm[]
 
   @@map("crew_notice")
@@ -215,6 +217,19 @@ model CrewNoticeComment {
   crewNotice CrewNotice @relation(fields: [crewNoticeId], references: [id])
 
   @@map("crew_notice_comment")
+}
+
+model CrewNoticeLike {
+  id  Int @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  crewNoticeId Int @map("crew_notice_id")
+  crewMemberId Int @map("crew_member_id")
+
+  crewNotice CrewNotice @relation(fields: [crewNoticeId], references: [id])
+  crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
+
+  @@unique([crewNoticeId, crewMemberId])
+  @@map("crew_notice_like")
 }
 
 model CrewAlbum {

@@ -1,25 +1,26 @@
-//notice.service.js에서 로직 가져옴
-import * as noticeService from "./notice.service.js";
+import * as noticeCommentService from "./notice.comment.service.js";
 import {
-  createNoticeRequestDto,
-  updateNoticeRequestDto,
+  createCommentRequestDto,
+  updateCommentRequestDto,
+  validateCommentIdDto,
   validateNoticeIdDto,
   validateCrewIdDto,
-} from "./dto/request/notice.request.dto.js";
+} from "./dto/request/notice.comment.request.dto.js";
 import {
-  noticeListResponseDto,
-  noticeDetailResponseDto,
-  noticeCreateResponseDto,
-  noticeUpdateResponseDto,
-  noticeDeleteResponseDto,
-  noticeErrorResponseDto,
-} from "./dto/response/notice.response.dto.js";
+  commentListResponseDto,
+  commentDetailResponseDto,
+  commentCreateResponseDto,
+  commentUpdateResponseDto,
+  commentDeleteResponseDto,
+  likeResponseDto,
+  unlikeResponseDto,
+} from "./dto/response/notice.comment.response.dto.js";
 
 /*
- * 1. 공지 리스트 조회
+ * 1. 공지 좋아요
  */
-// #swagger.tags = ['Notice']
-// #swagger.description = '특정 크루의 공지사항 목록을 조회합니다.'
+// #swagger.tags = ['Notice Like']
+// #swagger.description = '공지사항에 좋아요를 추가합니다.'
 // #swagger.parameters['crewId'] = {
 //   in: 'path',
 //   description: '크루 ID',
@@ -27,8 +28,15 @@ import {
 //   type: 'integer',
 //   example: 1
 // }
+// #swagger.parameters['noticeId'] = {
+//   in: 'path',
+//   description: '공지 ID',
+//   required: true,
+//   type: 'integer',
+//   example: 1
+// }
 // #swagger.responses[200] = {
-//   description: '공지사항 목록 조회 성공',
+//   description: '좋아요 추가 성공',
 //   content: {
 //     'application/json': {
 //       schema: {
@@ -39,14 +47,172 @@ import {
 //           success: {
 //             type: 'object',
 //             properties: {
-//               message: { type: 'string', example: 'Crew 1의 공지사항 목록입니다.' },
+//               message: { type: 'string', example: '좋아요가 추가되었습니다.' }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+// #swagger.responses[400] = {
+//   description: '이미 좋아요를 눌렀음',
+//   content: {
+//     'application/json': {
+//       schema: {
+//         type: 'object',
+//         properties: {
+//           resultType: { type: 'string', example: 'FAIL' },
+//           error: {
+//             type: 'object',
+//             properties: {
+//               errorCode: { type: 'string', example: 'ALREADY_LIKED' },
+//               reason: { type: 'string', example: '이미 좋아요를 눌렀습니다.' }
+//             }
+//           },
+//           success: { type: 'object', nullable: true, example: null }
+//         }
+//       }
+//     }
+//   }
+// }
+export const likeNotice = async (req, res, next) => {
+  try {
+    const { crewId, noticeId } = req.params;
+    const validatedCrewId = validateCrewIdDto(crewId);
+    const validatedNoticeId = validateNoticeIdDto(noticeId);
+    const userId = 1; // req.user?.id; // 테스트를 위해 임시로 사용자 ID를 1로 설정
+
+    const result = await noticeCommentService.likeNotice(
+      validatedCrewId,
+      validatedNoticeId,
+      userId
+    );
+    const response = likeResponseDto();
+    res.success(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/*
+ * 1-1. 공지 좋아요 취소
+ */
+// #swagger.tags = ['Notice Like']
+// #swagger.description = '공지사항의 좋아요를 취소합니다.'
+// #swagger.parameters['crewId'] = {
+//   in: 'path',
+//   description: '크루 ID',
+//   required: true,
+//   type: 'integer',
+//   example: 1
+// }
+// #swagger.parameters['noticeId'] = {
+//   in: 'path',
+//   description: '공지 ID',
+//   required: true,
+//   type: 'integer',
+//   example: 1
+// }
+// #swagger.responses[200] = {
+//   description: '좋아요 취소 성공',
+//   content: {
+//     'application/json': {
+//       schema: {
+//         type: 'object',
+//         properties: {
+//           resultType: { type: 'string', example: 'SUCCESS' },
+//           error: { type: 'object', nullable: true, example: null },
+//           success: {
+//             type: 'object',
+//             properties: {
+//               message: { type: 'string', example: '좋아요가 취소되었습니다.' }
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+// #swagger.responses[404] = {
+//   description: '좋아요를 찾을 수 없음',
+//   content: {
+//     'application/json': {
+//       schema: {
+//         type: 'object',
+//         properties: {
+//           resultType: { type: 'string', example: 'FAIL' },
+//           error: {
+//             type: 'object',
+//             properties: {
+//               errorCode: { type: 'string', example: 'LIKE_NOT_FOUND' },
+//               reason: { type: 'string', example: '좋아요를 찾을 수 없습니다.' }
+//             }
+//           },
+//           success: { type: 'object', nullable: true, example: null }
+//         }
+//       }
+//     }
+//   }
+// }
+export const unlikeNotice = async (req, res, next) => {
+  try {
+    const { crewId, noticeId } = req.params;
+    const validatedCrewId = validateCrewIdDto(crewId);
+    const validatedNoticeId = validateNoticeIdDto(noticeId);
+    const userId = 1; // req.user?.id; // 테스트를 위해 임시로 사용자 ID를 1로 설정
+
+    const result = await noticeCommentService.unlikeNotice(
+      validatedCrewId,
+      validatedNoticeId,
+      userId
+    );
+    const response = unlikeResponseDto();
+    res.success(response);
+  } catch (err) {
+    next(err);
+  }
+};
+
+/*
+ * 2. 공지 댓글 목록 조회
+ */
+// #swagger.tags = ['Notice Comment']
+// #swagger.description = '공지사항의 댓글 목록을 조회합니다.'
+// #swagger.parameters['crewId'] = {
+//   in: 'path',
+//   description: '크루 ID',
+//   required: true,
+//   type: 'integer',
+//   example: 1
+// }
+// #swagger.parameters['noticeId'] = {
+//   in: 'path',
+//   description: '공지 ID',
+//   required: true,
+//   type: 'integer',
+//   example: 1
+// }
+// #swagger.responses[200] = {
+//   description: '댓글 목록 조회 성공',
+//   content: {
+//     'application/json': {
+//       schema: {
+//         type: 'object',
+//         properties: {
+//           resultType: { type: 'string', example: 'SUCCESS' },
+//           error: { type: 'object', nullable: true, example: null },
+//           success: {
+//             type: 'object',
+//             properties: {
+//               message: { type: 'string', example: '댓글 목록입니다.' },
 //               data: {
 //                 type: 'array',
 //                 items: {
 //                   type: 'object',
 //                   properties: {
 //                     id: { type: 'integer', example: 1 },
-//                     title: { type: 'string', example: '공지 제목' },
+//                     content: { type: 'string', example: '댓글 내용' },
 //                     createdAt: { type: 'string', format: 'date-time' },
 //                     author: { type: 'string', example: '작성자' }
 //                   }
@@ -59,15 +225,16 @@ import {
 //     }
 //   }
 // }
-export const getNotices = async (req, res, next) => {
+export const getComments = async (req, res, next) => {
   try {
-    const { crewId } = req.params;
+    const { crewId, noticeId } = req.params;
 
     // DTO를 사용한 유효성 검증
     const validatedCrewId = validateCrewIdDto(crewId);
+    const validatedNoticeId = validateNoticeIdDto(noticeId);
 
-    const result = await noticeService.getNotices(validatedCrewId);
-    const response = noticeListResponseDto(result, validatedCrewId);
+    const result = await noticeCommentService.getComments(validatedNoticeId);
+    const response = commentListResponseDto(result, validatedNoticeId);
 
     res.success(response);
   } catch (err) {
@@ -76,13 +243,20 @@ export const getNotices = async (req, res, next) => {
 };
 
 /*
- * 2. 공지 작성
+ * 3. 공지 댓글 작성
  */
-// #swagger.tags = ['Notice']
-// #swagger.description = '새로운 공지사항을 작성합니다.'
+// #swagger.tags = ['Notice Comment']
+// #swagger.description = '공지사항에 댓글을 작성합니다.'
 // #swagger.parameters['crewId'] = {
 //   in: 'path',
 //   description: '크루 ID',
+//   required: true,
+//   type: 'integer',
+//   example: 1
+// }
+// #swagger.parameters['noticeId'] = {
+//   in: 'path',
+//   description: '공지 ID',
 //   required: true,
 //   type: 'integer',
 //   example: 1
@@ -94,16 +268,15 @@ export const getNotices = async (req, res, next) => {
 //       schema: {
 //         type: "object",
 //         properties: {
-//           title: { type: "string", example: "공지 제목", description: "공지 제목" },
-//           content: { type: "string", example: "공지 내용", description: "공지 내용" }
+//           content: { type: "string", example: "댓글 내용", description: "댓글 내용" }
 //         },
-//         required: ["title", "content"]
+//         required: ["content"]
 //       }
 //     }
 //   }
 // }
 // #swagger.responses[201] = {
-//   description: '공지사항 작성 성공',
+//   description: '댓글 작성 성공',
 //   content: {
 //     'application/json': {
 //       schema: {
@@ -115,10 +288,9 @@ export const getNotices = async (req, res, next) => {
 //             type: 'object',
 //             properties: {
 //               id: { type: 'integer', example: 1 },
-//               title: { type: 'string', example: '공지 제목' },
-//               content: { type: 'string', example: '공지 내용' },
+//               content: { type: 'string', example: '댓글 내용' },
 //               createdAt: { type: 'string', format: 'date-time' },
-//               crewId: { type: 'integer', example: 1 },
+//               noticeId: { type: 'integer', example: 1 },
 //               crewMemberId: { type: 'integer', example: 1 }
 //             }
 //           }
@@ -127,47 +299,27 @@ export const getNotices = async (req, res, next) => {
 //     }
 //   }
 // }
-// #swagger.responses[403] = {
-//   description: '권한 없음',
-//   content: {
-//     'application/json': {
-//       schema: {
-//         type: 'object',
-//         properties: {
-//           resultType: { type: 'string', example: 'FAIL' },
-//           error: {
-//             type: 'object',
-//             properties: {
-//               errorCode: { type: 'string', example: 'FORBIDDEN' },
-//               reason: { type: 'string', example: '공지 작성 권한이 없습니다. 크루 멤버인지 확인하세요.' }
-//             }
-//           },
-//           success: { type: 'object', nullable: true, example: null }
-//         }
-//       }
-//     }
-//   }
-// }
-export const createNotice = async (req, res, next) => {
+export const createComment = async (req, res, next) => {
   try {
-    const { crewId } = req.params;
-    const noticeData = req.body;
+    const { crewId, noticeId } = req.params;
+    const commentData = req.body;
 
     // DTO를 사용한 유효성 검증
     const validatedCrewId = validateCrewIdDto(crewId);
-    const validatedNoticeData = createNoticeRequestDto(noticeData);
+    const validatedNoticeId = validateNoticeIdDto(noticeId);
+    const validatedCommentData = createCommentRequestDto(commentData);
 
     // 테스트를 위해 임시로 사용자 ID를 1로 설정
-    //const userId = req.user.id;
-    const userId = 1;
+    const userId = 1; // req.user?.id;
 
-    const newNotice = await noticeService.createNotice(
+    const newComment = await noticeCommentService.createComment(
       validatedCrewId,
+      validatedNoticeId,
       userId,
-      validatedNoticeData
+      validatedCommentData
     );
 
-    const response = noticeCreateResponseDto(newNotice);
+    const response = commentCreateResponseDto(newComment);
     res.status(201).success(response);
   } catch (err) {
     next(err);
@@ -175,10 +327,10 @@ export const createNotice = async (req, res, next) => {
 };
 
 /*
- * 3. 특정 크루 공지 상세 조회
+ * 4. 공지 댓글 수정
  */
-// #swagger.tags = ['Notice']
-// #swagger.description = '특정 공지사항의 상세 정보를 조회합니다.'
+// #swagger.tags = ['Notice Comment']
+// #swagger.description = '공지사항의 댓글을 수정합니다.'
 // #swagger.parameters['crewId'] = {
 //   in: 'path',
 //   description: '크루 ID',
@@ -193,89 +345,9 @@ export const createNotice = async (req, res, next) => {
 //   type: 'integer',
 //   example: 1
 // }
-// #swagger.responses[200] = {
-//   description: '공지사항 상세 조회 성공',
-//   content: {
-//     'application/json': {
-//       schema: {
-//         type: 'object',
-//         properties: {
-//           resultType: { type: 'string', example: 'SUCCESS' },
-//           error: { type: 'object', nullable: true, example: null },
-//           success: {
-//             type: 'object',
-//             properties: {
-//               id: { type: 'integer', example: 1 },
-//               title: { type: 'string', example: '공지 제목' },
-//               content: { type: 'string', example: '공지 내용' },
-//               createdAt: { type: 'string', format: 'date-time' },
-//               modifiedAt: { type: 'string', format: 'date-time', nullable: true },
-//               author: {
-//                 type: 'object',
-//                 properties: {
-//                   nickname: { type: 'string', example: '작성자' },
-//                   image: { type: 'string', nullable: true, example: null }
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-// #swagger.responses[404] = {
-//   description: '공지사항을 찾을 수 없음',
-//   content: {
-//     'application/json': {
-//       schema: {
-//         type: 'object',
-//         properties: {
-//           resultType: { type: 'string', example: 'FAIL' },
-//           error: {
-//             type: 'object',
-//             properties: {
-//               errorCode: { type: 'string', example: 'NOTICE_NOT_FOUND' },
-//               reason: { type: 'string', example: '해당 공지를 찾을 수 없습니다.' }
-//             }
-//           },
-//           success: { type: 'object', nullable: true, example: null }
-//         }
-//       }
-//     }
-//   }
-// }
-export const getNoticeDetails = async (req, res, next) => {
-  try {
-    const { noticeId } = req.params;
-
-    // DTO를 사용한 유효성 검증
-    const validatedNoticeId = validateNoticeIdDto(noticeId);
-
-    const notice = await noticeService.getNoticeDetails(validatedNoticeId);
-    const response = noticeDetailResponseDto(notice);
-
-    res.success(response);
-  } catch (err) {
-    next(err);
-  }
-};
-
-/*
- * 4. 특정 크루 공지 수정
- */
-// #swagger.tags = ['Notice']
-// #swagger.description = '공지사항을 수정합니다.'
-// #swagger.parameters['crewId'] = {
+// #swagger.parameters['commentId'] = {
 //   in: 'path',
-//   description: '크루 ID',
-//   required: true,
-//   type: 'integer',
-//   example: 1
-// }
-// #swagger.parameters['noticeId'] = {
-//   in: 'path',
-//   description: '공지 ID',
+//   description: '댓글 ID',
 //   required: true,
 //   type: 'integer',
 //   example: 1
@@ -287,16 +359,15 @@ export const getNoticeDetails = async (req, res, next) => {
 //       schema: {
 //         type: "object",
 //         properties: {
-//           title: { type: "string", example: "수정된 공지 제목" },
-//           content: { type: "string", example: "수정된 공지 내용" }
+//           content: { type: "string", example: "수정된 댓글 내용" }
 //         },
-//         required: ["title", "content"]
+//         required: ["content"]
 //       }
 //     }
 //   }
 // }
 // #swagger.responses[200] = {
-//   description: '공지사항 수정 성공',
+//   description: '댓글 수정 성공',
 //   content: {
 //     'application/json': {
 //       schema: {
@@ -308,8 +379,7 @@ export const getNoticeDetails = async (req, res, next) => {
 //             type: 'object',
 //             properties: {
 //               id: { type: 'integer', example: 1 },
-//               title: { type: 'string', example: '수정된 공지 제목' },
-//               content: { type: 'string', example: '수정된 공지 내용' },
+//               content: { type: 'string', example: '수정된 댓글 내용' },
 //               modifiedAt: { type: 'string', format: 'date-time' }
 //             }
 //           }
@@ -351,7 +421,7 @@ export const getNoticeDetails = async (req, res, next) => {
 //             type: 'object',
 //             properties: {
 //               errorCode: { type: 'string', example: 'FORBIDDEN' },
-//               reason: { type: 'string', example: '공지를 수정할 권한이 없습니다.' }
+//               reason: { type: 'string', example: '댓글을 수정할 권한이 없습니다.' }
 //             }
 //           },
 //           success: { type: 'object', nullable: true, example: null }
@@ -360,14 +430,14 @@ export const getNoticeDetails = async (req, res, next) => {
 //     }
 //   }
 // }
-export const updateNotice = async (req, res, next) => {
+export const updateComment = async (req, res, next) => {
   try {
-    const { noticeId } = req.params;
-    const noticeUpdateData = req.body;
+    const { commentId } = req.params;
+    const commentUpdateData = req.body;
 
     // DTO를 사용한 유효성 검증
-    const validatedNoticeId = validateNoticeIdDto(noticeId);
-    const validatedUpdateData = updateNoticeRequestDto(noticeUpdateData);
+    const validatedCommentId = validateCommentIdDto(commentId);
+    const validatedUpdateData = updateCommentRequestDto(commentUpdateData);
 
     // 인증 미들웨어로부터 사용자 ID 획득 (테스트를 위해 임시로 1로 설정)
     const userId = 1; // req.user?.id;
@@ -379,13 +449,13 @@ export const updateNotice = async (req, res, next) => {
       });
     }
 
-    const updatedNotice = await noticeService.updateNotice(
-      validatedNoticeId,
+    const updatedComment = await noticeCommentService.updateComment(
+      validatedCommentId,
       userId,
       validatedUpdateData
     );
 
-    const response = noticeUpdateResponseDto(updatedNotice);
+    const response = commentUpdateResponseDto(updatedComment);
     res.success(response);
   } catch (err) {
     next(err);
@@ -393,10 +463,10 @@ export const updateNotice = async (req, res, next) => {
 };
 
 /*
- * 5. 특정 크루 공지 삭제
+ * 5. 공지 댓글 삭제
  */
-// #swagger.tags = ['Notice']
-// #swagger.description = '공지사항을 삭제합니다.'
+// #swagger.tags = ['Notice Comment']
+// #swagger.description = '공지사항의 댓글을 삭제합니다.'
 // #swagger.parameters['crewId'] = {
 //   in: 'path',
 //   description: '크루 ID',
@@ -411,8 +481,15 @@ export const updateNotice = async (req, res, next) => {
 //   type: 'integer',
 //   example: 1
 // }
+// #swagger.parameters['commentId'] = {
+//   in: 'path',
+//   description: '댓글 ID',
+//   required: true,
+//   type: 'integer',
+//   example: 1
+// }
 // #swagger.responses[200] = {
-//   description: '공지사항 삭제 성공',
+//   description: '댓글 삭제 성공',
 //   content: {
 //     'application/json': {
 //       schema: {
@@ -423,7 +500,7 @@ export const updateNotice = async (req, res, next) => {
 //           success: {
 //             type: 'object',
 //             properties: {
-//               message: { type: 'string', example: '공지가 성공적으로 삭제되었습니다.' }
+//               message: { type: 'string', example: '댓글이 성공적으로 삭제되었습니다.' }
 //             }
 //           }
 //         }
@@ -464,7 +541,7 @@ export const updateNotice = async (req, res, next) => {
 //             type: 'object',
 //             properties: {
 //               errorCode: { type: 'string', example: 'FORBIDDEN' },
-//               reason: { type: 'string', example: '공지를 삭제할 권한이 없습니다.' }
+//               reason: { type: 'string', example: '댓글을 삭제할 권한이 없습니다.' }
 //             }
 //           },
 //           success: { type: 'object', nullable: true, example: null }
@@ -473,12 +550,12 @@ export const updateNotice = async (req, res, next) => {
 //     }
 //   }
 // }
-export const deleteNotice = async (req, res, next) => {
+export const deleteComment = async (req, res, next) => {
   try {
-    const { noticeId } = req.params;
+    const { commentId } = req.params;
 
     // DTO를 사용한 유효성 검증
-    const validatedNoticeId = validateNoticeIdDto(noticeId);
+    const validatedCommentId = validateCommentIdDto(commentId);
 
     // 인증 미들웨어로부터 사용자 ID 획득 (테스트를 위해 임시로 1로 설정)
     const userId = 1; // req.user?.id;
@@ -490,9 +567,9 @@ export const deleteNotice = async (req, res, next) => {
       });
     }
 
-    await noticeService.deleteNotice(validatedNoticeId, userId);
+    await noticeCommentService.deleteComment(validatedCommentId, userId);
 
-    const response = noticeDeleteResponseDto();
+    const response = commentDeleteResponseDto();
     res.success(response);
   } catch (err) {
     next(err);

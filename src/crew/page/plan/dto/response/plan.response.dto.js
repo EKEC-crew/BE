@@ -3,7 +3,7 @@ export class CreateCrewPlanResponse {
     constructor(plan) {
       this.id = plan.id;
       this.crew_name = plan.crew.title;
-      this.writer = plan.crewPlanReqest.crewMember.user.nickname;
+      this.writer = plan.crewPlanRequest.crewMember.user.nickname;
       this.title = plan.title;
       this.content = plan.content;
       this.day = plan.day;
@@ -24,7 +24,7 @@ export class CreateCrewPlanResponse {
     constructor(plan) {
       this.id = plan.id;
       this.crew_name = plan.crew.title;
-      this.writer = plan.crewPlanReqest.crewMember.user.nickname;
+      this.writer = plan.crewPlanRequest.crewMember.user.nickname;
       this.title = plan.title;
       this.content = plan.content;
       this.day = plan.day;

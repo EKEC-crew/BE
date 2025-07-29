@@ -219,6 +219,27 @@ export const getPlanList = async (req, res, next) => {
       }
     }
   }
+  #swagger.responses[404] = {
+    description: "크루가 존재하지 않음",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            resultType: { type: "string", example: "FAIL" },
+            error: {
+              type: "object",
+              properties: {
+                errorCode: { type: "string", example: "P001" },
+                reason: { type: "string", example: "크루가 존재하지 않습니다." }
+              }
+            },
+            data: { type: "null", example: null }
+          }
+        }
+      }
+    }
+  }
   */
   try {
     const crewId = parseInt(req.params.crewId);
@@ -355,26 +376,26 @@ export const deletePlan = async (req, res, next) => {
 }
 
 export const createPlanComment = async (req, res, next) => {
-  /**
- * #swagger.summary = "크루 일정 댓글 작성"
- * #swagger.tags = ["Crew Plan Comment"]
- * #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer', description: '크루 ID' }
- * #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer', description: '일정 ID' }
- * #swagger.requestBody = {
- *   required: true,
- *   content: {
- *     "application/json": {
- *       schema: {
- *         type: "object",
- *         required: ["crewMemberId", "content"],
- *         properties: {
- *           crewMemberId: { type: "integer", example: 5 },
- *           content: { type: "string", example: "참석하겠습니다!" }
- *         }
- *       }
- *     }
- *   }
- * }
+  /*
+  #swagger.summary = "크루 일정 댓글 작성"
+  #swagger.tags = ["Crew Plan Comment"]
+  #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer', description: '크루 ID' }
+  #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer', description: '일정 ID' }
+  #swagger.requestBody = {
+    required: true,
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          required: ["crewMemberId", "content"],
+          properties: {
+            crewMemberId: { type: "integer", example: 5 },
+            content: { type: "string", example: "참석하겠습니다!" }
+          }
+        }
+      }
+    }
+  }
  * #swagger.responses[200] = { 
  *   description: "댓글 작성 성공",
  *   content: {
@@ -568,26 +589,26 @@ export const getPlanCommentList = async (req, res, next) => {
 }
 
 export const updatePlanComment = async (req, res, next) => {
-  /**
-  * #swagger.summary = "크루 일정 댓글 수정"
-  * #swagger.tags = ["Crew Plan Comment"]
-  * #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer' }
-  * #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer' }
-  * #swagger.parameters['commentId'] = { in: 'path', required: true, type: 'integer' }
-  * #swagger.requestBody = {
-  *   required: true,
-  *   content: {
-  *     "application/json": {
-  *       schema: {
-  *         type: "object",
-  *         required: ["content"],
-  *         properties: {
-  *           content: { type: "string", example: "내용을 수정했습니다." }
-  *         }
-  *       }
-  *     }
-  *   }
-  * }
+  /*
+  #swagger.summary = "크루 일정 댓글 수정"
+  #swagger.tags = ["Crew Plan Comment"]
+  #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer' }
+  #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer' }
+  #swagger.parameters['commentId'] = { in: 'path', required: true, type: 'integer' }
+  #swagger.requestBody = {
+    required: true,
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          required: ["content"],
+          properties: {
+            content: { type: "string", example: "내용을 수정했습니다." }
+          }
+        }
+      }
+    }
+  }
   * #swagger.responses[200] = { 
   *   description: "댓글 수정 성공",
   *   content: {

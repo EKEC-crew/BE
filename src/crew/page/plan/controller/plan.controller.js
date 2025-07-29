@@ -316,6 +316,29 @@ export const deletePlan = async (req, res, next) => {
 }
 
 export const createPlanComment = async (req, res, next) => {
+  /**
+ * #swagger.summary = "크루 일정 댓글 작성"
+ * #swagger.tags = ["Crew Plan Comment"]
+ * #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer', description: '크루 ID' }
+ * #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer', description: '일정 ID' }
+ * #swagger.requestBody = {
+ *   required: true,
+ *   content: {
+ *     "application/json": {
+ *       schema: {
+ *         type: "object",
+ *         required: ["crewMemberId", "content"],
+ *         properties: {
+ *           crewMemberId: { type: "integer", example: 5 },
+ *           content: { type: "string", example: "참석하겠습니다!" }
+ *         }
+ *       }
+ *     }
+ *   }
+ * }
+ * #swagger.responses[200] = { description: "댓글 작성 성공" }
+ * #swagger.responses[400] = { description: "입력값 오류" }
+ */
   try {
     const {crewId, planId} = req.params;
     const reqDto = new CreateCrewPlanCommentRequest(req.body);
@@ -328,6 +351,130 @@ export const createPlanComment = async (req, res, next) => {
     });
 
     return res.success(comment);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export const getPlanCommentById = async (req, res, next) => {
+  /**
+ * #swagger.summary = "크루 일정 댓글 단건 조회"
+ * #swagger.tags = ["Crew Plan Comment"]
+ * #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.parameters['commentId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.responses[200] = { description: "댓글 단건 조회 성공" }
+ * #swagger.responses[404] = { description: "댓글이 존재하지 않음" }
+ */
+
+  try {
+    const {crewId, planId, commentId} = req.params;
+
+    //객체 방식으로 넣으면 순서 상관 없이 넣을 수 있음
+    //가독성 향상 및 의미 명확화화
+    const comment = await planService.CrewPlanCommentService.getCommentById({
+      crewId: Number(crewId),
+      planId: Number(planId),
+      commentId: Number(commentId),
+    });
+
+    return res.success(comment);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export const getPlanCommentList = async (req, res, next) => {
+  /**
+ * #swagger.summary = "크루 일정 댓글 목록 조회"
+ * #swagger.tags = ["Crew Plan Comment"]
+ * #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer', description: '크루 ID' }
+ * #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer', description: '일정 ID' }
+ * #swagger.parameters['page'] = { in: 'query', required: false, type: 'integer', description: '페이지 번호 (기본 1)' }
+ * #swagger.parameters['size'] = { in: 'query', required: false, type: 'integer', description: '페이지 크기 (기본 10)' }
+ * #swagger.responses[200] = { description: "댓글 목록 조회 성공" }
+ */
+
+  try {
+    const {crewId, planId} = req.params;
+    const page = Number(req.query.page || 1);
+    const size = Number(req.query.size || 10);
+
+    const commentList = await planService.CrewPlanCommentService.getCommentList({
+      crewId: Number(crewId),
+      planId: Number(planId),
+      page,
+      size,
+    });
+
+    return res.success(commentList);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export const updatePlanComment = async (req, res, next) => {
+  /**
+ * #swagger.summary = "크루 일정 댓글 수정"
+ * #swagger.tags = ["Crew Plan Comment"]
+ * #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.parameters['commentId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.requestBody = {
+ *   required: true,
+ *   content: {
+ *     "application/json": {
+ *       schema: {
+ *         type: "object",
+ *         properties: {
+ *           content: { type: "string", example: "내용을 수정했습니다." }
+ *         }
+ *       }
+ *     }
+ *   }
+ * }
+ * #swagger.responses[200] = { description: "댓글 수정 성공" }
+ * #swagger.responses[400] = { description: "수정할 댓글이 존재하지 않거나 입력값 오류" }
+ */
+
+  try {
+    const {crewId, planId, commentId} = req.params;
+    const {content} = req.body;
+
+    //comment 하나만 수정하면 되서 dto 따로 만들지 않음
+    const comment = await planService.CrewPlanCommentService.updateComment({
+      crewId: Number(crewId),
+      planId: Number(planId),
+      commentId: Number(commentId),
+      content,
+    });
+    
+    return res.success(comment);
+  } catch (err) {
+    next(err);
+  }
+}
+export const deletePlanComment = async (req, res, next) => {
+  /**
+ * #swagger.summary = "크루 일정 댓글 삭제"
+ * #swagger.tags = ["Crew Plan Comment"]
+ * #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.parameters['commentId'] = { in: 'path', required: true, type: 'integer' }
+ * #swagger.responses[200] = { description: "댓글 삭제 성공" }
+ * #swagger.responses[404] = { description: "삭제할 댓글이 존재하지 않음" }
+ */
+
+  try {
+    const {crewId, planId, commentId} = req.params;
+    
+    await planService.CrewPlanCommentService.deleteComment({
+      crewId: Number(crewId),
+      planId: Number(planId),
+      commentId: Number(commentId),
+    });
+
+    return res.success({message: "댓글이 삭제되었습니다."});
   } catch (err) {
     next(err);
   }

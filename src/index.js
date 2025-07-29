@@ -12,15 +12,15 @@ import swaggerAutogen from "swagger-autogen";
 import swaggerUiExpress from "swagger-ui-express";
 
 //session, passport 세팅
-import {prisma} from "./db.config.js";
-import {PrismaSessionStore} from "@quixo3/prisma-session-store";
+import { prisma } from "./db.config.js";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
 import fs from "fs"; // 추가
 
 import routes from "./route/route.js";
 
-import {initS3} from "./config/aws/s3.js";
+import { initS3 } from "./config/aws/s3.js";
 
 const app = express();
 const port = process.env.PORT;
@@ -36,13 +36,13 @@ export const s3 = initS3();
  */
 app.use((req, res, next) => {
   res.success = (success) => {
-    return res.json({resultType: "SUCCESS", error: null, data: success});
+    return res.json({ resultType: "SUCCESS", error: null, data: success });
   };
 
-  res.error = ({errorCode = "unknown", reason = null, data = null}) => {
+  res.error = ({ errorCode = "unknown", reason = null, data = null }) => {
     return res.json({
       resultType: "FAIL",
-      error: {errorCode, reason, data},
+      error: { errorCode, reason, data },
       data: null,
     });
   };
@@ -77,7 +77,7 @@ const corsOptions = {
 app.use(cors(corsOptions)); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
 app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함 (JSON 형태의 요청 body를 파싱하기 위함)
-app.use(express.urlencoded({extended: false})); // 단순 객체 문자열 형태로 본문 데이터 해석
+app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
 // 미들웨어 설정
 app.use(express.json()); // JSON 본문 파싱
 
@@ -154,8 +154,6 @@ app.get("/openapi.json", async (req, res, next) => {
   const result = await swaggerAutogen(options)(outputFile, routes, doc);
   res.json(result ? result.data : null);
 });
-
-app.use("/docs", swaggerUiExpress.serve, swaggerUiExpress.setup(swaggerFile)); //추가
 
 app.use((err, req, res, next) => {
   if (res.headersSent) {

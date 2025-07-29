@@ -116,6 +116,8 @@ model CrewPlan {
   crewPlanRequest          CrewPlanRequest[]
   alarm                    Alarm[]
 
+  comments                 CrewPlanComment[]
+
   @@map("crew_plan")
 
   @@unique([id, crewId]) //복합 키
@@ -131,6 +133,7 @@ model CrewPlanComment {
   crewMemberId  Int       @map("crew_member_id")
 
   crewPlan      CrewPlan  @relation(fields: [crewPlanId], references: [id])
+  
   crewMember    CrewMember @relation(fields: [crewMemberId], references: [id])
 
   @@map("crew_plan_comment")
@@ -169,6 +172,7 @@ model CrewMember {
   crewAlbum CrewAlbum[]
   crewNoticeLike CrewNoticeLike[]
   crewPostLike CrewPostLike[]
+  comments CrewPlanComment[]
 
   @@map("crew_member")
 }

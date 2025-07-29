@@ -25,7 +25,6 @@ import { initS3 } from "./config/aws/s3.js";
 const app = express();
 const port = process.env.PORT;
 
-
 /**
  *  AWS S3 설정
  */
@@ -136,18 +135,18 @@ app.get("/openapi.json", async (req, res, next) => {
   const doc = {
     info: {
       title: "EKEC 이크에크",
-      version: '1.0.0',
+      version: "1.0.0",
       description: "EKEC 이크에크 프로젝트입니다.",
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: "http://localhost:3000",
         description: "개발 서버",
       },
       {
         url: "https://api.ekec.site",
         description: "라이브 서버",
-      }
+      },
     ],
   };
 

@@ -37,11 +37,40 @@ export const createPlan = async (req, res, next) => {
     }
     #swagger.responses[200] = {
       description: "일정 생성 성공",
-      ...
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "SUCCESS" },
+              error: { type: "object", nullable: true, example: null },
+              data: {
+                type: "object",
+                properties: {
+                  id: { type: "number", example: 12 },
+                  crew_name: { type: "string", example: "코딩 크루" },
+                  writer: { type: "string", example: "비쿠" },
+                  title: { type: "string", example: "저녁 모임" },
+                  content: { type: "string", example: "7시 강남역" },
+                  day: { type: "string", format: "date-time" },
+                  type: { type: "number", example: 0 },
+                  isRequired: { type: "boolean" },
+                  allowComments: { type: "boolean" },
+                  allowPrivateComments: { type: "boolean" },
+                  allowExternalShare: { type: "boolean" },
+                  hasFee: { type: "boolean" },
+                  fee: { type: "integer" },
+                  feePurpose: { type: "string" },
+                  createdAt: { type: "string", format: "date-time" }
+                }
+              }
+            }
+          }
+        }
+      }
     }
     #swagger.responses[400] = {
-      description: "입력값 오류",
-      ...
+      description: "입력값 오류"
     }
   */
 
@@ -199,46 +228,10 @@ export const getPlanList = async (req, res, next) => {
     }
   }
   #swagger.responses[400] = {
-    description: "입력값 오류",
-    content: {
-      "application/json": {
-        schema: {
-          type: "object",
-          properties: {
-            resultType: { type: "string", example: "FAIL" },
-            error: {
-              type: "object",
-              properties: {
-                errorCode: { type: "string", example: "P001" },
-                reason: { type: "string", example: "잘못된 입력값입니다." }
-              }
-            },
-            data: { type: "null", example: null }
-          }
-        }
-      }
-    }
+    description: "입력값 오류"
   }
   #swagger.responses[404] = {
-    description: "크루가 존재하지 않음",
-    content: {
-      "application/json": {
-        schema: {
-          type: "object",
-          properties: {
-            resultType: { type: "string", example: "FAIL" },
-            error: {
-              type: "object",
-              properties: {
-                errorCode: { type: "string", example: "P001" },
-                reason: { type: "string", example: "크루가 존재하지 않습니다." }
-              }
-            },
-            data: { type: "null", example: null }
-          }
-        }
-      }
-    }
+    description: "크루가 존재하지 않음"
   }
   */
   try {
@@ -422,25 +415,7 @@ export const createPlanComment = async (req, res, next) => {
  *   }
  * }
  * #swagger.responses[400] = { 
- *   description: "입력값 오류",
- *   content: {
- *     "application/json": {
- *       schema: {
- *         type: "object",
- *         properties: {
- *           resultType: { type: "string", example: "FAIL" },
- *           error: {
- *             type: "object",
- *             properties: {
- *               errorCode: { type: "string", example: "P001" },
- *               reason: { type: "string", example: "잘못된 입력값입니다." }
- *             }
- *           },
- *           data: { type: "null", example: null }
- *         }
- *       }
- *     }
- *   }
+ *   description: "입력값 오류"
  * }
  */
   try {
@@ -635,25 +610,7 @@ export const updatePlanComment = async (req, res, next) => {
   *   }
   * }
   * #swagger.responses[400] = { 
-  *   description: "수정할 댓글이 존재하지 않거나 입력값 오류",
-  *   content: {
-  *     "application/json": {
-  *       schema: {
-  *         type: "object",
-  *         properties: {
-  *           resultType: { type: "string", example: "FAIL" },
-  *           error: {
-  *             type: "object",
-  *             properties: {
-  *               errorCode: { type: "string", example: "P001" },
-  *               reason: { type: "string", example: "수정할 댓글이 존재하지 않습니다." }
-  *             }
-  *           },
-  *           data: { type: "null", example: null }
-  *         }
-  *       }
-  *     }
-  *   }
+  *   description: "수정할 댓글이 존재하지 않거나 입력값 오류"
   * }
   */
   try {

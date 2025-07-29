@@ -19,4 +19,20 @@ router.put('/:planId', planController.updatePlan);
 // 크루 일정 삭제
 router.delete('/:planId', planController.deletePlan);
 
+// 크루 일정 댓글 등록
+router.post("/crew/:crewId/plans/:planId/comments", planController.createPlanComment);
+
+// 크루 일정 댓글 조회
+router.get("/crew/:crewId/plans/:planId/comments/:commentId", planController.getPlanCommentById);
+
+// 크루 일정 댓글 리스트 조회
+router.get("/crew/:crewId/plans/:planId/comments/list", planController.getPlanCommentList);
+
+// 크루 일정 댓글 수정
+router.patch("/crew/:crewId/plans/:planId/comments/:commentId", planController.updatePlanComment);
+
+// 크루 일정 댓글 삭제
+router.delete("/crew/:crewId/plans/:planId/comments/:commentId", planController.deletePlanComment);
+
+
 export default router;

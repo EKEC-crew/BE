@@ -121,7 +121,8 @@ export const CrewPlanCommentService = {
         return new planResponse.CrewPlanCommentResponse(comment);
     }
 
-    //
+    //일장 댓글 단건 조회 서비스
+    
 
 
 }

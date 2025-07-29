@@ -30,18 +30,16 @@ export class CreateCrewPlanRequest {
   // 일정 수정 요청 DTO 
 export class UpdateCrewPlanRequest {
   constructor({
-    crewMemberId,
     title, content, type,
-    day = new Date(day), // day 명시적으로 입력해야함
-    isRequired = false,
-    allowComments = true,
-    allowPrivateComments = true,
-    allowExternalShare = false,
-    hasFee = false,
-    fee = 0,
-    feePurpose = null,
+    day,
+    isRequired,
+    allowComments,
+    allowPrivateComments,
+    allowExternalShare,
+    hasFee,
+    fee,
+    feePurpose,
   }) {
-    this.crewMemberId = crewMemberId;
     this.title = title;
     this.content = content;
     this.day = day;

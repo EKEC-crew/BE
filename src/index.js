@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+
 dotenv.config();
 
 import cors from "cors";
@@ -11,41 +12,38 @@ import swaggerAutogen from "swagger-autogen";
 import swaggerUiExpress from "swagger-ui-express";
 
 //session, passport 세팅
-import { prisma } from "./db.config.js";
-import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import {prisma} from "./db.config.js";
+import {PrismaSessionStore} from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
 import fs from "fs"; // 추가
 
 import routes from "./route/route.js";
 
+import {initS3} from "./config/aws/s3.js";
+
 const app = express();
 const port = process.env.PORT;
 
-//테스트용
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path} --- request received`);
-  next();
-});
 
-// ✅ swagger-output.json 읽기
-const swaggerFile = JSON.parse(
-  fs.readFileSync(new URL("./swagger-output.json", import.meta.url))
-);
+/**
+ *  AWS S3 설정
+ */
+export const s3 = initS3();
 
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
  */
 app.use((req, res, next) => {
   res.success = (success) => {
-    return res.json({ resultType: "SUCCESS", error: null, success });
+    return res.json({resultType: "SUCCESS", error: null, data: success});
   };
 
-  res.error = ({ errorCode = "unknown", reason = null, data = null }) => {
+  res.error = ({errorCode = "unknown", reason = null, data = null}) => {
     return res.json({
       resultType: "FAIL",
-      error: { errorCode, reason, data },
-      success: null,
+      error: {errorCode, reason, data},
+      data: null,
     });
   };
 
@@ -71,20 +69,36 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cors()); // cors 방식 허용
+const corsOptions = {
+  origin: [process.env.LOCAL_ORIGIN, process.env.PROD_ORIGIN],
+  credentials: true,
+};
+
+app.use(cors(corsOptions)); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
 app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함 (JSON 형태의 요청 body를 파싱하기 위함)
-app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
+app.use(express.urlencoded({extended: false})); // 단순 객체 문자열 형태로 본문 데이터 해석
 // 미들웨어 설정
 app.use(express.json()); // JSON 본문 파싱
 
 app.use("/api", routes); // 라우터 연결
 
-// "/" 경로의 미들웨어 (app.listen 앞으로 이동)
-app.get("/", (req, res) => {
-  // #swagger.ignore = true
-  console.log("/");
-  res.send("Hello UMC!");
+//전역 에러 처리 미들웨어는 모든 미들웨어와 라우터 등록 이후에 맨 마지막에 위치해야 합니다.
+/**
+ * 전역 오류를 처리하기 위한 미들웨어
+ => 이 미들웨어는 Controller 내에서 별도로 처리하지 않은 오류가 발생할 경우,
+ 모두 잡아서 공통된 오류 응답으로 내려주게 됩니다.
+ */
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(err.statusCode || 500).error({
+    errorCode: err.errorCode || "unknown",
+    reason: err.reason || err.message || null,
+    data: err.data || null,
+  });
 });
 
 /**logger setting*/
@@ -122,9 +136,19 @@ app.get("/openapi.json", async (req, res, next) => {
   const doc = {
     info: {
       title: "EKEC 이크에크",
+      version: '1.0.0',
       description: "EKEC 이크에크 프로젝트입니다.",
     },
-    host: "localhost:3000",
+    servers: [
+      {
+        url: 'http://localhost:3000',
+        description: "개발 서버",
+      },
+      {
+        url: "https://api.ekec.site",
+        description: "라이브 서버",
+      }
+    ],
   };
 
   const result = await swaggerAutogen(options)(outputFile, routes, doc);

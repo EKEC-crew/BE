@@ -6,11 +6,11 @@ import listRoutes from "../list/route/list.route.js";
 
 import noticeRouter from "../page/notice/route/notice.route.js";
 
-const router = express.Router();
-router.use("/search", searchRoutes);
-router.use("/sort", sortRoutes);
-router.use("/create", creationRoutes);
-router.use("/list", listRoutes);
-router.use("/:crewId/notice", noticeRouter);
+const router = express.Router({ mergeParams: true });
+router.use('/search', searchRoutes);
+router.use('/sort', sortRoutes);
+router.use('/create', creationRoutes);
+router.use('/list', listRoutes);
+router.use('/', pageRoutes);
 
 export default router;

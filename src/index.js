@@ -16,13 +16,15 @@ import {prisma} from "./db.config.js";
 import {PrismaSessionStore} from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
+import fs from "fs"; // 추가
 
-import routes from './route/route.js'
+import routes from "./route/route.js";
 
 import {initS3} from "./config/aws/s3.js";
 
 const app = express();
 const port = process.env.PORT;
+
 
 /**
  *  AWS S3 설정
@@ -47,6 +49,7 @@ app.use((req, res, next) => {
 
   next();
 });
+
 /** session */
 app.use(
   session({
@@ -78,7 +81,7 @@ app.use(express.urlencoded({extended: false})); // 단순 객체 문자열 형�
 // 미들웨어 설정
 app.use(express.json()); // JSON 본문 파싱
 
-app.use('/api', routes); // 라우터 연결
+app.use("/api", routes); // 라우터 연결
 
 //전역 에러 처리 미들웨어는 모든 미들웨어와 라우터 등록 이후에 맨 마지막에 위치해야 합니다.
 /**
@@ -97,6 +100,14 @@ app.use((err, req, res, next) => {
     data: err.data || null,
   });
 });
+
+/**logger setting*/
+const myLogger = (req, res, next) => {
+  console.log("LOGGED");
+  next();
+};
+
+app.use(myLogger);
 
 //Swagger 세팅
 app.use(
@@ -144,13 +155,19 @@ app.get("/openapi.json", async (req, res, next) => {
   res.json(result ? result.data : null);
 });
 
-/**logger setting*/
-const myLogger = (req, res, next) => {
-  console.log("LOGGED");
-  next();
-}
+app.use("/docs", swaggerUiExpress.serve, swaggerUiExpress.setup(swaggerFile)); //추가
 
-app.use(myLogger);
+app.use((err, req, res, next) => {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(err.statusCode || 500).error({
+    errorCode: err.errorCode || "unknown",
+    reason: err.reason || err.message || null,
+    data: err.data || null,
+  });
+});
 
 app.use((err, req, res, next) => {
   if (res.headersSent) {
@@ -168,11 +185,4 @@ app.use((err, req, res, next) => {
 //서버가 성공적으로 시작되었을때 콜백함수 실행
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
-});
-
-// "/" 경로의 미들웨어
-app.get("/", (req, res) => {
-  // #swagger.ignore = true
-  console.log("/");
-  res.send("Hello UMC!");
 });

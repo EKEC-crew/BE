@@ -5,6 +5,7 @@ export const CrewPostListResponse = (body) => {
 		createdAt: post.createdAt,
 		nickname: post.crewMember.user.nickname,
 		commentCount: post.commentCount,
+		likeCount: post.likeCount,
 	}))
 
 	return response;
@@ -19,7 +20,9 @@ export const CrewPostResponse = (body) => {
 		content: post.content,
 		createdAt: post.createdAt,
 		nickname: post.crewMember?.user?.nickname,
+		image: post.crewMember?.user?.image,
 		commentCount: post.commentCount,
+		likeCount: post.likeCount,
 	}
 
 	return response;
@@ -42,7 +45,8 @@ export const CrewCommentListResponse = (body) => {
 		commentId: comment.id,
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
-		createdAt: post.createdAt,
+		image: comment.crewMember.user.image,
+		createdAt: comment.createdAt,
 	}))
 
 	return response;
@@ -55,7 +59,8 @@ export const CrewCommentResponse = (body) => {
 		commentId: comment.id,
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
-		createdAt: post.createdAt,
+		image: comment.crewMember.user.image,
+		createdAt: comment.createdAt,
 	}
 
 	return response;

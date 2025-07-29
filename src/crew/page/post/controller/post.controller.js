@@ -6,13 +6,16 @@ export const readPostsByCrew = async (req, res, next) => {
   console.log("특정 크루 게시글 리스트 조회를 요청했습니다.");
 
   const { crewId } = req.params;
+  const page = req.query.page || 1;
+  const size = req.query.size || 10;
 
-  const response = await postService.readPostsByCrew(
-    postRequest.readPostListRequest(crewId)
-  );
+  const response = await postService.readPostsByCrew(postRequest.readPostListRequest(crewId, page, size));
   // #region Swagger: 게시글 리스트 조회 API
   /*
     #swagger.summary = '게시글 리스트 조회 API';
+    #swagger.tags = ["Crew Post"]
+    #swagger.parameters['page'] = { in: 'query', required: false, type: 'integer', description: '페이지 번호 (기본1)' }
+    #swagger.parameters['size'] = { in: 'query', required: false, type: 'integer', description: '페이지 크기 (기본10)' }
     #swagger.responses[200] = {
       description: "게시글 리스트 조회 성공 응답",
       content: {
@@ -85,7 +88,7 @@ export const createCrewPost = async (req, res, next) => {
   // #region Swagger: 게시글 작성 API
   /*
     #swagger.summary = '게시글 작성 API';
-
+    #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
       content: {
@@ -118,6 +121,8 @@ export const createCrewPost = async (req, res, next) => {
                   "title": "게시글 작성 테스트 제목입니다.",
                   "content": "게시글 작성 테스트 내용입니다.",
                   "createdAt": "2025-07-18T02:04:54.410Z",
+                  "nickname": "길동이",
+                  "image": "profile.jpg",
                   "commentCount": 0
                 }
               }
@@ -166,7 +171,7 @@ export const readCrewPost = async (req, res, next) => {
   // #region Swagger: 특정 크루 특정 게시글 상세 조회 API
   /*
     #swagger.summary = '특정 크루 특정 게시글 상세 조회 API';
-
+    #swagger.tags = ["Crew Post"]
     #swagger.responses[200] = {
       description: "특정 크루 특정 게시글 상세 조회 성공 응답",
       content: {
@@ -184,6 +189,7 @@ export const readCrewPost = async (req, res, next) => {
                   "content": "이 게시글은...",
                   "createdAt": "2025-07-18T01:42:20.494Z",
                   "nickname": "길동이",
+                  "image": "profile.jpg",
                   "commentCount": 0
                 }
               }
@@ -233,7 +239,7 @@ export const updateCrewPost = async (req, res, next) => {
   // #region Swagger: 특정 크루 특정 게시글 수정 API
   /*
     #swagger.summary = '특정 크루 특정 게시글 수정 API';
-
+    #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
       content: {
@@ -266,6 +272,8 @@ export const updateCrewPost = async (req, res, next) => {
                   "title": "게시글 수정 테스트 제목입니다.",
                   "content": "게시글 수정 테스트 내용입니다.",
                   "createdAt": "2025-07-18T02:04:54.410Z",
+                  "nickname": "길동이",
+                  "image": "profile.jpg",
                   "commentCount": 0
                 }
               }
@@ -315,7 +323,7 @@ export const deleteCrewPost = async (req, res, next) => {
   // #region Swagger: 특정 크루 특정 게시글 삭제 API
   /*
     #swagger.summary = '특정 크루 특정 게시글 삭제 API';
-
+    #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
       content: {
@@ -346,6 +354,8 @@ export const deleteCrewPost = async (req, res, next) => {
                   "title": "게시글 작성 테스트 제목입니다.",
                   "content": "게시글 작성 테스트 내용입니다.",
                   "createdAt": "2025-07-18T03:41:07.805Z",
+                  "nickname": "길동이",
+                  "image": "profile.jpg",
                   "commentCount": 0
                 }
               }
@@ -394,7 +404,7 @@ export const toggleCrewPostLike = async (req, res, next) => {
   // #region Swagger: 특정 크루 특정 게시글 좋아요 API
   /*
     #swagger.summary = '특정 크루 특정 게시글 좋아요 API';
-
+    #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
       content: {
@@ -463,14 +473,17 @@ export const readCommentsByCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 댓글 리스트 조회를 요청했습니다.");
 
   const { crewId, postId } = req.params;
+  const page = req.query.page || 1;
+  const size = req.query.size || 10;
   console.log(req.params);
 
-  const response = await postService.readCommentsByCrewPost(
-    postRequest.readCommentListRequest(crewId, postId)
-  );
+  const response = await postService.readCommentsByCrewPost(postRequest.readCommentListRequest(crewId, postId, page, size));
   // #region Swagger: 게시글 댓글 리스트 조회 API
   /*
     #swagger.summary = '게시글 댓글 리스트 조회 API';
+    #swagger.tags = ["Crew Post"]
+    #swagger.parameters['page'] = { in: 'query', required: false, type: 'integer', description: '페이지 번호 (기본1)' }
+    #swagger.parameters['size'] = { in: 'query', required: false, type: 'integer', description: '페이지 크기 (기본10)' }
     #swagger.responses[200] = {
       description: "게시글 댓글 리스트 조회 성공 응답",
       content: {
@@ -487,13 +500,17 @@ export const readCommentsByCrewPost = async (req, res, next) => {
                     "commentId": 1,
                     "content": "게시글 작성 테스트 내용1 입니다.",
                     "nickname": "철수짱1",
-                    "createdAt": "2025-07-20 12:13:07"
+                    "createdAt": "2025-07-20 12:13:07",
+                    "nickname": "길동이",
+                    "image": "profile.jpg",
                   },
                   {
                     "commentId": 2,
                     "content": "게시글 작성 테스트 내용2 입니다.",
                     "nickname": "철수짱2",
-                    "createdAt": "2025-07-20 12:13:24"
+                    "createdAt": "2025-07-20 12:13:24",
+                    "nickname": "길동이",
+                    "image": "profile.jpg",
                   },
                 ]
               }
@@ -542,7 +559,7 @@ export const createCrewPostComment = async (req, res, next) => {
   // #region Swagger: 댓글 작성 API
   /*
     #swagger.summary = '댓글 작성 API';
-
+    #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
       content: {
@@ -575,6 +592,8 @@ export const createCrewPostComment = async (req, res, next) => {
                   "content": "댓글 작성 테스트 내용입니다.",
                   "nickname": "홍길동",
                   "createdAt": "2025-07-18T02:04:54.410Z",
+                  "nickname": "길동이",
+                  "image": "profile.jpg",
                 }
               }
             }
@@ -627,7 +646,7 @@ export const updateCrewPostComment = async (req, res, next) => {
   // #region Swagger: 특정 댓글 수정 API
   /*
     #swagger.summary = '특정 댓글 수정 API';
-
+    #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
       content: {
@@ -660,6 +679,8 @@ export const updateCrewPostComment = async (req, res, next) => {
                   "content": "댓글 수정 테스트 내용입니다.",
                   "nickname": "홍길동",
                   "createdAt": "2025-07-18 02:04:54.410",
+                  "nickname": "길동이",
+                  "image": "profile.jpg",
                 }
               }
             }
@@ -711,7 +732,7 @@ export const deleteCrewPostComment = async (req, res, next) => {
   // #region Swagger: 특정 댓글 삭제 API
   /*
     #swagger.summary = '특정 댓글 삭제 API';
-
+    #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
       content: {
@@ -742,6 +763,8 @@ export const deleteCrewPostComment = async (req, res, next) => {
                   "content": "삭제된 댓글의 내용입니다.",
                   "nickname": "홍길동",
                   "createdAt": "2025-07-18 02:04:54.410",
+                  "nickname": "길동이",
+                  "image": "profile.jpg",
                 }
               }
             }

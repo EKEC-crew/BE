@@ -17,9 +17,11 @@ export const createCrewPostCommentRequest = (crewId, postId, body) => {
     }
 }
 
-export const readPostListRequest = (crewId) => {
+export const readPostListRequest = (crewId, page, size) => {
     return {
         crewId: Number(crewId),
+        page: Number(page),
+        size: Number(size),
     }
 }
 
@@ -30,10 +32,12 @@ export const readPostRequest = (crewId, postId) => {
     }
 }
 
-export const readCommentListRequest = (crewId, postId) => {
+export const readCommentListRequest = (crewId, postId, page, size) => {
     return {
         crewId: Number(crewId),
         postId: Number(postId),
+        page: Number(page),
+        size: Number(size),
     }
 }
 

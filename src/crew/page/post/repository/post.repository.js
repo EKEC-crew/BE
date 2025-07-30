@@ -38,7 +38,6 @@ export const createCrewPost = async ({ crewMemberId, crewId, title, content }) =
 				title,
 				content,
 				commentCount: 0,
-				createdAt: new Date(),
 				crewId,
 				crewMemberId: crewMemberId,
 			},

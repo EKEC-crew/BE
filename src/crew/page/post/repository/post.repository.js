@@ -54,6 +54,14 @@ export const createCrewPost = async ({ crewMemberId, crewId, title, content }) =
 				}
 			}
 		})
+		await prisma.crew.update({
+			where: { id: crewId },
+			data: {
+				postCount: {
+					increment: 1,
+				}
+			}
+		});
 		return post;
 	} catch (err) {
 		throw new Error(
@@ -139,6 +147,15 @@ export const removeCrewPostBypostId = async ({ postId }) => {
 				}
 			}
 		})
+		const crewId = deletedPost.crewId;
+		await prisma.crew.update({
+			where: { id: crewId },
+			data: {
+				postCount: {
+					decrement: 1,
+				}
+			}
+		});
 		return deletedPost;
 	} catch (err) {
 		throw new Error(

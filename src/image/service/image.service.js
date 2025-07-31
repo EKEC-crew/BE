@@ -37,7 +37,7 @@ export const uploadBannerImage = async (file) => {
  */
 export const generatePresignedURL = (data) => {
     // 타입에 따른 경로명
-    const typeEnum = ["crewBanner", "profile"];
+    const typeEnum = ["crewBanner", "profile", "crewPost"];
     // AWS SDK를 통하여 Presigned URL 발급 요청
     const getSignedUrlForGet = s3.getSignedUrl('getObject', {
         Bucket: process.env.AWS_S3_BUCKET,
@@ -46,4 +46,21 @@ export const generatePresignedURL = (data) => {
     });
     // Presigned URL 값 반환
     return responseFromGetImageURL({ getSignedUrlForGet });
+}
+
+export const uploadPostImage = async (file) => {
+    // 원본 파일의 확장자
+    const originalExtension = file.originalname.split(".").at(-1);
+    // 새 파일명으로 지정할 랜덤한 UUID 생성
+    const id = uuidv4();
+    // 새 파일명 조합
+    const fileName = `${id}.${originalExtension}`;
+    // S3 버킷에 업로드 요청
+    const data = await s3.upload({
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: `crewPost/${fileName}`,
+        Body: file.buffer,
+        ContentType: file.mimetype
+    }).promise();
+    return data.Location;
 }

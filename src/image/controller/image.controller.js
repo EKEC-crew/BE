@@ -130,7 +130,7 @@ export const handleGetImageURL = async (req, res, next) => {
     console.log("이미지 로드 작업이 요청되었습니다!")
     console.log("query:", req.query);
     // ✅ 유효성 검사 (파일 타입)
-    if (req.query.type === undefined || isNaN(Number(req.query.type)) || Number(req.query.type) < 0 || Number(req.query.type) > 1) {
+    if (req.query.type === undefined || isNaN(Number(req.query.type)) || Number(req.query.type) < 0 || Number(req.query.type) > 2) {
         throw new InvalidInputValueError("올바른 이미지 종류(타입)을 입력해 주세요.", req.query);
     }
     // 서비스 레이어로부터 Presigned URL 가져오기

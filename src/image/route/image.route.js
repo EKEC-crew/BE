@@ -1,7 +1,7 @@
-import express from 'express';
-import { handleGetImageURL } from '../controller/image.controller.js';
+import express from "express";
+import { handleGetImage } from "../controller/image.controller.js";
 
 const router = express.Router({ mergeParams: true });
-router.get("/", handleGetImageURL);
+router.get("/", handleGetImage);
 
 export default router;

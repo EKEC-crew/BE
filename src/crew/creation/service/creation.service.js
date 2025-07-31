@@ -1,6 +1,6 @@
 import { createApplicationForm, createCrew, updateCrewBanner } from "../repository/creation.repository.js";
 import { responseFromCreateNewCrew } from "../dto/response/creation.response.dto.js";
-import { uploadBannerImage } from "../../image/service/image.service.js"
+import { uploadBannerImage } from "../../../image/service/image.service.js"
 import { UnprocessableInputValueError } from "../../../error.js";
 /**
  * **[Crew Creation]**
@@ -26,7 +26,7 @@ export const createNewCrew = async (body) => {
     // 저장한 크루 ID를 이용해 신청서도 추가합니다.
     await createApplicationForm(body, crewId);
     // 배너 이미지를 S3에 업로드 한 다음 파일명만 잘라서 저장합니다.
-    const bannerFileName = (await uploadBannerImage(body.bannerImage, crewId)).split('/').at(-1);
+    const bannerFileName = (await uploadBannerImage(body.bannerImage)).split('/').at(-1);
     // 크루 정보에 배너 이미지 파일명을 추가합니다.
     await updateCrewBanner(crewId, bannerFileName);
     // 크루 ID를 반환

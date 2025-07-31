@@ -2,6 +2,7 @@ import { } from "../../../../error.js";
 import * as postResponse from "../dto/response/post.response.dto.js"
 import * as postRepository from "../repository/post.repository.js"
 import * as baseError from "../../../../error.js"
+import * as s3Function from "../../../../utils/s3.js"
 
 export const readPostsByCrew = async ({ crewId, page, size }) => {
 	try {
@@ -16,7 +17,7 @@ export const readPostsByCrew = async ({ crewId, page, size }) => {
 	}
 }
 
-export const createCrewPost = async ({ userId, crewId, title, content }) => {
+export const createCrewPost = async ({ userId, crewId, title, content, images }) => {
 	try {
 		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {
@@ -35,8 +36,15 @@ export const createCrewPost = async ({ userId, crewId, title, content }) => {
 			title,
 			content,
 		})
+		const postId = post.id;
+		const imagesInfo = [];
+		for (const file of images) {
+			const imageName = await s3Function.uploadToS3(file, 2);
+			const image = await postRepository.addImage({ postId, imageName });
+			imagesInfo.push(image);
+		}
 
-		return postResponse.CrewPostResponse(post);
+		return postResponse.CrewPostResponse({ post, imagesInfo });
 	} catch (err) {
 		throw err;
 	}
@@ -54,13 +62,14 @@ export const readCrewPost = async ({ crewId, postId }) => {
 		}
 
 		const post = await postRepository.getPostByPostId({ postId });
-		return postResponse.CrewPostResponse(post);
+		const imagesInfo = await postRepository.getImages({ postId });
+		return postResponse.CrewPostResponse({ post, imagesInfo });
 	} catch (err) {
 		throw err;
 	}
 }
 
-export const updateCrewPost = async ({ userId, crewId, postId, title, content }) => {
+export const updateCrewPost = async ({ userId, crewId, postId, title, content, images, existingImageIds }) => {
 	try {
 		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {
@@ -86,7 +95,35 @@ export const updateCrewPost = async ({ userId, crewId, postId, title, content })
 			title,
 			content,
 		});
-		return postResponse.CrewPostResponse(post);
+
+		//존재하는 이미지 아이디가 맞는지 확인하기
+		for (const imageId of existingImageIds) {
+			const isExistImage = await postRepository.isExistImage({ imageId });
+			if (!isExistImage) {
+				throw new baseError.NotFoundImageError("존재하지 않는 이미지입니다.", { imageId });
+			}
+		}
+		//existingImageIds에 남은 Id들이 해당 게시글의 이미지Id가 맞는지 확인하기
+		for (const imageId of existingImageIds) {
+			const isExistImageInPost = await postRepository.isExistImageInPost({ postId, imageId });
+			if (!isExistImageInPost) {
+				throw new baseError.NotExistImageInPostError("해당 게시글의 이미지가 아닙니다.", { imageId });
+			}
+		}
+
+		//이미지 DB삭제 및 s3에서도 삭제
+		const deletedImages = await postRepository.deleteUpdatedImages({ postId, existingImageIds });
+		for (const deletedImage of deletedImages) {
+			await s3Function.deleteFromS3(deletedImage.imageName, 2);
+		}
+		//수정에서 추가한 이미지 업로드 및 DB에도 업로드
+		for (const file of images) {
+			const imageName = await s3Function.uploadToS3(file, 2);
+			await postRepository.addImage({ postId, imageName });
+		}
+		const imagesInfo = await postRepository.getImages({ postId });
+
+		return postResponse.CrewPostResponse({ post, imagesInfo });
 	} catch (err) {
 		throw err;
 	}
@@ -114,11 +151,17 @@ export const deleteCrewPost = async ({ userId, crewId, postId }) => {
 			throw new baseError.PermissionDeniedError("권한이 없는 유저입니다.", { userId });
 		}
 
+		const deletedImages = await postRepository.deleteImages({ postId });
+		for (const deletedImage of deletedImages) {
+			await s3Function.deleteFromS3(deletedImage.imageName, 2);
+		}
+		const imagesInfo = deletedImages;
+
 		const post = await postRepository.removeCrewPostBypostId({
 			postId,
 		})
 
-		return postResponse.CrewPostResponse(post);
+		return postResponse.CrewPostResponse({ post, imagesInfo });
 	} catch (err) {
 		throw err;
 	}

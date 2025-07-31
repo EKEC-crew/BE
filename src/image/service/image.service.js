@@ -12,8 +12,8 @@ import { generatePresignedUrlForGet } from "../../utils/s3.js";
  * @returns {Object}
  */
 export const getImageURL = (data) => {
-  // 이미지에 대한 Presigned URL 생성
-  const imageUrl = generatePresignedUrlForGet(data.type, data.fileName);
-  // Presigned URL 값 반환
-  return responseFromGetImage({ imageUrl });
+    // 이미지에 대한 Presigned URL 생성
+    const imageUrl = generatePresignedUrlForGet(data.type, data.fileName);
+    // Presigned URL 값 반환
+    return responseFromGetImage({ imageUrl });
 };

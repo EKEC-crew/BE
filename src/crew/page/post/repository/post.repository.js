@@ -193,6 +193,50 @@ export const getImages = async ({ postId }) => {
 	}
 }
 
+export const deleteUpdatedImages = async ({ postId, existingImageIds }) => {
+	try {
+		const deletedImages = await prisma.crewPostImage.findMany({
+			where: {
+				postId: postId,
+				id: {
+					notIn: existingImageIds.length > 0 ? existingImageIds : [0],
+				}
+			}
+		})
+		await prisma.crewPostImage.deleteMany({
+			where: {
+				postId: postId,
+				id: {
+					notIn: existingImageIds.length > 0 ? existingImageIds : [0],
+				},
+			},
+		});
+		return deletedImages;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const deleteImages = async ({ postId }) => {
+	try {
+		const deletedImages = await prisma.crewPostImage.findMany({
+			where: { postId: postId },
+		})
+		await prisma.crewPostImage.deleteMany({
+			where: {
+				postId: postId,
+			}
+		});
+		return deletedImages;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
 export const likeCrewPost = async ({ crewMemberId, postId }) => {
 	try {
 		const post = await prisma.crewPost.findUnique({
@@ -461,6 +505,45 @@ export const isExistComment = async ({ commentId }) => {
 		)
 
 		return isExist;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const isExistImage = async ({ imageId }) => {
+	try {
+		const isExist = await prisma.crewPostImage.findUnique(
+			{
+				where: {
+					id: imageId,
+				}
+			}
+		)
+
+		return isExist;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const isExistImageInPost = async ({ postId, imageId }) => {
+	try {
+		const image = await prisma.crewPostImage.findUnique(
+			{
+				where: {
+					id: imageId,
+				}
+			}
+		)
+		if (image.postId !== postId) {
+			return false;
+		} else {
+			return true;
+		}
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

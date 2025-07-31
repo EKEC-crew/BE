@@ -12,7 +12,7 @@ const upload = multer({
 router.get('/list', postController.readPostsByCrew);
 router.post('/', upload.array('images', 10), postController.createCrewPost); //인증 필요
 router.get('/:postId', postController.readCrewPost);
-router.put('/:postId', postController.updateCrewPost); //인증 필요
+router.put('/:postId', upload.array('images', 10), postController.updateCrewPost); //인증 필요
 router.delete('/:postId', postController.deleteCrewPost); //인증 필요
 router.post('/:postId/like', postController.toggleCrewPostLike); //인증 필요
 router.get('/:postId/comment/list', postController.readCommentsByCrewPost);

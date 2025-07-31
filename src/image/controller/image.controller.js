@@ -65,7 +65,7 @@ export const handleGetImage = async (req, res, next) => {
                                     "data" :{
                                         type:"object",
                                         properties: {
-                                            "type": {type:"string", example:"2"},
+                                            "type": {type:"string", example:"-1"},
                                             "fileName": {type:"string", example:"example.jpeg"}
                                         }
                                     }

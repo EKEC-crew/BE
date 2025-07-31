@@ -102,7 +102,65 @@ export const handleCreateCrew = async (req, res, next) => {
                   }
               }
           }
-
+          #swagger.responses[404] = {
+            description: "크루 생성 실패 응답 (유효하지 않은 유저)",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    resultType: { type: "string", example: "FAIL" },
+                    error: {
+                      type: "object",
+                      properties: {
+                        errorCode: { type: "string", example: "U001" },
+                        reason: { type: "string", example: "유효하지 않은 유저 입니다." },
+                        data: {
+                          type: "object",
+                          properties: {
+                            name: { type: "string", example: "새로운 크루" },
+                            description: { type: "string", example: "가족같은 분위기의 크루" },
+                            maxCapacity: { type: "number", example: 10 },
+                            category: { type: "number", example: 1 },
+                            activities: {
+                              type: "array",
+                              items: { type: "number", example: 1 }
+                            },
+                            styles: {
+                              type: "array",
+                              items: { type: "number", example: 2 }
+                            },
+                            region: { type: "number", example: 1 },
+                            age: { type: "number", example: 1 },
+                            gender: { type: "number", example: 0 },
+                            recruitMessage: { type: "string", example: "선택해주셔서 감사합니다!" },
+                            applicationForm: {
+                              type: "array",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  question: { type: "string", example: "어떤경로로 이 크루를 가입하시게 되셨나요?" },
+                                  type: { type: "number", example: 0 },
+                                  choices: {
+                                    type: "array",
+                                    items: { type: "string", example: "지인 추천" }
+                                  },
+                                  etc: { type: "number", example: 1 },
+                                  required: { type: "number", example: 1 }
+                                }
+                              }
+                            },
+                            admin: { type: "number", example: 2 }
+                          }
+                        }
+                      }
+                    },
+                    data: { type: "object", nullable: true, example: null }
+                  }
+                }
+              }
+            }
+          }
           #swagger.responses[400] = {
               description : "크루 생성 실패 응답 (올바르지 않은 입력값)",
               content:{
@@ -734,62 +792,7 @@ export const handleCreateCrew = async (req, res, next) => {
                   }
               }
           }
-          #swagger.responses[404] = {
-              description: "크루 생성 실패 응답 (존재하지 않는 사용자)",
-              content: {
-                  "application/json" :{
-                      schema: {
-                          type: "object",
-                          properties :{
-                              resultType: {type: "string", example: "FAIL"},
-                              error: { type: "object", properties: {
-                                  errorCode: {type: "string", example: "U001"},
-                                  reason: {type: "string", example: "존재하지 않는 유저입니다."},
-                                  data: {type: "object", properties:{
-                                    crewInfo:{
-                                      type: "object",
-                                      properties: {
-                                        gender: {type: "number", example: 0},
-                                        styles: {type: "array", items: {type: "Number", example: 1}},
-                                        recruitMessage: {type: "string", example: "크루에 가입해 주세요!"},
-                                        name: {type: "string", example: "크루 이름"},
-                                        activities: {type: "array", items: {type: "number", example: 1}},
-                                        admin: {type: "number", example: 1},
-                                        region: {type: "number", example: 1},
-                                        description: {type: "string", example: "크루 설명"},
-                                        category: {type: "number", example: 1},
-                                        maxCapacity: {type: "number", example: 10},
-                                        age: {type: "number", example: 1}
-                                      }
-                                    },
-                                    applicationForm: {
-                                        type: "object",
-                                        properties: {
-                                          questions: {
-                                            type: "array",
-                                            items: {
-                                              type: "object",
-                                              properties: {
-                                                question: {type: "string", example: "질문"},
-                                                type: {type: "number", example: 0},
-                                                choices: {type: "array", items: {type: "string", example: "선택1"}},
-                                                etc: {type:"number", example: 1},
-                                                required: {type: "number", example: 1}
-                                              }
-                                            }
-                                          }
-                                        }
-                                    }
-                                  }
-                                  }
-                              }},
-                              data: { type: "object", nullable: true, example: null},
-                              }
-                          }
-                      }
-                  }
-              }
-          }
+
        */
   // #endregion
   // multipart/form-data 로부터 JSON 파싱

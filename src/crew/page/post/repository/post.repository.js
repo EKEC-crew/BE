@@ -31,7 +31,7 @@ export const getPostsByCrewId = async ({ crewId, page, size }) => {
 	}
 }
 
-export const createCrewPost = async ({ crewMemberId, crewId, title, content }) => {
+export const createCrewPost = async ({ crewMemberId, crewId, title, content, images }) => {
 	try {
 		const post = await prisma.crewPost.create({
 			data: {

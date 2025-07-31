@@ -80,7 +80,7 @@ export const readPostsByCrew = async (req, res, next) => {
 export const createCrewPost = async (req, res, next) => {
   console.log("특정 크루 게시글 작성을 요청했습니다.");
   const { crewId } = req.params;
-  //console.log(req.body);
+
   const validImageExtensions = ["jpg", "jpeg", "png", "gif"];
   if (req.files.some(file => {
     const ext = file.originalname.split('.').pop().toLowerCase();

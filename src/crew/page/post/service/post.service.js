@@ -2,7 +2,7 @@ import { } from "../../../../error.js";
 import * as postResponse from "../dto/response/post.response.dto.js"
 import * as postRepository from "../repository/post.repository.js"
 import * as baseError from "../../../../error.js"
-import * as imageService from "../../../../image/service/image.service.js";
+import * as s3Function from "../../../../utils/s3.js"
 
 export const readPostsByCrew = async ({ crewId, page, size }) => {
 	try {
@@ -39,7 +39,7 @@ export const createCrewPost = async ({ userId, crewId, title, content, images })
 		const postId = post.id;
 		const imageNames = [];
 		for (const file of images) {
-			const imageName = (await imageService.uploadPostImage(file)).split('/').at(-1);
+			const imageName = await s3Function.uploadToS3(file, 2);
 			const image = await postRepository.addImage({ postId, imageName });
 			imageNames.push(image);
 		}

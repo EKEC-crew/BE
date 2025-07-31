@@ -62,7 +62,8 @@ export const readCrewPost = async ({ crewId, postId }) => {
 		}
 
 		const post = await postRepository.getPostByPostId({ postId });
-		return postResponse.CrewPostResponse(post);
+		const imageNames = await postRepository.getImages({ postId });
+		return postResponse.CrewPostResponse({ post, imageNames });
 	} catch (err) {
 		throw err;
 	}

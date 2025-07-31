@@ -180,6 +180,19 @@ export const addImage = async ({ postId, imageName }) => {
 	}
 }
 
+export const getImages = async ({ postId }) => {
+	try {
+		const images = await prisma.crewPostImage.findMany({
+			where: { postId: postId }
+		})
+		return images;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
 export const likeCrewPost = async ({ crewMemberId, postId }) => {
 	try {
 		const post = await prisma.crewPost.findUnique({

@@ -4,7 +4,10 @@ import {
   updateCrewBanner,
 } from "../repository/creation.repository.js";
 import { responseFromCreateNewCrew } from "../dto/response/creation.response.dto.js";
-import { UnprocessableInputValueError } from "../../../error.js";
+import {
+  UnprocessableInputValueError,
+  UserNotFoundError,
+} from "../../../error.js";
 import { deleteFromS3, uploadToS3 } from "../../../utils/s3.js";
 /**
  * **[Crew Creation]**
@@ -43,6 +46,9 @@ export const createNewCrew = async (body) => {
       "유효하지 않은 지역 입니다.",
       restBody,
     );
+  // 유효하지 않는 유저일 경우
+  if (crewId === -5)
+    throw new UserNotFoundError("유효하지 않은 유저 입니다.", restBody);
   // 저장한 크루 ID를 이용해 신청서도 추가합니다.
   await createApplicationForm(body, crewId);
   // 배너 이미지를 S3에 업로드 한 다음 파일명을 가져옵니다.

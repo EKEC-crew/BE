@@ -32,6 +32,23 @@ export const uploadToS3 = async (file, type) => {
 /**
  * **[s3]**
  * **\<🪛 Utils\>**
+ * ***deleteFromS3***
+ * S3 버킷에서 파일을 삭제하는 유틸입니다.
+ * @param {String} fileName - [삭제할 파일의 이름]
+ * @param {Number} type - [이미지 타입 - 0 : 배너 이미지, 1 : 프로필 이미지, 2 : 게시글 이미지, 3 : 앨범 이미지 ]
+ */
+export const deleteFromS3 = async (fileName, type) => {
+  await s3
+    .deleteObject({
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: `${typeEnum[type]}/${fileName}`,
+    })
+    .promise();
+};
+
+/**
+ * **[s3]**
+ * **\<🪛 Utils\>**
  * ***generatePresignedUrlForGet***
  * 이미지 로드 Presigned URL 발급 유틸 입니다. AWS로 Presigned URL을 요청하여 받은 다음 반환합니다.
  * @param {Number} type - [이미지 타입 - 0 : 배너 이미지, 1 : 프로필 이미지, 2 : 게시글 이미지, 3 : 앨범 이미지 ]

@@ -5,7 +5,7 @@ import {
 } from "../repository/creation.repository.js";
 import { responseFromCreateNewCrew } from "../dto/response/creation.response.dto.js";
 import { UnprocessableInputValueError } from "../../../error.js";
-import { uploadToS3 } from "../../../utils/s3.js";
+import { deleteFromS3, uploadToS3 } from "../../../utils/s3.js";
 /**
  * **[Crew Creation]**
  * **\<🛠️ Service\>**

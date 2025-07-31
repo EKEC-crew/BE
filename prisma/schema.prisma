@@ -182,7 +182,7 @@ model CrewPost {
 
 model CrewPostImage{
   id  Int @id @default(autoincrement())
-  url String @db.Text
+  imageName String @db.Text @map("image_name")
   createdAt DateTime @default(now()) @map("created_at")
   postId  Int @map("post_id")
 

@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import * as postRequest from "../dto/request/post.request.dto.js";
 import * as postService from "../service/post.service.js";
+import * as baseError from "../../../../error.js";
 
 export const readPostsByCrew = async (req, res, next) => {
   console.log("특정 크루 게시글 리스트 조회를 요청했습니다.");
@@ -78,11 +79,18 @@ export const readPostsByCrew = async (req, res, next) => {
 
 export const createCrewPost = async (req, res, next) => {
   console.log("특정 크루 게시글 작성을 요청했습니다.");
-
   const { crewId } = req.params;
-  console.log("user : ", req.body.userId, "params: ", req.params);
+  //console.log(req.body);
+  const validImageExtensions = ["jpg", "jpeg", "png", "gif"];
+  if (req.files.some(file => {
+    const ext = file.originalname.split('.').pop().toLowerCase();
+    return !validImageExtensions.includes(ext);
+  })
+  ) {
+    throw new baseError.InvalidInputValueError("올바른 이미지를 등록 해 주세요.", req.body);
+  }
 
-  const response = await postService.createCrewPost(postRequest.createCrewPostRequest(crewId, req.body));
+  const response = await postService.createCrewPost(postRequest.createCrewPostRequest(crewId, req.body, req.files));
   // #region Swagger: 게시글 작성 API
   /*
     #swagger.summary = '게시글 작성 API';
@@ -90,15 +98,22 @@ export const createCrewPost = async (req, res, next) => {
     #swagger.requestBody = {
       required: true,
       content: {
-        "application/json": {
+        "multipart/form-data": {
           schema: {
             type: "object",
             properties: {
-              title: { type: "string", example: "게시글 작성 테스트 제목입니다." },
-              content: { type: "string", example: "게시글 작성 테스트 내용입니다." },
-              userId: { type: "number", example: "1" }
+              images: {
+                type: "array",
+                items: {
+                  type: "string",
+                  format: "binary"
+                }
+              },
+              title: { type: "string", example: "게시글 제목입니다" },
+              content: { type: "string", example: "게시글 내용입니다" },
+              userId: { type: "number", example: 1 }
             },
-            required: ["title", "content", "userId"]
+            required: ["images", "title", "content", "userId"]
           }
         }
       }

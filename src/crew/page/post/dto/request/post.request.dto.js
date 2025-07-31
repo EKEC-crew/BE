@@ -1,9 +1,10 @@
-export const createCrewPostRequest = (crewId, body) => {
+export const createCrewPostRequest = (crewId, body, files) => {
     return {
         crewId: Number(crewId),
         userId: Number(body.userId),
         title: body.title,
         content: body.content,
+        images: files,
     };
 }
 

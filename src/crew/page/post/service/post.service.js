@@ -16,7 +16,7 @@ export const readPostsByCrew = async ({ crewId, page, size }) => {
 	}
 }
 
-export const createCrewPost = async ({ userId, crewId, title, content }) => {
+export const createCrewPost = async ({ userId, crewId, title, content, images }) => {
 	try {
 		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {

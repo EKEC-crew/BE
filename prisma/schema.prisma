@@ -59,7 +59,7 @@ model CrewCategory {
 
 model Crew {
   id  Int @id @default(autoincrement())
-  title String @unique(map: "title") @db.VarChar(30)
+  title String @db.VarChar(30)
   content String  @db.VarChar(50)
   introduction String @db.Text
   score Float
@@ -74,6 +74,7 @@ model Crew {
   userId Int @map("user_id")
   categoryId Int @map("category_id")
   regionId Int @map("region_id")
+  recruitMessage String @map("recruit_message") @db.Text
 
   user User @relation(fields: [userId], references: [id])
   crewCategory CrewCategory @relation(fields: [categoryId], references: [id])

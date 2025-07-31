@@ -13,7 +13,7 @@ export class DuplicateUserEmailError extends Error {
 }
 
 /**
- * **\<Error\>**
+ * **\<💥 Error\>**
  * ***InvalidInputValueError***
  * 올바르지 않은 값이 입력되었을때 발생하는 에러
  */
@@ -27,6 +27,22 @@ export class InvalidInputValueError extends Error {
     this.data = data;
   }
 }
+/**
+ * **\<💥 Error\>**
+ * ***UnprocessableInputValueError***
+ * DB에 존재하지 않는 값이 입력되어 유효하지 않을때 발생하는 에러
+ */
+export class UnprocessableInputValueError extends Error {
+  errorCode = "I002";
+  statusCode = 422
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+
 
 //찾을 수 없는 크루
 export class NotFoundCrewError extends Error {

@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+
 dotenv.config();
 
 import cors from "cors";
@@ -11,29 +12,35 @@ import swaggerAutogen from "swagger-autogen";
 import swaggerUiExpress from "swagger-ui-express";
 
 //session, passport 세팅
-import { prisma } from "./db.config.js";
-import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+import {prisma} from "./db.config.js";
+import {PrismaSessionStore} from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
 
 import routes from './route/route.js'
 
+import {initS3} from "./config/aws/s3.js";
+
 const app = express();
 const port = process.env.PORT;
 
+/**
+ *  AWS S3 설정
+ */
+export const s3 = initS3();
 
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
  */
 app.use((req, res, next) => {
   res.success = (success) => {
-    return res.json({ resultType: "SUCCESS", error: null, data: success });
+    return res.json({resultType: "SUCCESS", error: null, data: success});
   };
 
-  res.error = ({ errorCode = "unknown", reason = null, data = null }) => {
+  res.error = ({errorCode = "unknown", reason = null, data = null}) => {
     return res.json({
       resultType: "FAIL",
-      error: { errorCode, reason, data },
+      error: {errorCode, reason, data},
       data: null,
     });
   };
@@ -67,7 +74,7 @@ const corsOptions = {
 app.use(cors(corsOptions)); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
 app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함 (JSON 형태의 요청 body를 파싱하기 위함)
-app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
+app.use(express.urlencoded({extended: false})); // 단순 객체 문자열 형태로 본문 데이터 해석
 // 미들웨어 설정
 app.use(express.json()); // JSON 본문 파싱
 
@@ -76,8 +83,8 @@ app.use('/api', routes); // 라우터 연결
 //전역 에러 처리 미들웨어는 모든 미들웨어와 라우터 등록 이후에 맨 마지막에 위치해야 합니다.
 /**
  * 전역 오류를 처리하기 위한 미들웨어
-=> 이 미들웨어는 Controller 내에서 별도로 처리하지 않은 오류가 발생할 경우, 
-모두 잡아서 공통된 오류 응답으로 내려주게 됩니다.
+ => 이 미들웨어는 Controller 내에서 별도로 처리하지 않은 오류가 발생할 경우,
+ 모두 잡아서 공통된 오류 응답으로 내려주게 됩니다.
  */
 app.use((err, req, res, next) => {
   if (res.headersSent) {

@@ -109,6 +109,30 @@ export class NotFoundCommentError extends Error {
   }
 }
 
+//존재하지 않는 이미지
+export class NotFoundImageError extends Error {
+  errorCode = "N004";
+  statusCode = 404;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+
+//게시글에 존재하지 않는 이미지
+export class NotExistImageInPostError extends Error {
+  errorCode = "N004";
+  statusCode = 403;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+
 //크루 멤버에 속하지 않은 유저
 export class NotCrewMemberError extends Error {
   errorCode = "N002";

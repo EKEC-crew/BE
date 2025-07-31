@@ -11,18 +11,20 @@ export const CrewPostListResponse = (body) => {
 	return response;
 }
 
-export const CrewPostResponse = (body) => {
-	const post = body;
-
+export const CrewPostResponse = ({ post, imagesInfo }) => {
 	const response = {
 		postId: post.id,
 		title: post.title,
 		content: post.content,
 		createdAt: post.createdAt,
 		nickname: post.crewMember?.user?.nickname,
-		image: post.crewMember?.user?.image,
+		profileImage: post.crewMember?.user?.image,
 		commentCount: post.commentCount,
 		likeCount: post.likeCount,
+		images: imagesInfo.map(image => ({
+			imageId: image.id,
+			imageName: image.imageName,
+		})),
 	}
 
 	return response;

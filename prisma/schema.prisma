@@ -204,9 +204,21 @@ model CrewPost {
 
   crewPostComment CrewPostComment[]
   crewPostLike CrewPostLike[]
+  crewPostImage CrewPostImage[]
   alarm Alarm[]
 
   @@map("crew_post")
+}
+
+model CrewPostImage{
+  id  Int @id @default(autoincrement())
+  imageName String @db.Text @map("image_name")
+  createdAt DateTime @default(now()) @map("created_at")
+  postId  Int @map("post_id")
+
+  crewPost CrewPost @relation(fields: [postId], references: [id])
+
+  @@map("crew_post_image")
 }
 
 model CrewPostLike {

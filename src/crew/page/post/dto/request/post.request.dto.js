@@ -1,9 +1,10 @@
-export const createCrewPostRequest = (crewId, body) => {
+export const createCrewPostRequest = (crewId, body, files) => {
     return {
         crewId: Number(crewId),
         userId: Number(body.userId),
         title: body.title,
         content: body.content,
+        images: files,
     };
 }
 
@@ -41,13 +42,28 @@ export const readCommentListRequest = (crewId, postId, page, size) => {
     }
 }
 
-export const updateCrewPostRequest = (crewId, postId, body) => {
+export const updateCrewPostRequest = (crewId, postId, body, files) => {
+
+    let existingImageIds = [];
+
+    if (typeof body.existingImageIds === 'string') {
+        existingImageIds = body.existingImageIds
+            .split(',')
+            .map(id => id.trim())
+            .filter(id => id !== '')
+            .map(Number);
+    } else if (Array.isArray(body.existingImageIds)) {
+        existingImageIds = body.existingImageIds.map(Number);
+    }
+
     return {
         crewId: Number(crewId),
         postId: Number(postId),
         userId: Number(body.userId),
         title: body.title,
         content: body.content,
+        images: files,
+        existingImageIds: existingImageIds,
     }
 }
 

@@ -2,8 +2,7 @@ import { } from "../../../../error.js";
 import * as postResponse from "../dto/response/post.response.dto.js"
 import * as postRepository from "../repository/post.repository.js"
 import * as baseError from "../../../../error.js"
-import { Buffer } from 'buffer'
-import { s3 } from "../../../../index.js";
+import * as imageService from "../../../../image/service/image.service.js";
 
 export const readPostsByCrew = async ({ crewId, page, size }) => {
 	try {
@@ -37,24 +36,15 @@ export const createCrewPost = async ({ userId, crewId, title, content, images })
 			title,
 			content,
 		})
+		const postId = post.id;
+		const imageNames = [];
 		for (const file of images) {
-			const uploadImage = async (file, crewId) => {
-				const originalExtension = file.originalname.split(".").at(-1);
-				const timestamp = Date.now();
-				const encodedFileName = `${Buffer.from(`crew_post_image_${crewId}_${timestamp}`).toString('base64')}.${originalExtension}`;
-				const data = await s3.upload({
-					Bucket: process.env.AWS_S3_BUCKET,
-					Key: `crewPostImage/${encodedFileName}`,
-					Body: file.buffer,
-					ContentType: file.mimetype
-				}).promise();
-				return data.Location;
-			}
-			const imageUrl = await uploadImage(file, crewId);
-			console.log(imageUrl);
+			const imageName = (await imageService.uploadPostImage(file)).split('/').at(-1);
+			const image = await postRepository.addImage({ postId, imageName });
+			imageNames.push(image);
 		}
 
-		return postResponse.CrewPostResponse(post);
+		return postResponse.CrewPostResponse({ post, imageNames });
 	} catch (err) {
 		throw err;
 	}

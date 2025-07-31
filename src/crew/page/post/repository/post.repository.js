@@ -164,6 +164,22 @@ export const removeCrewPostBypostId = async ({ postId }) => {
 	}
 }
 
+export const addImage = async ({ postId, imageName }) => {
+	try {
+		const image = await prisma.crewPostImage.create({
+			data: {
+				imageName: imageName,
+				postId: postId,
+			}
+		})
+		return image;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
 export const likeCrewPost = async ({ crewMemberId, postId }) => {
 	try {
 		const post = await prisma.crewPost.findUnique({

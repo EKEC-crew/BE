@@ -127,16 +127,27 @@ export const createCrewPost = async (req, res, next) => {
             properties: {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
-              success: {
+              data: {
                 type: "string", example: 
                 {
-                  "postId": 4,
-                  "title": "게시글 작성 테스트 제목입니다.",
-                  "content": "게시글 작성 테스트 내용입니다.",
-                  "createdAt": "2025-07-18T02:04:54.410Z",
-                  "nickname": "길동이",
-                  "image": "profile.jpg",
-                  "commentCount": 0
+                  "postId": 19,
+                  "title": "멀티파트 테스트",
+                  "content": "멀티파트 테스트 내용",
+                  "createdAt": "2025-07-31T10:27:17.103Z",
+                  "nickname": "차은우",
+                  "profileImage": "profile1.jpg",
+                  "commentCount": 0,
+                  "likeCount": 0,
+                  "imageNames": [
+                    {
+                      "imageId": 21,
+                      "imageName": "95befbe2-a17e-44a9-bd1f-4708fa9fbd27.png"
+                    },
+                    {
+                      "imageId": 22,
+                      "imageName": "2e4b97b8-41a3-4686-997b-fc04dea279b2.png"
+                    }
+                  ]
                 }
               }
             }

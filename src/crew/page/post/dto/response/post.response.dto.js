@@ -1,8 +1,10 @@
+import { formatInTimeZone } from "date-fns-tz";
+
 export const CrewPostListResponse = (body) => {
 	const response = body.map(post => ({
 		postId: post.id,
 		title: post.title,
-		createdAt: post.createdAt,
+		createdAt: formatInTimeZone(post.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 		nickname: post.crewMember.user.nickname,
 		commentCount: post.commentCount,
 		likeCount: post.likeCount,
@@ -16,7 +18,7 @@ export const CrewPostResponse = ({ post, imagesInfo }) => {
 		postId: post.id,
 		title: post.title,
 		content: post.content,
-		createdAt: post.createdAt,
+		createdAt: formatInTimeZone(post.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 		nickname: post.crewMember?.user?.nickname,
 		profileImage: post.crewMember?.user?.image,
 		commentCount: post.commentCount,
@@ -48,7 +50,7 @@ export const CrewCommentListResponse = (body) => {
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
 		image: comment.crewMember.user.image,
-		createdAt: comment.createdAt,
+		createdAt: formatInTimeZone(comment.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 	}))
 
 	return response;
@@ -62,7 +64,7 @@ export const CrewCommentResponse = (body) => {
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
 		image: comment.crewMember.user.image,
-		createdAt: comment.createdAt,
+		createdAt: formatInTimeZone(comment.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 	}
 
 	return response;

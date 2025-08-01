@@ -38,10 +38,8 @@ export const createCrewPost = async ({ userId, crewId, title, content, images })
 		})
 		const postId = post.id;
 		const imagesInfo = [];
-		console.log("images: ", images);
 		for (const file of images) {
 			const imageName = await s3Function.uploadToS3(file, 2);
-			console.log("imageName:", imageName);
 			const image = await postRepository.addImage({ postId, imageName });
 			imagesInfo.push(image);
 		}

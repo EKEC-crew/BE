@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  //output   = "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -133,7 +133,7 @@ model CrewPlanComment {
   crewMemberId  Int       @map("crew_member_id")
 
   crewPlan      CrewPlan  @relation(fields: [crewPlanId], references: [id])
-  
+
   crewMember    CrewMember @relation(fields: [crewMemberId], references: [id])
 
   @@map("crew_plan_comment")

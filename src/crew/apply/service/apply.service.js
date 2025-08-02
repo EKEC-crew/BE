@@ -41,6 +41,19 @@ const applyToCrew = async (dto) => {
     await applyRepository.createApplicationWithTransaction(step1Data, step2Data);
 };
 
+const getCrewApplicationById = async (crewId, applyId) => {
+    const application = await applyRepository.findApplicationById(crewId, applyId);
+    if (!application) {
+        const error = new Error('지원서를 찾을 수 없습니다.');
+        error.status = 404;
+        throw error;
+    }
+
+    return application;
+};
+
+
 export default {
     applyToCrew,
+    getCrewApplicationById,
 };

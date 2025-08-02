@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { prisma } from '../../../db.config.js';
 
 // 중복 지원 확인
 const findByUserAndCrew = async (userId, crewId) => {
@@ -12,13 +11,45 @@ const findByUserAndCrew = async (userId, crewId) => {
 const createApplicationWithTransaction = async (step1Data, step2Data) => {
     return await prisma.$transaction([
         prisma.crewRecruitAppliedStep1.create({ data: step1Data }),
-        prisma.crewRecruitAppliedStep2.createMany({
-            data: step2Data,
-        }),
+        prisma.crewRecruitAppliedStep2.createMany({ data: step2Data }),
     ]);
+};
+
+// 특정 크루 특정 지원서 조회
+const findApplicationById = async (crewId, applyId) => {
+    const step1 = await prisma.crewRecruitAppliedStep1.findFirst({
+        where: {
+            id: applyId,
+            crewId: crewId,
+        },
+        include: {
+            user: true,
+            crewCategory: true,
+        },
+    });
+
+    if (!step1) {
+        const error = new Error('지원서를 찾을 수 없습니다.');
+        error.status = 404;
+        throw error;
+    }
+
+    const step2 = await prisma.crewRecruitAppliedStep2.findMany({
+        where: {
+            userId: step1.userId,
+        },
+        select: {
+            recruitFormId: true,
+            checkedChoices: true,
+            answer: true,
+        },
+    });
+
+    return { ...step1, answers: step2 };
 };
 
 export default {
     findByUserAndCrew,
     createApplicationWithTransaction,
+    findApplicationById,
 };

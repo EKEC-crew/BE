@@ -48,8 +48,22 @@ const findApplicationById = async (crewId, applyId) => {
     return { ...step1, answers: step2 };
 };
 
+// 지원 상태 변경
+const updateStatus = async (crewId, applyId, status) => {
+    return await prisma.crewRecruitAppliedStep1.updateMany({
+        where: {
+            id: applyId,
+            crewId,
+        },
+        data: {
+            status,
+        },
+    });
+};
+
 export default {
     findByUserAndCrew,
     createApplicationWithTransaction,
     findApplicationById,
+    updateStatus,
 };

@@ -52,8 +52,12 @@ const getCrewApplicationById = async (crewId, applyId) => {
     return application;
 };
 
+const updateStatus = async (crewId, applyId, status) => {
+    return await applyRepository.updateStatus(crewId, applyId, status);
+};
 
 export default {
     applyToCrew,
     getCrewApplicationById,
+    updateStatus,
 };

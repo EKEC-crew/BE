@@ -1,5 +1,5 @@
 import applyService from '../service/apply.service.js';
-import { ApplyRequestDTO } from '../dto/request/apply.request.dto.js';
+import { ApplyRequestDTO, UpdateApplyStatusDto } from '../dto/request/apply.request.dto.js';
 import {
   ApplySuccessResponseDTO,
   ApplyErrorResponseDTO,
@@ -191,7 +191,75 @@ export const getCrewApplicationById = async (req, res, next) => {
   }
 };
 
+// 특정 크루 특정 지원서 승인/거절 하기
+export const updateApplicationStatus = async (req, res, next) => {
+  /*
+    #swagger.summary = "크루 지원 상태 변경 (승인/거절)"
+    #swagger.tags = ["Crew Apply"]
+    #swagger.parameters['crewId'] = {
+        in: 'path',
+        description: '크루 ID',
+        required: true,
+        schema: { type: 'integer' }
+    }
+    #swagger.parameters['applyId'] = {
+        in: 'path',
+        description: '지원서 ID',
+        required: true,
+        schema: { type: 'integer' }
+    }
+    #swagger.requestBody = {
+        required: true,
+        content: {
+            "application/json": {
+                schema: {
+                    type: "object",
+                    properties: {
+                        status: { type: "integer", example: 1, description: "1: 승인, 2: 거절" }
+                    }
+                }
+            }
+        }
+    }
+    #swagger.responses[200] = {
+        description: "지원 상태 변경 성공",
+        content: {
+            "application/json": {
+                example: {
+                    resultType: "SUCCESS",
+                    error: null,
+                    success: {
+                        message: "지원 상태가 승인으로 변경되었습니다.",
+                        updated: { count: 1 }
+                    }
+                }
+            }
+        }
+    }
+*/
+  try {
+    const crewId = parseInt(req.params.crewId);
+    const applyId = parseInt(req.params.applyId);
+    const { status } = req.body; // ✅ 여기를 확인!
+
+    if (typeof status !== 'number') {
+      throw new Error('status 값이 숫자가 아닙니다.');
+    }
+
+    await applyService.updateStatus(crewId, applyId, status);
+
+    return res.status(200).json({
+      resultType: 'SUCCESS',
+      error: null,
+      success: { message: '지원 상태가 업데이트되었습니다.' },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   applyToCrew,
   getCrewApplicationById,
+  updateApplicationStatus,
 };

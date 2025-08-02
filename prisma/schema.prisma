@@ -367,6 +367,7 @@ model CrewRecruitAppliedStep1 {
   crewId       Int      @map("crew_id")
   userId       Int      @map("user_id")
   categoryId   Int      @map("category_id")
+  status       Int      @default(0) // 0: 대기중, 1: 승인, (2: 거절)
 
   crew         Crew         @relation(fields: [crewId], references: [id])
   user         User         @relation(fields: [userId], references: [id])

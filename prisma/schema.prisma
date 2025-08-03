@@ -15,32 +15,32 @@ datasource db {
 }
 
 model User {
-  id  Int @id @default(autoincrement())
-  email String  @unique(map: "email") @db.VarChar(40)
-  password String @db.VarChar(40)
-  name  String?  @db.VarChar(10)
-  nickname  String?  @db.VarChar(10)
-  gender  Int?
-  birth DateTime?
-  phone String?  @unique(map: "phone") @db.VarChar(15)
-  image String?  @db.VarChar(50)
-  createdAt DateTime @default(now()) @map("created_at")
+  id         Int       @id @default(autoincrement())
+  email      String    @unique(map: "email") @db.VarChar(40)
+  password   String    @db.VarChar(40)
+  name       String?   @db.VarChar(10)
+  nickname   String?   @db.VarChar(10)
+  gender     Int?
+  birth      DateTime?
+  phone      String?   @unique(map: "phone") @db.VarChar(15)
+  image      String?   @db.VarChar(50)
+  createdAt  DateTime  @default(now()) @map("created_at")
   modifiedAt DateTime? @updatedAt @map("modified_at")
 
-  crew Crew[]
-  crewRegister CrewRegister[]
-  crewUser CrewMember[]
+  crew                    Crew[]
+  crewRegister            CrewRegister[]
+  crewUser                CrewMember[]
   crewRecruitAppliedStep1 CrewRecruitAppliedStep1[]
   crewRecruitAppliedStep2 CrewRecruitAppliedStep2[]
-  alarm Alarm[]
+  alarm                   Alarm[]
 
   @@map("user")
 }
 
 model Region {
-  id  Int @id @default(autoincrement())
+  id   Int    @id @default(autoincrement())
   sido String @db.VarChar(50)
-  goo String @db.VarChar(50)
+  goo  String @db.VarChar(50)
 
   crew Crew[]
 
@@ -48,133 +48,104 @@ model Region {
 }
 
 model CrewCategory {
-  id  Int @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   content String @db.VarChar(20)
 
-  crew Crew[]
+  crew                    Crew[]
   crewRecruitAppliedStep1 CrewRecruitAppliedStep1[]
 
   @@map("crew_category")
 }
 
 model Crew {
-  id  Int @id @default(autoincrement())
-  title String @db.VarChar(30)
-  content String  @db.VarChar(50)
-  introduction String @db.Text
-  score Float
-  crewCapacity  Int @map("crew_capacity")
-  createdAt DateTime @default(now()) @map("created_at")
-  modifiedAt DateTime? @updatedAt @map("modified_at")
-  noticeCount Int @default(0) @map("notice_count")
-  postCount Int @default(0) @map("post_count")
-  bannerImage String? @map("banner_image") @db.VarChar(50)
-  ageLimit  Int @map("age_limit")
-  genderLimit Int @map("gender_limit")
-  userId Int @map("user_id")
-  categoryId Int @map("category_id")
-  regionId Int @map("region_id")
-  recruitMessage String @map("recruit_message") @db.Text
+  id             Int       @id @default(autoincrement())
+  title          String    @db.VarChar(30)
+  content        String    @db.VarChar(50)
+  introduction   String    @db.Text
+  score          Float
+  crewCapacity   Int       @map("crew_capacity")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  modifiedAt     DateTime? @updatedAt @map("modified_at")
+  noticeCount    Int       @default(0) @map("notice_count")
+  postCount      Int       @default(0) @map("post_count")
+  bannerImage    String?   @map("banner_image") @db.VarChar(50)
+  ageLimit       Int       @map("age_limit")
+  genderLimit    Int       @map("gender_limit")
+  userId         Int       @map("user_id")
+  categoryId     Int       @map("category_id")
+  regionId       Int       @map("region_id")
+  recruitMessage String    @map("recruit_message") @db.Text
 
-  user User @relation(fields: [userId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
   crewCategory CrewCategory @relation(fields: [categoryId], references: [id])
-  region Region @relation(fields: [regionId], references: [id])
+  region       Region       @relation(fields: [regionId], references: [id])
 
-  crewPlan CrewPlan[]
-  crewRegister CrewRegister[]
-  crewUser CrewMember[]
-  crewPost CrewPost[]
-  crewNotice CrewNotice[]
-  crewAlbum CrewAlbum[]
-  crewActivity CrewActivity[]
-  crewStyle CrewStyle[]
-  crewRecruitForm CrewRecruitForm[]
+  crewPlan                CrewPlan[]
+  crewRegister            CrewRegister[]
+  crewUser                CrewMember[]
+  crewPost                CrewPost[]
+  crewNotice              CrewNotice[]
+  crewAlbum               CrewAlbum[]
+  crewActivity            CrewActivity[]
+  crewStyle               CrewStyle[]
+  crewRecruitForm         CrewRecruitForm[]
   crewRecruitAppliedStep1 CrewRecruitAppliedStep1[]
-  alarm Alarm[]
+  alarm                   Alarm[]
 
   @@map("crew")
 }
 
 model CrewPlan {
-  id                       Int           @id @default(autoincrement())
-  day                      DateTime
-  title                    String        @db.VarChar(30)
-  content                  String        @db.Text
-  type                     Int           @default(0) //0이 번개모임이고 1이 정기모임
-  isRequired               Boolean       @default(false) @map("is_required") // 필참 여부
-  allowComments            Boolean       @default(false) @map("allow_comments") // 댓글 허용
-  allowPrivateComments     Boolean       @default(false) @map("allow_private_comments") // 비공개 댓글 허용
-  allowExternalShare       Boolean       @default(false) @map("allow_external_share") // 외부 공유 허용
-  hasFee                   Boolean       @default(false) @map("has_fee") // 회비 여부
-  fee                      Int?          @default(0)
-  feePurpose               String?       @db.VarChar(100) @map("fee_purpose") // 회비 목적
-  createdAt                DateTime      @default(now()) @map("created_at")
-  crewId                   Int           @map("crew_id")
+  id                   Int      @id @default(autoincrement())
+  day                  DateTime
+  title                String   @db.VarChar(30)
+  content              String   @db.Text
+  type                 Int      @default(0) //0이 번개모임이고 1이 정기모임
+  isRequired           Boolean  @default(false) @map("is_required") // 필참 여부
+  allowComments        Boolean  @default(false) @map("allow_comments") // 댓글 허용
+  allowPrivateComments Boolean  @default(false) @map("allow_private_comments") // 비공개 댓글 허용
+  allowExternalShare   Boolean  @default(false) @map("allow_external_share") // 외부 공유 허용
+  hasFee               Boolean  @default(false) @map("has_fee") // 회비 여부
+  fee                  Int?     @default(0)
+  feePurpose           String?  @map("fee_purpose") @db.VarChar(100) // 회비 목적
+  createdAt            DateTime @default(now()) @map("created_at")
+  crewId               Int      @map("crew_id")
 
   // 관계
-  crew                     Crew          @relation(fields: [crewId], references: [id])
-  crewPlanRequest          CrewPlanRequest[]
-  alarm                    Alarm[]
+  crew            Crew              @relation(fields: [crewId], references: [id])
+  crewPlanRequest CrewPlanRequest[]
+  alarm           Alarm[]
 
-  crewPlanComment                 CrewPlanComment[]
-  crewPlanLike                    CrewPlanLike[]
+  comments                 CrewPlanComment[]
 
   @@map("crew_plan")
 
+  @@unique([id, crewId]) //복합 키
 }
 
 model CrewPlanComment {
-  id            Int       @id @default(autoincrement())
-  content       String    @db.Text
-  createdAt     DateTime  @default(now()) @map("created_at")
-  modifiedAt    DateTime? @updatedAt @map("modified_at")
+  id         Int       @id @default(autoincrement())
+  content    String    @db.Text
+  createdAt  DateTime  @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
 
   crewPlanId    Int       @map("crew_plan_id")
   crewMemberId  Int       @map("crew_member_id")
-  isPublic      Boolean   @map("is_public")
 
   crewPlan      CrewPlan  @relation(fields: [crewPlanId], references: [id])
-
   crewMember    CrewMember @relation(fields: [crewMemberId], references: [id])
 
 
   @@map("crew_plan_comment")
 }
 
-model CrewPlanRequest {
-  id  Int @id @default(autoincrement())
-  status  Int @default(0)
-  crewMemberId Int @map("crew_member_id")
-  crewPlanId Int @map("crew_plan_id")
-
-  crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewPlan CrewPlan @relation(fields:[crewPlanId], references: [id])
-
-  @@map("crew_plan_request")
-}
-
-model CrewPlanLike {
-  id  Int   @id   @default(autoincrement())
-  isLiked   Int   @map("is_liked")  @default(1)
-  crewMemberId  Int @map("crew_member_id")
-  planId  Int   @map("plan_id")
-
-  crewPlan  CrewPlan  @relation(fields: [planId], references: [id])
-  crewMember  CrewMember  @relation(fields: [crewMemberId], references: [id])
-
-  @@unique([planId, crewMemberId])
-  @@map("crew_plan_like")
-
-
-}
-
 
 model CrewRegister {
-  id  Int @id @default(autoincrement())
-  createdAt DateTime @default(now()) @map("created_at")
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now()) @map("created_at")
   modifiedAt DateTime? @updatedAt @map("modified_at")
-  userId Int @map("user_id")
-  crewId Int @map("crew_id")
+  userId     Int       @map("user_id")
+  crewId     Int       @map("crew_id")
 
   user User @relation(fields: [userId], references: [id])
   crew Crew @relation(fields: [crewId], references: [id])
@@ -184,20 +155,17 @@ model CrewRegister {
 
 
 model CrewMember {
-  id  Int @id @default(autoincrement())
-  role  Int
-  createdAt DateTime @default(now()) @map("created_at")
+  id         Int       @id @default(autoincrement())
+  role       Int
+  createdAt  DateTime  @default(now()) @map("created_at")
   modifiedAt DateTime? @updatedAt @map("modified_at")
-  userId Int @map("user_id")
-  crewId Int @map("crew_id")
+  userId     Int       @map("user_id")
+  crewId     Int       @map("crew_id")
 
   user User @relation(fields: [userId], references: [id])
   crew Crew @relation(fields: [crewId], references: [id])
 
   crewPlanRequest CrewPlanRequest[]
-  crewPlan  CrewPlan[]
-  crewPlanComment CrewPlanComment[]
-  crewPlanLike  CrewPlanLike[]
   crewPost CrewPost[]
   crewPostComment CrewPostComment[]
   crewNotice CrewNotice[]
@@ -205,22 +173,34 @@ model CrewMember {
   crewAlbum CrewAlbum[]
   crewNoticeLike CrewNoticeLike[]
   crewPostLike CrewPostLike[]
+  comments CrewPlanComment[]
 
   @@map("crew_member")
 }
+model CrewPlanRequest {
+  id  Int @id @default(autoincrement())
+  status  Int @default(0)
+  memberId Int @map("member_id")
+  planId Int @map("plan_id")
+
+  crewMember CrewMember @relation(fields: [memberId], references: [id])
+  crewPlan CrewPlan @relation(fields:[planId], references: [id])
+
+  @@map("crew_plan_request")
+}
 
 model CrewPost {
-  id  Int @id @default(autoincrement())
-  title String @db.VarChar(50)
-  content String @db.Text
-  commentCount Int @map("comment_count") @default(0)
-  likeCount Int @map("like_count") @default(0)
-  createdAt DateTime @default(now()) @map("created_at")
-  modifiedAt DateTime? @updatedAt @map("modified_at")
-  crewId  Int @map("crew_id")
-  crewMemberId Int @map("crew_member_id")
+  id           Int       @id @default(autoincrement())
+  title        String    @db.VarChar(50)
+  content      String    @db.Text
+  commentCount Int       @default(0) @map("comment_count")
+  likeCount    Int       @default(0) @map("like_count")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  modifiedAt   DateTime? @updatedAt @map("modified_at")
+  crewId       Int       @map("crew_id")
+  crewMemberId Int       @map("crew_member_id")
 
-  crew Crew @relation(fields: [crewId], references: [id])
+  crew       Crew       @relation(fields: [crewId], references: [id])
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
 
   crewPostComment CrewPostComment[]
@@ -243,12 +223,12 @@ model CrewPostImage{
 }
 
 model CrewPostLike {
-  id  Int @id @default(autoincrement())
-  isLiked Int @map("is_liked") @default(1)
+  id           Int @id @default(autoincrement())
+  isLiked      Int @default(1) @map("is_liked")
   crewMemberId Int @map("crew_member_id")
-  postId  Int @map("post_id")
+  postId       Int @map("post_id")
 
-  crewPost CrewPost @relation(fields: [postId], references: [id])
+  crewPost   CrewPost   @relation(fields: [postId], references: [id])
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
 
   @@unique([postId, crewMemberId])
@@ -256,46 +236,46 @@ model CrewPostLike {
 }
 
 model CrewPostComment {
-  id  Int @id @default(autoincrement())
-  content String @db.Text
-  createdAt DateTime @default(now()) @map("created_at")
-  modifiedAt DateTime? @updatedAt @map("modified_at")
-  isPublic Int @map("is_public")
-  crewMemberId Int @map("crew_member_id")
-  postId  Int @map("post_id")
+  id           Int       @id @default(autoincrement())
+  content      String    @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at")
+  modifiedAt   DateTime? @updatedAt @map("modified_at")
+  isPublic     Int       @map("is_public")
+  crewMemberId Int       @map("crew_member_id")
+  postId       Int       @map("post_id")
 
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewPost CrewPost @relation(fields: [postId], references: [id])
+  crewPost   CrewPost   @relation(fields: [postId], references: [id])
 
   @@map("crew_post_comment")
 }
 
 model CrewNotice {
-  id  Int @id @default(autoincrement())
-  title String @db.VarChar(50)
-  content String @db.Text
-  createdAt DateTime @default(now()) @map("created_at")
-  modifiedAt DateTime? @updatedAt @map("modified_at")
-  crewId  Int @map("crew_id")
-  crewMemberId Int @map("crew_member_id")
+  id           Int       @id @default(autoincrement())
+  title        String    @db.VarChar(50)
+  content      String    @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at")
+  modifiedAt   DateTime? @updatedAt @map("modified_at")
+  crewId       Int       @map("crew_id")
+  crewMemberId Int       @map("crew_member_id")
 
-  crew Crew @relation(fields: [crewId], references: [id])
+  crew       Crew       @relation(fields: [crewId], references: [id])
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
 
   crewNoticeComment CrewNoticeComment[]
-  crewNoticeLike CrewNoticeLike[]
-  alarm Alarm[]
+  crewNoticeLike    CrewNoticeLike[]
+  alarm             Alarm[]
 
   @@map("crew_notice")
 }
 
 model CrewNoticeComment {
-  id  Int @id @default(autoincrement())
-  content String @db.Text
-  createdAt DateTime @default(now()) @map("created_at")
-  modifiedAt DateTime? @updatedAt @map("modified_at")
-  crewMemberId Int @map("crew_member_id")
-  crewNoticeId  Int @map("crew_notice_id")
+  id           Int       @id @default(autoincrement())
+  content      String    @db.Text
+  createdAt    DateTime  @default(now()) @map("created_at")
+  modifiedAt   DateTime? @updatedAt @map("modified_at")
+  crewMemberId Int       @map("crew_member_id")
+  crewNoticeId Int       @map("crew_notice_id")
 
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
   crewNotice CrewNotice @relation(fields: [crewNoticeId], references: [id])
@@ -304,10 +284,10 @@ model CrewNoticeComment {
 }
 
 model CrewNoticeLike {
-  id  Int @id @default(autoincrement())
-  createdAt DateTime @default(now()) @map("created_at")
-  crewNoticeId Int @map("crew_notice_id")
-  crewMemberId Int @map("crew_member_id")
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now()) @map("created_at")
+  crewNoticeId Int      @map("crew_notice_id")
+  crewMemberId Int      @map("crew_member_id")
 
   crewNotice CrewNotice @relation(fields: [crewNoticeId], references: [id])
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
@@ -317,21 +297,21 @@ model CrewNoticeLike {
 }
 
 model CrewAlbum {
-  id  Int @id @default(autoincrement())
-  image String  @db.VarChar(50)
-  createdAt DateTime @default(now()) @map("created_at")
-  modifiedAt DateTime? @updatedAt @map("modified_at")
-  crewId  Int @map("crew_id")
-  crewMemberId Int @map("crew_member_id")
+  id           Int       @id @default(autoincrement())
+  image        String    @db.VarChar(50)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  modifiedAt   DateTime? @updatedAt @map("modified_at")
+  crewId       Int       @map("crew_id")
+  crewMemberId Int       @map("crew_member_id")
 
-  crew Crew @relation(fields: [crewId], references: [id])
+  crew       Crew       @relation(fields: [crewId], references: [id])
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
 
   @@map("crew_album")
 }
 
 model Activity {
-  id  Int @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   content String @db.VarChar(20)
 
   crewActivity CrewActivity[]
@@ -340,46 +320,48 @@ model Activity {
 }
 
 model CrewActivity {
-  id  Int @id @default(autoincrement())
-  createdAt DateTime @default(now()) @map("created_at")
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now()) @map("created_at")
   modifiedAt DateTime? @updatedAt @map("modified_at")
-  crewId  Int @map("crew_id")
-  activityId Int @map("activity_id")
+  crewId     Int       @map("crew_id")
+  activityId Int       @map("activity_id")
 
-  crew Crew @relation(fields: [crewId], references: [id])
+  crew     Crew     @relation(fields: [crewId], references: [id])
   activity Activity @relation(fields: [activityId], references: [id])
 
   @@map("crew_activity")
 }
+
 model Style {
-  id  Int @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   content String @db.VarChar(20)
 
   crewStyle CrewStyle[]
 
   @@map("style")
 }
-model CrewStyle {
-  id  Int @id @default(autoincrement())
-  createdAt DateTime @default(now()) @map("created_at")
-  modifiedAt DateTime? @updatedAt @map("modified_at")
-  crewId  Int @map("crew_id")
-  styleId Int @map("style_id")
 
-  crew Crew @relation(fields: [crewId], references: [id])
+model CrewStyle {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
+  crewId     Int       @map("crew_id")
+  styleId    Int       @map("style_id")
+
+  crew  Crew  @relation(fields: [crewId], references: [id])
   style Style @relation(fields: [styleId], references: [id])
 
   @@map("crew_style")
 }
 
 model CrewRecruitForm {
-  id  Int @id @default(autoincrement())
-  question String @db.VarChar(40)
-  questionType Int @map("question_type")
-  choiceList Json? @map("choice_list")
-  isEtc Int @map("is_etc")
-  required Int
-  crewId Int @map("crew_id")
+  id           Int    @id @default(autoincrement())
+  question     String @db.VarChar(40)
+  questionType Int    @map("question_type")
+  choiceList   Json?  @map("choice_list")
+  isEtc        Int    @map("is_etc")
+  required     Int
+  crewId       Int    @map("crew_id")
 
   crew Crew @relation(fields: [crewId], references: [id])
 
@@ -389,34 +371,35 @@ model CrewRecruitForm {
 }
 
 model CrewRecruitAppliedStep1 {
-  id  Int @id @default(autoincrement())
-  activityList Json @map("activity_list")
-  styleList Json @map("style_list")
-  region Int
-  age Int
-  gender Int
-  createdAt DateTime @default(now()) @map("created_at")
-  crewId Int @map("crew_id")
-  userId Int @map("user_id")
-  categoryId Int @map("category_id")
+  id           Int      @id @default(autoincrement())
+  activityList Json     @map("activity_list")
+  styleList    Json     @map("style_list")
+  region       Int
+  age          Int
+  gender       Int
+  createdAt    DateTime @default(now()) @map("created_at")
+  crewId       Int      @map("crew_id")
+  userId       Int      @map("user_id")
+  categoryId   Int      @map("category_id")
+  status       Int      @default(0) // 0: 대기중, 1: 승인, (2: 거절)
 
-  crew Crew @relation(fields: [crewId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  crew         Crew         @relation(fields: [crewId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
   crewCategory CrewCategory @relation(fields: [categoryId], references: [id])
 
   @@map("crew_recruit_applied_step1")
 }
 
 model CrewRecruitAppliedStep2 {
-  id  Int @id @default(autoincrement())
-  checkedChoices Json? @map("checked_choices")
-  answer String?
-  createdAt DateTime @default(now()) @map("created_at")
-  recruitFormId Int @map("recruit_form_id")
-  userId Int @map("user_id")
+  id             Int      @id @default(autoincrement())
+  checkedChoices Json?    @map("checked_choices")
+  answer         String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  recruitFormId  Int      @map("recruit_form_id")
+  userId         Int      @map("user_id")
 
   crewRecruitForm CrewRecruitForm @relation(fields: [recruitFormId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
 
   @@map("crew_recruit_applied_step2")
 }
@@ -433,22 +416,22 @@ enum AlarmType {
 }
 
 model Alarm {
-  id  Int @id @default(autoincrement())
-  content String @db.Text
-  status Int @default(0)
-  type AlarmType
-  createdAt DateTime @default(now()) @map("created_at")
-  userId Int @map("user_id")
-  crewId Int @map("crew_id")
-  noticeId Int @map("notice_id")
-  postId Int @map("post_id")
-  planId Int @map("plan_id")
+  id        Int       @id @default(autoincrement())
+  content   String    @db.Text
+  status    Int       @default(0)
+  type      AlarmType
+  createdAt DateTime  @default(now()) @map("created_at")
+  userId    Int       @map("user_id")
+  crewId    Int       @map("crew_id")
+  noticeId  Int       @map("notice_id")
+  postId    Int       @map("post_id")
+  planId    Int       @map("plan_id")
 
-  user User @relation(fields: [userId], references: [id])
-  crew Crew @relation(fields: [crewId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+  crew       Crew       @relation(fields: [crewId], references: [id])
   crewNotice CrewNotice @relation(fields: [noticeId], references: [id])
-  crewPost CrewPost @relation(fields: [postId], references: [id])
-  crewPlan CrewPlan @relation(fields: [planId], references: [id])
+  crewPost   CrewPost   @relation(fields: [postId], references: [id])
+  crewPlan   CrewPlan   @relation(fields: [planId], references: [id])
 
   @@map("alarm")
 }

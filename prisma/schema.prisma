@@ -116,11 +116,12 @@ model CrewPlan {
   crewPlanRequest CrewPlanRequest[]
   alarm           Alarm[]
 
-  comments                 CrewPlanComment[]
+  crewPlanComment                 CrewPlanComment[]
+  crewPlanLike                    CrewPlanLike[]
 
   @@map("crew_plan")
 
-  @@unique([id, crewId]) //복합 키
+
 }
 
 model CrewPlanComment {
@@ -131,6 +132,8 @@ model CrewPlanComment {
 
   crewPlanId    Int       @map("crew_plan_id")
   crewMemberId  Int       @map("crew_member_id")
+  isPublic      Boolean   @map("is_public")
+
 
   crewPlan      CrewPlan  @relation(fields: [crewPlanId], references: [id])
   crewMember    CrewMember @relation(fields: [crewMemberId], references: [id])
@@ -138,6 +141,34 @@ model CrewPlanComment {
 
   @@map("crew_plan_comment")
 }
+
+model CrewPlanRequest {
+  id  Int @id @default(autoincrement())
+  status  Int @default(0)
+  crewMemberId Int @map("crew_member_id")
+  crewPlanId Int @map("crew_plan_id")
+
+  crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
+  crewPlan CrewPlan @relation(fields:[crewPlanId], references: [id])
+
+  @@map("crew_plan_request")
+}
+
+model CrewPlanLike {
+  id  Int   @id   @default(autoincrement())
+  isLiked   Int   @map("is_liked")  @default(1)
+  crewMemberId  Int @map("crew_member_id")
+  planId  Int   @map("plan_id")
+
+  crewPlan  CrewPlan  @relation(fields: [planId], references: [id])
+  crewMember  CrewMember  @relation(fields: [crewMemberId], references: [id])
+
+  @@unique([planId, crewMemberId])
+  @@map("crew_plan_like")
+
+
+}
+
 
 
 model CrewRegister {
@@ -165,7 +196,11 @@ model CrewMember {
   user User @relation(fields: [userId], references: [id])
   crew Crew @relation(fields: [crewId], references: [id])
 
+
   crewPlanRequest CrewPlanRequest[]
+  crewPlan  CrewPlan[]
+  crewPlanComment CrewPlanComment[]
+  crewPlanLike  CrewPlanLike[]
   crewPost CrewPost[]
   crewPostComment CrewPostComment[]
   crewNotice CrewNotice[]
@@ -173,21 +208,10 @@ model CrewMember {
   crewAlbum CrewAlbum[]
   crewNoticeLike CrewNoticeLike[]
   crewPostLike CrewPostLike[]
-  comments CrewPlanComment[]
 
   @@map("crew_member")
 }
-model CrewPlanRequest {
-  id  Int @id @default(autoincrement())
-  status  Int @default(0)
-  memberId Int @map("member_id")
-  planId Int @map("plan_id")
 
-  crewMember CrewMember @relation(fields: [memberId], references: [id])
-  crewPlan CrewPlan @relation(fields:[planId], references: [id])
-
-  @@map("crew_plan_request")
-}
 
 model CrewPost {
   id           Int       @id @default(autoincrement())

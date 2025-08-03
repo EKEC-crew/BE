@@ -4,6 +4,7 @@ import {
   ApplySuccessResponseDTO,
   ApplyErrorResponseDTO,
   createCrewApplicationDetailResponse,
+  createCrewRecruitFormResponse,
 } from '../dto/response/apply.response.dto.js';
 
 // 크루 지원하기
@@ -240,7 +241,7 @@ export const updateApplicationStatus = async (req, res, next) => {
   try {
     const crewId = parseInt(req.params.crewId);
     const applyId = parseInt(req.params.applyId);
-    const { status } = req.body; // ✅ 여기를 확인!
+    const { status } = req.body;
 
     if (typeof status !== 'number') {
       throw new Error('status 값이 숫자가 아닙니다.');
@@ -258,8 +259,87 @@ export const updateApplicationStatus = async (req, res, next) => {
   }
 };
 
+// 특정 크루 지원서 조회하기
+export const getCrewApplicationForm = async (req, res, next) => {
+  /*
+  #swagger.summary = "크루 모집 응답 폼 조회"
+  #swagger.tags = ["Crew Apply"]
+  #swagger.parameters['crewId'] = {
+      in: 'path',
+      description: '크루 ID',
+      required: true,
+      schema: { type: 'integer' }
+  }
+  #swagger.responses[200] = {
+      description: "모집 응답 폼 조회 성공",
+      content: {
+          "application/json": {
+              example: {
+                  resultType: "SUCCESS",
+                  error: null,
+                  success: [
+                      {
+                          id: 1,
+                          question: "어떤 활동을 선호하시나요?",
+                          questionType: 0,
+                          choiceList: ["러닝", "요가"],
+                          isEtc: 0,
+                          required: 1
+                      },
+                      {
+                          id: 2,
+                          question: "이 크루를 어떻게 알게 되었나요?",
+                          questionType: 1,
+                          choiceList: ["SNS", "지인 추천"],
+                          isEtc: 1,
+                          required: 1
+                      },
+                      {
+                          id: 3,
+                          question: "기타 하고 싶은 말이 있다면 작성해주세요.",
+                          questionType: 2,
+                          choiceList: null,
+                          isEtc: 0,
+                          required: 0
+                      }
+                  ]
+              }
+          }
+      }
+  }
+  #swagger.responses[404] = {
+      description: "모집 응답 폼 없음",
+      content: {
+          "application/json": {
+              example: {
+                  resultType: "FAIL",
+                  error: {
+                      message: "해당 크루의 모집 응답 폼이 없습니다.",
+                      code: 404
+                  },
+                  success: null
+              }
+          }
+      }
+  }
+*/
+  try {
+    const { crewId } = req.params;
+    const result = await applyService.getRecruitFormByCrewId(+crewId);
+
+    return res.status(200).json({
+      resultType: 'SUCCESS',
+      error: null,
+      success: createCrewRecruitFormResponse(result),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   applyToCrew,
   getCrewApplicationById,
   updateApplicationStatus,
+  getCrewApplicationForm,
 };

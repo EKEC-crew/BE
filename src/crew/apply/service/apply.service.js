@@ -56,8 +56,20 @@ const updateStatus = async (crewId, applyId, status) => {
     return await applyRepository.updateStatus(crewId, applyId, status);
 };
 
+const getRecruitFormByCrewId = async (crewId) => {
+    const forms = await applyRepository.findRecruitFormByCrewId(crewId);
+    if (!forms || forms.length === 0) {
+        const error = new Error('해당 크루의 모집 응답 폼이 없습니다.');
+        error.status = 404;
+        throw error;
+    }
+    return forms;
+};
+
+
 export default {
     applyToCrew,
     getCrewApplicationById,
     updateStatus,
+    getRecruitFormByCrewId,
 };

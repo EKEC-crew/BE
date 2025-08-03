@@ -315,7 +315,7 @@ export const updatePlan = async (req, res, next) => {
   try {
     const {crewId} = req.params;
     const {planId} = req.params; 
-    const plan = await planService.CrewPlanService.updatePlan(crewId, planId, req.body);
+    const plan = await planService.CrewPlanService.updatePlanById(crewId, planId, req.body);
     return res.success(plan);
   } catch (err) {
     next(err);

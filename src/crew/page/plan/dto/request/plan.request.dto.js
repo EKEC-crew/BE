@@ -58,9 +58,11 @@ export class UpdateCrewPlanRequest {
 export class CreateCrewPlanCommentRequest {
   constructor({
     crewMemberId,
-    content
+    content,
+    isPublic = true // 기본값으로 공개 댓글
   }) {
     this.crewMemberId = crewMemberId;
     this.content = content;
+    this.isPublic = isPublic;
   }
 }

@@ -3,7 +3,7 @@
 //중복 회원
 export class DuplicateUserEmailError extends Error {
   errorCode = "U001";
-  statusCode = 409
+  statusCode = 409;
 
   constructor(reason, data) {
     super(reason);
@@ -19,7 +19,7 @@ export class DuplicateUserEmailError extends Error {
  */
 export class InvalidInputValueError extends Error {
   errorCode = "I001";
-  statusCode = 400
+  statusCode = 400;
 
   constructor(reason, data) {
     super(reason);
@@ -34,7 +34,7 @@ export class InvalidInputValueError extends Error {
  */
 export class UnprocessableInputValueError extends Error {
   errorCode = "I002";
-  statusCode = 422
+  statusCode = 422;
 
   constructor(reason, data) {
     super(reason);
@@ -49,7 +49,22 @@ export class UnprocessableInputValueError extends Error {
  */
 export class UnavailableImageError extends Error {
   errorCode = "M001";
-  statusCode = 502
+  statusCode = 502;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+/**
+ * **\<💥 Error\>**
+ * ***UserNotFoundError***
+ * 존재하지 않는 유저에 대한 요청이 발생했을때 발생하는 에러
+ */
+export class UserNotFoundError extends Error {
+  errorCode = "U001";
+  statusCode = 404;
 
   constructor(reason, data) {
     super(reason);
@@ -58,11 +73,10 @@ export class UnavailableImageError extends Error {
   }
 }
 
-
 //찾을 수 없는 크루
 export class NotFoundCrewError extends Error {
   errorCode = "N001";
-  statusCode = 404
+  statusCode = 404;
 
   constructor(reason, data) {
     super(reason);
@@ -87,6 +101,30 @@ export class NotFoundPostError extends Error {
 export class NotFoundCommentError extends Error {
   errorCode = "N004";
   statusCode = 404;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+
+//존재하지 않는 이미지
+export class NotFoundImageError extends Error {
+  errorCode = "N004";
+  statusCode = 404;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+
+//게시글에 존재하지 않는 이미지
+export class NotExistImageInPostError extends Error {
+  errorCode = "N004";
+  statusCode = 403;
 
   constructor(reason, data) {
     super(reason);

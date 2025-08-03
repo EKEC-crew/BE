@@ -61,9 +61,27 @@ const updateStatus = async (crewId, applyId, status) => {
     });
 };
 
+// 특정 크루 지원서 폼 조회
+const findRecruitFormByCrewId = async (crewId) => {
+    return await prisma.crewRecruitForm.findMany({
+        where: { crewId },
+        select: {
+            id: true,
+            question: true,
+            questionType: true,
+            choiceList: true,
+            isEtc: true,
+            required: true,
+        },
+        orderBy: { id: 'asc' },
+    });
+};
+
+
 export default {
     findByUserAndCrew,
     createApplicationWithTransaction,
     findApplicationById,
     updateStatus,
+    findRecruitFormByCrewId,
 };

@@ -65,3 +65,14 @@ export const createCrewApplicationDetailResponse = (application) => {
         })) || []
     };
 };
+
+export const createCrewRecruitFormResponse = (forms) => {
+    return forms.map((form) => ({
+        id: form.id,
+        question: form.question,
+        questionType: form.questionType,
+        choiceList: form.choiceList,
+        isEtc: form.isEtc,
+        required: form.required,
+    }));
+};

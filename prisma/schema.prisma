@@ -96,32 +96,32 @@ model Crew {
 }
 
 model CrewPlan {
-  id                   Int      @id @default(autoincrement())
+  id                   Int           @id @default(autoincrement())
   day                  DateTime
-  title                String   @db.VarChar(30)
-  content              String   @db.Text
-  type                 Int      @default(0) //0이 번개모임이고 1이 정기모임
-  isRequired           Boolean  @default(false) @map("is_required") // 필참 여부
-  allowComments        Boolean  @default(false) @map("allow_comments") // 댓글 허용
-  allowPrivateComments Boolean  @default(false) @map("allow_private_comments") // 비공개 댓글 허용
-  allowExternalShare   Boolean  @default(false) @map("allow_external_share") // 외부 공유 허용
-  hasFee               Boolean  @default(false) @map("has_fee") // 회비 여부
-  fee                  Int?     @default(0)
-  feePurpose           String?  @map("fee_purpose") @db.VarChar(100) // 회비 목적
-  createdAt            DateTime @default(now()) @map("created_at")
-  crewId               Int      @map("crew_id")
+  title                String        @db.VarChar(30)
+  content              String        @db.Text
+  type                 Int           @default(0) //0이 번개모임이고 1이 정기모임
+  isRequired           Boolean       @default(false) @map("is_required") // 필참 여부
+  allowComments        Boolean       @default(false) @map("allow_comments") // 댓글 허용
+  allowPrivateComments Boolean       @default(false) @map("allow_private_comments") // 비공개 댓글 허용
+  allowExternalShare   Boolean       @default(false) @map("allow_external_share") // 외부 공유 허용
+  hasFee               Boolean       @default(false) @map("has_fee") // 회비 여부
+  fee                  Int?          @default(0)
+  feePurpose           String?       @map("fee_purpose") @db.VarChar(100) // 회비 목적
+  createdAt            DateTime      @default(now()) @map("created_at")
+  crewId               Int           @map("crew_id")
+  crewMemberId         Int           @map("crew_member_id")
 
   // 관계
-  crew            Crew              @relation(fields: [crewId], references: [id])
-  crewPlanRequest CrewPlanRequest[]
-  alarm           Alarm[]
+  crew                 Crew          @relation(fields: [crewId], references: [id])
+  crewMember           CrewMember    @relation(fields: [crewMemberId], references: [id])
+  crewPlanRequest      CrewPlanRequest[]
+  alarm                Alarm[]
 
-  crewPlanComment                 CrewPlanComment[]
-  crewPlanLike                    CrewPlanLike[]
+  crewPlanComment      CrewPlanComment[]
+  crewPlanLike         CrewPlanLike[]
 
   @@map("crew_plan")
-
-
 }
 
 model CrewPlanComment {
@@ -195,7 +195,6 @@ model CrewMember {
 
   user User @relation(fields: [userId], references: [id])
   crew Crew @relation(fields: [crewId], references: [id])
-
 
   crewPlanRequest CrewPlanRequest[]
   crewPlan  CrewPlan[]

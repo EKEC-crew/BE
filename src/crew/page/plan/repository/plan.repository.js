@@ -182,12 +182,44 @@ export const CrewPlanRepository = {
     },
 
     deletePlanById: async (crewId, planId) => {
-      return await prisma.crewPlan.delete({
-        where: {
-          id: Number(planId),
-          crewId: Number(crewId)
-        }
-      })
+      // 트랜잭션을 사용하여 관련 데이터들을 먼저 삭제
+      return await prisma.$transaction(async (tx) => {
+        // 1. CrewPlanComment 삭제
+        await tx.crewPlanComment.deleteMany({
+          where: {
+            crewPlanId: Number(planId)
+          }
+        });
+
+        // 2. CrewPlanRequest 삭제
+        await tx.crewPlanRequest.deleteMany({
+          where: {
+            crewPlanId: Number(planId)
+          }
+        });
+
+        // 3. CrewPlanLike 삭제
+        await tx.crewPlanLike.deleteMany({
+          where: {
+            planId: Number(planId)
+          }
+        });
+
+        // 4. Alarm 삭제 (planId가 있는 경우)
+        await tx.alarm.deleteMany({
+          where: {
+            planId: Number(planId)
+          }
+        });
+
+        // 5. 마지막으로 CrewPlan 삭제
+        return await tx.crewPlan.delete({
+          where: {
+            id: Number(planId),
+            crewId: Number(crewId)
+          }
+        });
+      });
     }
     
 }
@@ -197,12 +229,13 @@ export const CrewPlanCommentRepository = {
   /**
    * 댓글 생성
    */
-  createComment: async (crewId, planId, crewMemberId, content) => {
+  createComment: async (crewId, planId, crewMemberId, content, isPublic = true) => {
     return await prisma.crewPlanComment.create({
       data: {
         content,
         crewPlanId: Number(planId),
         crewMemberId: Number(crewMemberId),
+        isPublic: isPublic,
       },
       include: {
         crewMember: {

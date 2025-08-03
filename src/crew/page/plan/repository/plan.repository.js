@@ -8,11 +8,12 @@ export const CrewPlanRepository = {
         return await prisma.crewPlan.create({
           data: {
             crewId: Number(crewId), //URL에서 받기
+            crewMemberId: Number(crewMemberId), // crewMember 관계 설정
             day: new Date(day), //날짜 세팅
             ...rest, // 나머지 정보는 DTO에서 받기
             crewPlanRequest: {
               create: {
-                memberId: crewMemberId,
+                crewMemberId: crewMemberId,
                 status: 0
               },
             },
@@ -21,6 +22,15 @@ export const CrewPlanRepository = {
             crew: {
                 select: {
                     title: true
+                }
+            },
+            crewMember: {
+                include: {
+                    user: {
+                        select: {
+                            nickname: true
+                        }
+                    }
                 }
             },
             crewPlanRequest: {
@@ -52,6 +62,15 @@ export const CrewPlanRepository = {
               title: true,
             },
           },
+          crewMember: {
+            include: {
+              user: {
+                select: {
+                  nickname: true,
+                },
+              },
+            },
+          },
           crewPlanRequest: {
             include: {
               crewMember: {
@@ -69,35 +88,65 @@ export const CrewPlanRepository = {
       });
     },
 
-    findPlanListByCrewId: async (crewId) => {
-      return await prisma.crewPlan.findMany({
-        where: {
-          crewId: Number(crewId),
-        },
-        orderBy: {
-          day: 'desc',
-        },
-        include: {
-          crew: {
-            select: {
-              title: true,
-            },
+    findPlanListByCrewId: async (crewId, page = 1, size = 10) => {
+      const skip = (page - 1) * size;
+      
+      const [totalCount, plans] = await Promise.all([
+        prisma.crewPlan.count({
+          where: {
+            crewId: Number(crewId),
+          }
+        }),
+        prisma.crewPlan.findMany({
+          where: {
+            crewId: Number(crewId),
           },
-          crewPlanRequest: {
-            include: {
-              crewMember: {
-                include: {
-                  user: {
-                    select: {
-                      nickname: true,
+          orderBy: {
+            day: 'desc',
+          },
+          skip,
+          take: size,
+          include: {
+            crew: {
+              select: {
+                title: true,
+              },
+            },
+            crewMember: {
+              include: {
+                user: {
+                  select: {
+                    nickname: true,
+                  }
+                }
+              }
+            },
+            crewPlanRequest: {
+              include: {
+                crewMember: {
+                  include: {
+                    user: {
+                      select: {
+                        nickname: true,
+                      }
                     }
                   }
                 }
               }
             }
           }
+        })
+      ]);
+
+      return {
+        plans,
+        pagination: {
+          totalCount,
+          currentPage: page,
+          pageSize: size,
+          totalPages: Math.ceil(totalCount / size)
         }
-      })
+      };
     },
 
     updatePlanById: async (crewId, planId, data) => {
@@ -111,9 +160,14 @@ export const CrewPlanRepository = {
 
       return await prisma.crewPlan.update({
         where: { id: Number(planId) },
-        data: updateData,
+        data: updatedData,
         include: {
           crew: { select: { title: true } },
+          crewMember: {
+            include: {
+              user: { select: { nickname: true } },
+            },
+          },
           crewPlanRequest: {
             include: {
               crewMember: {
@@ -244,7 +298,17 @@ export const CrewPlanCommentRepository = {
           }
         }
       })
-    ])
+    ]);
+
+    return {
+      comments,
+      pagination: {
+        totalCount,
+        currentPage: page,
+        pageSize: size,
+        totalPages: Math.ceil(totalCount / size)
+      }
+    };
   },
 
 
@@ -268,6 +332,18 @@ export const CrewPlanCommentRepository = {
     return await prisma.crewPlanComment.update({
       where: { id: Number(commentId)},
       data: { content },
+      include: {
+        crewMember: {
+          include: {
+            user: {
+              select: {
+                nickname: true,
+                image: true,
+              }
+            }
+          }
+        }
+      }
     })
   },
 

@@ -157,6 +157,7 @@ export class NotFoundPlanError extends Error {
   }
 }
 
+
 //권한이 없는 유저
 export class PermissionDeniedError extends Error {
   errorCode = "P001";

@@ -1,5 +1,5 @@
 import { prisma } from "../../../../db.config.js";
-import { InvalidInputValueError } from "../../../../error.js";
+import { InvalidInputValueError, NotFoundPlanError } from "../../../../error.js";
 
 import * as planRepository from "../repository/plan.repository.js";
 import * as planResponse from "../dto/response/plan.response.dto.js";
@@ -40,20 +40,20 @@ export const CrewPlanService = {
         return new planResponse.GetCrewPlanResponse(plan);
     },
 
-    //일정 리스트로 조회 서비스
-    getPlanListByCrewId: async (crewId) => {
+    //일정 리스트로 조회 서비스 (페이징 처리 추가)
+    getPlanListByCrewId: async (crewId, page = 1, size = 10) => {
         if (!crewId || isNaN(crewId)) {
             throw new InvalidInputValueError("crewId가 올바르지 않습니다.", {crewId});
-    }
+        }
 
-    const crew = await prisma.crew.findUnique({ where: {id: crewId} });
-    if (!crew) {
-        throw new InvalidInputValueError("존재하지 않는 crewId입니다.", {crewId});
-    }
+        const crew = await prisma.crew.findUnique({ where: {id: crewId} });
+        if (!crew) {
+            throw new InvalidInputValueError("존재하지 않는 crewId입니다.", {crewId});
+        }
 
-    const plans = await planRepository.CrewPlanRepository.findPlanListByCrewId(crewId);
-    
-    return plans.map((plan) => new planResponse.GetCrewPlanResponse(plan));
+        const plans = await planRepository.CrewPlanRepository.findPlanListByCrewId(crewId, page, size);
+        
+        return plans.map((plan) => new planResponse.GetCrewPlanResponse(plan));
     },
 
     //일정 수정 서비스
@@ -80,17 +80,19 @@ export const CrewPlanService = {
     deletePlan: async (crewId, planId) => {
         if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
             throw new InvalidInputValueError("유효하지 않은 crewId 또는 planId입니다.", {crewId, planId});
-          }
+        }
       
-          const deleted = await planRepository.CrewPlanRepository.deletePlanByCrewAndId(crewId, planId);
-          if (!deleted) {
-            throw new InvalidInputValueError("삭제할 일정이 존재하지 않습니다.", { crewId, planId });
-          }
+        const plan = await planRepository.CrewPlanRepository.findPlanById(crewId, planId);
+        if (!plan) {
+            throw new NotFoundPlanError("삭제할 일정이 존재하지 않습니다.", { crewId, planId });
+        }
 
         const deletedPlan = await planRepository.CrewPlanRepository.deletePlanById(crewId, planId);
         if (!deletedPlan) {
             throw new InvalidInputValueError("삭제할 일정이 존재하지 않습니다.", { crewId, planId });
         }
+        
+        return { message: "일정이 성공적으로 삭제되었습니다." };
     }
 }
 
@@ -119,10 +121,74 @@ export const CrewPlanCommentService = {
 
         const comment = await planRepository.CrewPlanCommentRepository.createComment(crewId, planId, crewMemberId, content);
         return new planResponse.CrewPlanCommentResponse(comment);
+    },
+
+    //일정 댓글 단건 조회 서비스
+    getCommentById: async (crewId, planId, commentId) => {
+        if (!crewId || !planId || !commentId || isNaN(crewId) || isNaN(planId) || isNaN(commentId)) {
+            throw new InvalidInputValueError("유효하지 않은 파라미터입니다.", { crewId, planId, commentId });
+        }
+
+        const comment = await planRepository.CrewPlanCommentRepository.findCommentById(crewId, planId, commentId);
+        if (!comment) {
+            throw new NotFoundPlanError("해당 댓글이 존재하지 않습니다.", { crewId, planId, commentId });
+        }
+
+        return new planResponse.CrewPlanCommentResponse(comment);
+    },
+
+    //일정 댓글 리스트 조회 서비스 (페이징 처리)
+    getCommentList: async ({crewId, planId, page = 1, size = 10}) => {
+        if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
+            throw new InvalidInputValueError("유효하지 않은 crewId 또는 planId입니다.", { crewId, planId });
+        }
+
+        // 일정 존재 확인
+        const plan = await planRepository.CrewPlanRepository.findPlanById(crewId, planId);
+        if (!plan) {
+            throw new InvalidInputValueError("해당 크루 일정이 존재하지 않습니다.", {crewId, planId});
+        }
+
+        const commentList = await planRepository.CrewPlanCommentRepository.findAllCommentsByPlan({
+            crewId: Number(crewId),
+            planId: Number(planId),
+            page: Number(page),
+            size: Number(size)
+        });
+
+        return commentList.map(comment => new planResponse.CrewPlanCommentResponse(comment));
+    },
+
+    //일정 댓글 수정 서비스
+    updateComment: async (crewId, planId, commentId, requestDto) => {
+        const { content } = requestDto;
+        
+        if (!crewId || !planId || !commentId || isNaN(crewId) || isNaN(planId) || isNaN(commentId)) {
+            throw new InvalidInputValueError("유효하지 않은 파라미터입니다.", { crewId, planId, commentId });
+        }
+        if (!content || content.trim().length === 0) {
+            throw new InvalidInputValueError("댓글 내용은 필수입니다.");
+        }
+
+        const comment = await planRepository.CrewPlanCommentRepository.updateCommentById(crewId, planId, commentId, content);
+        if (!comment) {
+            throw new NotFoundPlanError("수정할 댓글이 존재하지 않습니다.", { crewId, planId, commentId });
+        }
+
+        return new planResponse.CrewPlanCommentResponse(comment);
+    },
+
+    //일정 댓글 삭제 서비스
+    deleteComment: async (crewId, planId, commentId) => {
+        if (!crewId || !planId || !commentId || isNaN(crewId) || isNaN(planId) || isNaN(commentId)) {
+            throw new InvalidInputValueError("유효하지 않은 파라미터입니다.", { crewId, planId, commentId });
+        }
+
+        const comment = await planRepository.CrewPlanCommentRepository.deleteCommentById(crewId, planId, commentId);
+        if (!comment) {
+            throw new NotFoundPlanError("삭제할 댓글이 존재하지 않습니다.", { crewId, planId, commentId });
+        }
+
+        return { message: "댓글이 성공적으로 삭제되었습니다." };
     }
-
-    //일장 댓글 단건 조회 서비스
-    
-
-
 }

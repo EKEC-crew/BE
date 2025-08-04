@@ -207,8 +207,10 @@ export const readCommentsByCrewPost = async ({ crewId, postId, page, size }) => 
 			throw new baseError.NotFoundPostError("존재하지 않는 게시글입니다.", { postId });
 		}
 
-		const commentList = await postRepository.getCommentsByPostId({ postId, page, size });
-		return postResponse.CrewCommentListResponse(commentList);
+		const data = await postRepository.getCommentsByPostId({ postId, page, size });
+		const comments = data.comments;
+		const hasNext = data.hasNext;
+		return postResponse.CrewCommentListResponse({ comments, hasNext });
 	} catch (err) {
 		throw err;
 	}

@@ -365,7 +365,7 @@ export const getCommentsByPostId = async ({ postId, page, size }) => {
 				createdAt: 'asc',
 			},
 			skip: (page - 1) * size,
-			take: size,
+			take: size + 1,
 			include: {
 				crewMember: {
 					include: {
@@ -378,8 +378,10 @@ export const getCommentsByPostId = async ({ postId, page, size }) => {
 					}
 				}
 			}
-		})
-		return commentList;
+		});
+		const hasNext = commentList > size;
+		const comments = commentList.slice(0, size);
+		return { comments, hasNext };
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

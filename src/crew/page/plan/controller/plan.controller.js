@@ -189,6 +189,18 @@ export const getPlanList = async (req, res, next) => {
     type: "integer",
     description: "크루 ID"
   }
+  #swagger.parameters['page'] = {
+    in: 'query',
+    required: false,
+    type: "integer",
+    description: "페이지 번호 (기본 1)"
+  }
+  #swagger.parameters['size'] = {
+    in: 'query',
+    required: false,
+    type: "integer",
+    description: "페이지 크기 (기본 10)"
+  }
   #swagger.responses[200] = {
     description: "일정 목록 조회 성공",
     content: {
@@ -199,26 +211,40 @@ export const getPlanList = async (req, res, next) => {
             resultType: { type: "string", example: "SUCCESS" },
             error: { type: "object", nullable: true, example: null },
             data: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  id: { type: "number", example: 12 },
-                  crew_name: { type: "string", example: "코딩 크루" },
-                  writer: { type: "string", example: "비쿠" },
-                  title: { type: "string", example: "저녁 모임" },
-                  content: { type: "string", example: "7시 강남역" },
-                  day: { type: "string", format: "date-time" },
-                  type: { type: "number", example: 0 },
-                  isRequired: { type: "boolean" },
-                  allowComments: { type: "boolean" },
-                  allowPrivateComments: { type: "boolean" },
-                  allowExternalShare: { type: "boolean" },
-                  hasFee: { type: "boolean" },
-                  fee: { type: "integer" },
-                  feePurpose: { type: "string" },
-                  createdAt: { type: "string", format: "date-time" },
-                  updatedAt: { type: "string", format: "date-time" }
+              type: "object",
+              properties: {
+                plans: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "number", example: 12 },
+                      crew_name: { type: "string", example: "코딩 크루" },
+                      writer: { type: "string", example: "비쿠" },
+                      title: { type: "string", example: "저녁 모임" },
+                      content: { type: "string", example: "7시 강남역" },
+                      day: { type: "string", format: "date-time" },
+                      type: { type: "number", example: 0 },
+                      isRequired: { type: "boolean" },
+                      allowComments: { type: "boolean" },
+                      allowPrivateComments: { type: "boolean" },
+                      allowExternalShare: { type: "boolean" },
+                      hasFee: { type: "boolean" },
+                      fee: { type: "integer" },
+                      feePurpose: { type: "string" },
+                      createdAt: { type: "string", format: "date-time" },
+                      updatedAt: { type: "string", format: "date-time" }
+                    }
+                  }
+                },
+                pagination: {
+                  type: "object",
+                  properties: {
+                    totalCount: { type: "number", example: 25 },
+                    currentPage: { type: "number", example: 1 },
+                    pageSize: { type: "number", example: 10 },
+                    totalPages: { type: "number", example: 3 }
+                  }
                 }
               }
             }
@@ -236,8 +262,11 @@ export const getPlanList = async (req, res, next) => {
   */
   try {
     const crewId = parseInt(req.params.crewId);
-    const plans = await planService.CrewPlanService.getPlanListByCrewId(crewId);
-    return res.success(plans);
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 10;
+    
+    const result = await planService.CrewPlanService.getPlanListByCrewId(crewId, page, size);
+    return res.success(result);
   } catch (err) {
     next(err);
   }
@@ -286,7 +315,7 @@ export const updatePlan = async (req, res, next) => {
   try {
     const {crewId} = req.params;
     const {planId} = req.params; 
-    const plan = await planService.CrewPlanService.updatePlan(crewId, planId, req.body);
+    const plan = await planService.CrewPlanService.updatePlanById(crewId, planId, req.body);
     return res.success(plan);
   } catch (err) {
     next(err);
@@ -328,7 +357,7 @@ export const deletePlan = async (req, res, next) => {
 
 export const createPlanComment = async (req, res, next) => {
   /*
-  #swagger.summary = "크루 일정 댓글 작성"
+  #swagger.summary = "크루 일정 댓글 생성"
   #swagger.tags = ["Crew Plan Comment"]
   #swagger.parameters['crewId'] = { in: 'path', required: true, type: 'integer', description: '크루 ID' }
   #swagger.parameters['planId'] = { in: 'path', required: true, type: 'integer', description: '일정 ID' }
@@ -340,52 +369,50 @@ export const createPlanComment = async (req, res, next) => {
           type: "object",
           required: ["crewMemberId", "content"],
           properties: {
-            crewMemberId: { type: "integer", example: 5 },
+            crewMemberId: { type: "integer", example: 3 },
             content: { type: "string", example: "참석하겠습니다!" }
           }
         }
       }
     }
   }
- * #swagger.responses[200] = { 
- *   description: "댓글 작성 성공",
- *   content: {
- *     "application/json": {
- *       schema: {
- *         type: "object",
- *         properties: {
- *           resultType: { type: "string", example: "SUCCESS" },
- *           error: { type: "object", nullable: true, example: null },
- *           data: {
- *             type: "object",
- *             properties: {
- *               id: { type: "number", example: 1 },
- *               content: { type: "string", example: "참석하겠습니다!" },
- *               writer: { type: "string", example: "비쿠" },
- *               writerImage: { type: "string", example: "https://example.com/image.jpg" },
- *               createdAt: { type: "string", format: "date-time" },
- *               updatedAt: { type: "string", format: "date-time" }
- *             }
- *           }
- *         }
- *       }
- *     }
- *   }
- * }
- * #swagger.responses[400] = { 
- *   description: "입력값 오류"
- * }
- */
+  #swagger.responses[200] = { 
+    description: "댓글 생성 성공",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            resultType: { type: "string", example: "SUCCESS" },
+            error: { type: "object", nullable: true, example: null },
+            data: {
+              type: "object",
+              properties: {
+                id: { type: "number", example: 1 },
+                content: { type: "string", example: "참석하겠습니다!" },
+                writer: { type: "string", example: "비쿠" },
+                writerImage: { type: "string", example: "https://example.com/image.jpg" },
+                createdAt: { type: "string", format: "date-time" },
+                updatedAt: { type: "string", format: "date-time" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  #swagger.responses[400] = { 
+    description: "입력값 오류"
+  }
+  */
   try {
     const {crewId, planId} = req.params;
-    const reqDto = new CreateCrewPlanCommentRequest(req.body);
 
-    //객체 리터럴 방식 : {a : 1, b : 2} => a,b라는 key와 각각 1,2라는 value를 가진 객체
-    const comment = await planService.CrewPlanService.createComment({
-      crewId: Number(crewId),
-      planId: Number(planId),
-      requestDto: reqDto
-    });
+    const comment = await planService.CrewPlanCommentService.createComment(
+      Number(crewId), 
+      Number(planId), 
+      req.body
+    );
 
     return res.success(comment);
   } catch (err) {
@@ -426,38 +453,18 @@ export const getPlanCommentById = async (req, res, next) => {
  *   }
  * }
  * #swagger.responses[404] = { 
- *   description: "댓글이 존재하지 않음",
- *   content: {
- *     "application/json": {
- *       schema: {
- *         type: "object",
- *         properties: {
- *           resultType: { type: "string", example: "FAIL" },
- *           error: {
- *             type: "object",
- *             properties: {
- *               errorCode: { type: "string", example: "P001" },
- *               reason: { type: "string", example: "댓글이 존재하지 않습니다." }
- *             }
- *           },
- *           data: { type: "null", example: null }
- *         }
- *       }
- *     }
- *   }
+ *   description: "댓글이 존재하지 않음"
  * }
  */
 
   try {
     const {crewId, planId, commentId} = req.params;
 
-    //객체 방식으로 넣으면 순서 상관 없이 넣을 수 있음
-    //가독성 향상 및 의미 명확화화
-    const comment = await planService.CrewPlanCommentService.getCommentById({
-      crewId: Number(crewId),
-      planId: Number(planId),
-      commentId: Number(commentId),
-    });
+    const comment = await planService.CrewPlanCommentService.getCommentById(
+      Number(crewId),
+      Number(planId), 
+      Number(commentId)
+    );
 
     return res.success(comment);
   } catch (err) {
@@ -542,44 +549,44 @@ export const updatePlanComment = async (req, res, next) => {
       }
     }
   }
-  * #swagger.responses[200] = { 
-  *   description: "댓글 수정 성공",
-  *   content: {
-  *     "application/json": {
-  *       schema: {
-  *         type: "object",
-  *         properties: {
-  *           resultType: { type: "string", example: "SUCCESS" },
-  *           error: { type: "object", nullable: true, example: null },
-  *           data: {
-  *             type: "object",
-  *             properties: {
-   *               id: { type: "number", example: 1 },
- *               content: { type: "string", example: "내용을 수정했습니다." },
- *               writer: { type: "string", example: "비쿠" },
- *               writerImage: { type: "string", example: "https://example.com/image.jpg" },
- *               createdAt: { type: "string", format: "date-time" },
- *               updatedAt: { type: "string", format: "date-time" }
-  *             }
-  *           }
-  *         }
-  *       }
-  *     }
-  *   }
-  * }
-  * #swagger.responses[400] = { 
-  *   description: "수정할 댓글이 존재하지 않거나 입력값 오류"
-  * }
+  #swagger.responses[200] = { 
+    description: "댓글 수정 성공",
+    content: {
+      "application/json": {
+        schema: {
+          type: "object",
+          properties: {
+            resultType: { type: "string", example: "SUCCESS" },
+            error: { type: "object", nullable: true, example: null },
+            data: {
+              type: "object",
+              properties: {
+                id: { type: "number", example: 1 },
+                content: { type: "string", example: "내용을 수정했습니다." },
+                writer: { type: "string", example: "비쿠" },
+                writerImage: { type: "string", example: "https://example.com/image.jpg" },
+                createdAt: { type: "string", format: "date-time" },
+                updatedAt: { type: "string", format: "date-time" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  #swagger.responses[400] = { 
+    description: "수정할 댓글이 존재하지 않거나 입력값 오류"
+  }
   */
   try {
     const {crewId, planId, commentId} = req.params;
-    const {content} = req.body;
-    const comment = await planService.CrewPlanCommentService.updateComment({
-      crewId: Number(crewId),
-      planId: Number(planId),
-      commentId: Number(commentId),
-      content,
-    });
+    
+    const comment = await planService.CrewPlanCommentService.updateComment(
+      Number(crewId),
+      Number(planId),
+      Number(commentId),
+      req.body
+    );
     return res.success(comment);
   } catch (err) {
     next(err);
@@ -614,39 +621,22 @@ export const deletePlanComment = async (req, res, next) => {
  *   }
  * }
  * #swagger.responses[404] = { 
- *   description: "삭제할 댓글이 존재하지 않음",
- *   content: {
- *     "application/json": {
- *       schema: {
- *         type: "object",
- *         properties: {
- *           resultType: { type: "string", example: "FAIL" },
- *           error: {
- *             type: "object",
- *             properties: {
- *               errorCode: { type: "string", example: "P001" },
- *               reason: { type: "string", example: "삭제할 댓글이 존재하지 않습니다." }
- *             }
- *           },
- *           data: { type: "null", example: null }
- *         }
- *       }
- *     }
- *   }
+ *   description: "삭제할 댓글이 존재하지 않음"
  * }
  */
 
   try {
     const {crewId, planId, commentId} = req.params;
     
-    await planService.CrewPlanCommentService.deleteComment({
-      crewId: Number(crewId),
-      planId: Number(planId),
-      commentId: Number(commentId),
-    });
-
-    return res.success({message: "댓글이 삭제되었습니다."});
+    const result = await planService.CrewPlanCommentService.deleteComment(
+      Number(crewId),
+      Number(planId),
+      Number(commentId)
+    );
+    
+    return res.success(result);
   } catch (err) {
     next(err);
   }
-}
+};
+ 

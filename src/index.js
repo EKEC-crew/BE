@@ -74,7 +74,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const corsOptions = {
-  origin: [process.env.LOCAL_ORIGIN, process.env.PROD_ORIGIN],
+  origin: [process.env.LOCAL_ORIGIN, process.env.PROD_ORIGIN, process.env.FRONT_LOCAL_ORIGIN, process.env.FRONT_DOMAIN],
   credentials: true,
 };
 

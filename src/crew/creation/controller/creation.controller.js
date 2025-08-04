@@ -792,7 +792,27 @@ export const handleCreateCrew = async (req, res, next) => {
                   }
               }
           }
-
+          #swagger.responses[401] = {
+            description: "크루 생성 실패 응답 (유효하지 않은 토큰)",
+            content:{
+              "application/json":{
+                schema:{
+                  type:"object",
+                  properties:{
+                    resultType: {type:"string", example:"FAIL"},
+                    error:{
+                      type:"object",
+                      properties:{
+                        reason: {type:"string", example:"유효하지 않은 인증 토큰입니다."},
+                        data: {type:"object", nullable:true, example:null}
+                      }
+                    },
+                    data: {type:"object", nullable:true, example:null}
+                  }
+                }
+              }
+            }
+          }
        */
   // #endregion
   // multipart/form-data 로부터 JSON 파싱

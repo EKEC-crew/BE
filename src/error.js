@@ -107,6 +107,18 @@ export class InvalidTokenError extends Error {
   }
 }
 
+//유효하지 않은 개수 입력
+export class InvalidNumOfInputError extends Error {
+  errorCode = "I004";
+  statusCode = 401;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+
 //찾을 수 없는 크루
 export class NotFoundCrewError extends Error {
   errorCode = "N001";

@@ -11,6 +11,7 @@ export const getPostsByCrewId = async ({ crewId, page, size }) => {
 			ORDER BY (like_count + comment_count) DESC
 			LIMIT 6
 		`;
+		const popularIds = popularPosts.map(post => post.id);
 
 		await Promise.all(
 			popularPosts.map(post =>
@@ -20,6 +21,17 @@ export const getPostsByCrewId = async ({ crewId, page, size }) => {
 				})
 			)
 		);
+
+		await prisma.crewPost.updateMany({
+			where: {
+				crewId,
+				id: { notIn: popularIds },
+				isPopular: true
+			},
+			data: {
+				isPopular: false
+			}
+		});
 
 		const postList = await prisma.crewPost.findMany({
 			where: {
@@ -353,7 +365,7 @@ export const getCommentsByPostId = async ({ postId, page, size }) => {
 				createdAt: 'asc',
 			},
 			skip: (page - 1) * size,
-			take: size,
+			take: size + 1,
 			include: {
 				crewMember: {
 					include: {
@@ -366,8 +378,10 @@ export const getCommentsByPostId = async ({ postId, page, size }) => {
 					}
 				}
 			}
-		})
-		return commentList;
+		});
+		const hasNext = commentList > size;
+		const comments = commentList.slice(0, size);
+		return { comments, hasNext };
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

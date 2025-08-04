@@ -210,7 +210,7 @@ model CrewPost {
   crewId  Int @map("crew_id")
   crewMemberId Int @map("crew_member_id")
 
-  crew Crew @relation(fields: [crewId], references: [id])
+  crew Crew @relation(fields: [crewId], references: [id], onDelete: Cascade)
   crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
   crewPostComment CrewPostComment[]
   crewPostImage   CrewPostImage[]
@@ -226,7 +226,7 @@ model CrewPostImage {
   imageName String   @map("image_name") @db.Text
   createdAt DateTime @default(now()) @map("created_at")
   postId    Int      @map("post_id")
-  crewPost  CrewPost @relation(fields: [postId], references: [id])
+  crewPost  CrewPost @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([postId], map: "crew_post_image_post_id_fkey")
   @@map("crew_post_image")
@@ -237,8 +237,8 @@ model CrewPostLike {
   isLiked      Int        @default(1) @map("is_liked")
   crewMemberId Int        @map("crew_member_id")
   postId       Int        @map("post_id")
-  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewPost     CrewPost   @relation(fields: [postId], references: [id])
+  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
+  crewPost     CrewPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@unique([postId, crewMemberId])
   @@index([crewMemberId], map: "crew_post_like_crew_member_id_fkey")
@@ -253,8 +253,8 @@ model CrewPostComment {
   isPublic     Int        @map("is_public")
   crewMemberId Int        @map("crew_member_id")
   postId       Int        @map("post_id")
-  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewPost     CrewPost   @relation(fields: [postId], references: [id])
+  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
+  crewPost     CrewPost   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([crewMemberId], map: "crew_post_comment_crew_member_id_fkey")
   @@index([postId], map: "crew_post_comment_post_id_fkey")

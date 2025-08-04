@@ -11,7 +11,7 @@ datasource db {
 model User {
   id                      Int                       @id @default(autoincrement())
   email                   String                    @unique(map: "email") @db.VarChar(40)
-  password                String                    @db.VarChar(40)
+  password                String                    @db.VarChar(60)
   name                    String?                   @db.VarChar(10)
   nickname                String?                   @db.VarChar(10)
   gender                  Int?
@@ -20,13 +20,14 @@ model User {
   image                   String?                   @db.VarChar(50)
   createdAt               DateTime                  @default(now()) @map("created_at")
   modifiedAt              DateTime?                 @updatedAt @map("modified_at")
+  isCompleted             Boolean                   @default(false) @map("is_completed")
   alarm                   Alarm[]
   crew                    Crew[]
   crewUser                CrewMember[]
   crewRecruitAppliedStep1 CrewRecruitAppliedStep1[]
   crewRecruitAppliedStep2 CrewRecruitAppliedStep2[]
   crewRegister            CrewRegister[]
-
+  refreshToken            RefreshToken[]
   @@map("user")
 }
 
@@ -214,8 +215,7 @@ model CrewPost {
   crewPostComment CrewPostComment[]
   crewPostImage   CrewPostImage[]
   crewPostLike    CrewPostLike[]
-  alarm Alarm[]
-
+  alarm           Alarm[]
   @@index([crewId], map: "crew_post_crew_id_fkey")
   @@index([crewMemberId], map: "crew_post_crew_member_id_fkey")
   @@map("crew_post")
@@ -453,4 +453,13 @@ enum AlarmType {
   POST_COMMENTED
   CREW_WARNED
   CREW_KICKED
+}
+model RefreshToken {
+  id  Int @id @default(autoincrement())
+  token String @db.VarChar(300)
+  userId Int @map("user_id")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("refresh_token")
 }

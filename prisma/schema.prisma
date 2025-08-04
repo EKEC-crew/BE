@@ -214,7 +214,7 @@ model CrewPost {
   crewPostComment CrewPostComment[]
   crewPostImage   CrewPostImage[]
   crewPostLike    CrewPostLike[]
-  alarm Alarm[]
+  alarm           Alarm[]
 
   @@index([crewId], map: "crew_post_crew_id_fkey")
   @@index([crewMemberId], map: "crew_post_crew_member_id_fkey")

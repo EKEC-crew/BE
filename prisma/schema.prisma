@@ -17,7 +17,7 @@ datasource db {
 model User {
   id  Int @id @default(autoincrement())
   email String  @unique(map: "email") @db.VarChar(40)
-  password String @db.VarChar(40)
+  password String @db.VarChar(60)
   name  String?  @db.VarChar(10)
   nickname  String?  @db.VarChar(10)
   gender  Int?
@@ -26,6 +26,7 @@ model User {
   image String?  @db.VarChar(50)
   createdAt DateTime @default(now()) @map("created_at")
   modifiedAt DateTime? @updatedAt @map("modified_at")
+  isCompleted Boolean @default(false)
 
   crew Crew[]
   crewRegister CrewRegister[]
@@ -33,6 +34,7 @@ model User {
   crewRecruitAppliedStep1 CrewRecruitAppliedStep1[]
   crewRecruitAppliedStep2 CrewRecruitAppliedStep2[]
   alarm Alarm[]
+  refreshToken RefreshToken[]
 
   @@map("user")
 }
@@ -430,4 +432,13 @@ model Alarm {
   crewPlan CrewPlan @relation(fields: [planId], references: [id])
 
   @@map("alarm")
+}
+model RefreshToken {
+  id  Int @id @default(autoincrement())
+  token String @db.VarChar(300)
+  userId Int @map("user_id")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("refresh_token")
 }

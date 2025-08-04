@@ -1,8 +1,27 @@
 //오류 응답 개선
 
-//중복 회원
+/**
+ * **\<💥 Error\>**
+ * ***DuplicateUserEmailError***
+ * 중복된 이메일이 입력되었을때 발생하는 에러
+ */
 export class DuplicateUserEmailError extends Error {
   errorCode = "U001";
+  statusCode = 409;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+/**
+ * **\<💥 Error\>**
+ * ***DuplicateUserPhoneError***
+ * 중복된 전화번호가 입력되었을때 발생하는 에러
+ */
+export class DuplicateUserPhoneError extends Error {
+  errorCode = "U002";
   statusCode = 409;
 
   constructor(reason, data) {
@@ -65,6 +84,21 @@ export class UnavailableImageError extends Error {
 export class UserNotFoundError extends Error {
   errorCode = "U001";
   statusCode = 404;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+/**
+ * **\<💥 Error\>**
+ * ***InvalidTokenError***
+ * 유효하지 않은 토큰으로 인한 요청이 발생했을때 발생하는 에러
+ */
+export class InvalidTokenError extends Error {
+  errorCode = "I003";
+  statusCode = 401;
 
   constructor(reason, data) {
     super(reason);

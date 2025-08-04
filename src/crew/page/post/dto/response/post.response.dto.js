@@ -8,6 +8,8 @@ export const CrewPostListResponse = (body) => {
 		nickname: post.crewMember.user.nickname,
 		commentCount: post.commentCount,
 		likeCount: post.likeCount,
+		imageCount: post._count.crewPostImage,
+		isPopular: post.isPopular,
 	}))
 
 	return response;
@@ -23,6 +25,7 @@ export const CrewPostResponse = ({ post, imagesInfo }) => {
 		profileImage: post.crewMember?.user?.image,
 		commentCount: post.commentCount,
 		likeCount: post.likeCount,
+		isPopular: post.isPopular,
 		images: imagesInfo.map(image => ({
 			imageId: image.id,
 			imageName: image.imageName,

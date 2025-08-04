@@ -198,18 +198,19 @@ model CrewMember {
 }
 
 model CrewPost {
-  id              Int               @id @default(autoincrement())
-  title           String            @db.VarChar(50)
-  content         String            @db.Text
-  commentCount    Int               @default(0) @map("comment_count")
-  createdAt       DateTime          @default(now()) @map("created_at")
-  modifiedAt      DateTime?         @updatedAt @map("modified_at")
-  crewId          Int               @map("crew_id")
-  crewMemberId    Int               @map("crew_member_id")
-  likeCount       Int               @default(0) @map("like_count")
-  alarm           Alarm[]
-  crew            Crew              @relation(fields: [crewId], references: [id])
-  crewMember      CrewMember        @relation(fields: [crewMemberId], references: [id])
+  id  Int @id @default(autoincrement())
+  title String @db.VarChar(50)
+  content String @db.Text
+  commentCount Int @map("comment_count") @default(0)
+  likeCount Int @map("like_count") @default(0)
+  isPopular Boolean @map("is_popular") @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  modifiedAt DateTime? @updatedAt @map("modified_at")
+  crewId  Int @map("crew_id")
+  crewMemberId Int @map("crew_member_id")
+
+  crew Crew @relation(fields: [crewId], references: [id])
+  crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
   crewPostComment CrewPostComment[]
   crewPostImage   CrewPostImage[]
   crewPostLike    CrewPostLike[]

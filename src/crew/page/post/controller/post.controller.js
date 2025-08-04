@@ -453,28 +453,10 @@ export const deleteCrewPost = async (req, res, next) => {
             properties: {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
-              success: {
+              data: {
                 type: "string", example: 
                 {
-                  "postId": 19,
-                  "title": "삭제된 게시글 제목",
-                  "content": "삭제된 게시글 제목 내용",
-                  "createdAt": "2025-07-31T10:27:17.103Z",
-                  "nickname": "차은우",
-                  "profileImage": "profile1.jpg",
-                  "commentCount": 0,
-                  "likeCount": 0,
-                  isPopular: false,
-                  "images": [
-                    {
-                      "imageId": 21,
-                      "imageName": "95befbe2-a17e-44a9-bd1f-4708fa9fbd27.png"
-                    },
-                    {
-                      "imageId": 22,
-                      "imageName": "2e4b97b8-41a3-4686-997b-fc04dea279b2.png"
-                    }
-                  ]
+                  success: true
                 }
               }
             }
@@ -507,7 +489,7 @@ export const deleteCrewPost = async (req, res, next) => {
   */
   // #endregion
 
-  res.status(StatusCodes.OK).success(response);
+  res.status(StatusCodes.OK).success({ success: true });
 };
 
 export const toggleCrewPostLike = async (req, res, next) => {

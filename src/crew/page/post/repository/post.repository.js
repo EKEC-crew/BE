@@ -2,13 +2,33 @@ import { prisma } from "../../../../db.config.js";
 
 export const getPostsByCrewId = async ({ crewId, page, size }) => {
 	try {
+		const popularPosts = await prisma.$queryRaw`
+			SELECT *
+			FROM crew_post
+			WHERE crew_id = ${crewId}
+				AND (like_count + comment_count) > 0
+				AND created_at >= NOW() - INTERVAL 14 DAY
+			ORDER BY (like_count + comment_count) DESC
+			LIMIT 6
+		`;
+
+		await Promise.all(
+			popularPosts.map(post =>
+				prisma.crewPost.update({
+					where: { id: post.id },
+					data: { isPopular: true }
+				})
+			)
+		);
+
 		const postList = await prisma.crewPost.findMany({
 			where: {
 				crewId,
 			},
-			orderBy: {
-				createdAt: 'desc',
-			},
+			orderBy: [
+				{ isPopular: 'desc' },
+				{ createdAt: 'desc' },
+			],
 			skip: (page - 1) * size,
 			take: size,
 			include: {
@@ -19,6 +39,11 @@ export const getPostsByCrewId = async ({ crewId, page, size }) => {
 								nickname: true
 							}
 						}
+					}
+				},
+				_count: {
+					select: {
+						crewPostImage: true,
 					}
 				}
 			}

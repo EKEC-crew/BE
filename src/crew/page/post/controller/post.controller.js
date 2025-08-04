@@ -34,14 +34,20 @@ export const readPostsByCrew = async (req, res, next) => {
                     "title": "크루 22222",
                     "createdAt": "2025-07-18T01:52:40.886Z",
                     "nickname": "길동이",
-                    "commentCount": 0
+                    "commentCount": 0,
+                    "likeCount": 0,
+                    "imageCount": 0,
+                    "isPopular": true
                   },
                   {
                     "postId": 1,
                     "title": "크루 첫 게시글",
                     "createdAt": "2025-07-18T01:42:20.494Z",
                     "nickname": "길동이",
-                    "commentCount": 0
+                    "commentCount": 0,
+                    "likeCount": 0,
+                    "imageCount": 0,
+                    "isPopular": true
                   }
                 ]
               }
@@ -138,6 +144,7 @@ export const createCrewPost = async (req, res, next) => {
                   "profileImage": "profile1.jpg",
                   "commentCount": 0,
                   "likeCount": 0,
+                  isPopular: false,
                   "images": [
                     {
                       "imageId": 21,
@@ -216,6 +223,7 @@ export const readCrewPost = async (req, res, next) => {
                   "profileImage": "profile1.jpg",
                   "commentCount": 0,
                   "likeCount": 0,
+                  isPopular: false,
                   "images": [
                     {
                       "imageId": 21,
@@ -330,6 +338,7 @@ export const updateCrewPost = async (req, res, next) => {
                   "profileImage": "profile1.jpg",
                   "commentCount": 0,
                   "likeCount": 0,
+                  isPopular: false,
                   "images": [
                     {
                       "imageId": 21,
@@ -423,6 +432,7 @@ export const deleteCrewPost = async (req, res, next) => {
                   "profileImage": "profile1.jpg",
                   "commentCount": 0,
                   "likeCount": 0,
+                  isPopular: false,
                   "images": [
                     {
                       "imageId": 21,

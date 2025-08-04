@@ -20,7 +20,7 @@ model User {
   image                   String?                   @db.VarChar(50)
   createdAt               DateTime                  @default(now()) @map("created_at")
   modifiedAt              DateTime?                 @updatedAt @map("modified_at")
-  isCompleted             Boolean                   @default(false)
+  isCompleted             Boolean                   @default(false) @map("is_completed")
   alarm                   Alarm[]
   crew                    Crew[]
   crewUser                CrewMember[]

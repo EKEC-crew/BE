@@ -1,7 +1,7 @@
 import { formatInTimeZone } from "date-fns-tz";
 
-export const CrewPostListResponse = (body) => {
-	const response = body.map(post => ({
+export const CrewPostListResponse = ({ posts, hasNext }) => {
+	const items = posts.map(post => ({
 		postId: post.id,
 		title: post.title,
 		createdAt: formatInTimeZone(post.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
@@ -10,8 +10,11 @@ export const CrewPostListResponse = (body) => {
 		likeCount: post.likeCount,
 		imageCount: post._count.crewPostImage,
 		isPopular: post.isPopular,
-	}))
-
+	}));
+	const response = {
+		posts: items,
+		hasNext: hasNext,
+	}
 	return response;
 }
 

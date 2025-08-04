@@ -30,7 +30,7 @@ export const getPostsByCrewId = async ({ crewId, page, size }) => {
 				{ createdAt: 'desc' },
 			],
 			skip: (page - 1) * size,
-			take: size,
+			take: size + 1,
 			include: {
 				crewMember: {
 					include: {
@@ -48,7 +48,9 @@ export const getPostsByCrewId = async ({ crewId, page, size }) => {
 				}
 			}
 		});
-		return postList;
+		const hasNext = postList.length > size;
+		const posts = postList.slice(0, size);
+		return { posts, hasNext };
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

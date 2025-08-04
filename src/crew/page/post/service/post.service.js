@@ -10,8 +10,10 @@ export const readPostsByCrew = async ({ crewId, page, size }) => {
 		if (!isExistCrew) {
 			throw new baseError.NotFoundCrewError("존재하지 않는 크루입니다.", { crewId })
 		}
-		const postList = await postRepository.getPostsByCrewId({ crewId, page, size });
-		return postResponse.CrewPostListResponse(postList);
+		const data = await postRepository.getPostsByCrewId({ crewId, page, size });
+		const posts = data.posts;
+		const hasNext = data.hasNext;
+		return postResponse.CrewPostListResponse({ posts, hasNext });
 	} catch (err) {
 		throw err;
 	}

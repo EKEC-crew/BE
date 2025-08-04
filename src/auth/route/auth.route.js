@@ -1,4 +1,27 @@
-import express from 'express';
+import express from "express";
+import {
+  handleSignUp,
+  handleLogin,
+  handleRefresh,
+  handleLogout,
+  handleProfile,
+} from "../controller/auth.controller.js";
+import { authenticateAccessToken } from "../middleware/auth.middleware.js";
+import multer from "multer";
+
 const router = express.Router();
-router.get('/signup', (req, res) => res.send('Hello UMC!'));
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
+
+router.post("/signup", handleSignUp);
+router.post("/login", handleLogin);
+router.post("/logout", handleLogout);
+router.post("/refresh", handleRefresh);
+router.post(
+  "/profile",
+  authenticateAccessToken,
+  upload.single("profileImage"),
+  handleProfile,
+);
 export default router;

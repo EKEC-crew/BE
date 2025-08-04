@@ -50,14 +50,18 @@ export const likeCrewPostResponse = (body) => {
 	return response;
 }
 
-export const CrewCommentListResponse = (body) => {
-	const response = body.map(comment => ({
+export const CrewCommentListResponse = ({ comments, hasNext }) => {
+	const items = comments.map(comment => ({
 		commentId: comment.id,
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
 		image: comment.crewMember.user.image,
 		createdAt: formatInTimeZone(comment.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 	}))
+	const response = {
+		comments: items,
+		hasNext: hasNext
+	}
 
 	return response;
 }

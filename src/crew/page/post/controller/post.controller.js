@@ -120,6 +120,9 @@ export const createCrewPost = async (req, res, next) => {
   const { crewId } = req.params;
 
   const validImageExtensions = ["jpg", "jpeg", "png", "gif"];
+  if (req.files.length > 5) {
+    throw new baseError.InvalidNumOfInputError("이미지는 5개까지 등록 가능합니다.");
+  }
   if (req.files.some(file => {
     const ext = file.originalname.split('.').pop().toLowerCase();
     return !validImageExtensions.includes(ext);
@@ -142,6 +145,7 @@ export const createCrewPost = async (req, res, next) => {
             properties: {
               images: {
                 type: "array",
+                maxItems: 5,
                 items: {
                   type: "string",
                   format: "binary"
@@ -176,7 +180,7 @@ export const createCrewPost = async (req, res, next) => {
                   "profileImage": "profile1.jpg",
                   "commentCount": 0,
                   "likeCount": 0,
-                  isPopular: false,
+                  "isPopular": false,
                   "images": [
                     {
                       "imageId": 21,
@@ -244,7 +248,7 @@ export const readCrewPost = async (req, res, next) => {
             properties: {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
-              success: {
+              data: {
                 type: "string", example: 
                 {
                   "postId": 19,
@@ -255,7 +259,7 @@ export const readCrewPost = async (req, res, next) => {
                   "profileImage": "profile1.jpg",
                   "commentCount": 0,
                   "likeCount": 0,
-                  isPopular: false,
+                  "isPopular": false,
                   "images": [
                     {
                       "imageId": 21,
@@ -359,7 +363,7 @@ export const updateCrewPost = async (req, res, next) => {
             properties: {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
-              success: {
+              data: {
                 type: "string", example: 
                 {
                   "postId": 19,
@@ -370,7 +374,7 @@ export const updateCrewPost = async (req, res, next) => {
                   "profileImage": "profile1.jpg",
                   "commentCount": 0,
                   "likeCount": 0,
-                  isPopular: false,
+                  "isPopular": false,
                   "images": [
                     {
                       "imageId": 21,
@@ -528,7 +532,7 @@ export const toggleCrewPostLike = async (req, res, next) => {
             properties: {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
-              success: {
+              data: {
                 type: "string", example: 
                 {
                   "postId": 2,
@@ -594,25 +598,32 @@ export const readCommentsByCrewPost = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:  
-                [
-                  {
-                    "commentId": 1,
-                    "content": "게시글 작성 테스트 내용1 입니다.",
-                    "nickname": "철수짱1",
-                    "createdAt": "2025-07-20 12:13:07",
-                    "nickname": "길동이",
-                    "image": "profile.jpg",
-                  },
-                  {
-                    "commentId": 2,
-                    "content": "게시글 작성 테스트 내용2 입니다.",
-                    "nickname": "철수짱2",
-                    "createdAt": "2025-07-20 12:13:24",
-                    "nickname": "길동이",
-                    "image": "profile.jpg",
-                  },
-                ]
+                type: "string", example:{
+                  "comments": [
+                    {
+                      "commentId": 1,
+                      "content": "댓글 작성 테스트 내용입니다.",
+                      "nickname": "이병차은우",
+                      "image": "profile1.jpg",
+                      "createdAt": "2025-08-05 01:41:09"
+                    },
+                    {
+                      "commentId": 6,
+                      "content": "댓글 작성 테스트 내용입니다.",
+                      "nickname": "이병차은우",
+                      "image": "profile1.jpg",
+                      "createdAt": "2025-08-05 02:31:32"
+                    },
+                    {
+                      "commentId": 7,
+                      "content": "댓글 작성 테스트 내용입니다.",
+                      "nickname": "이병차은우",
+                      "image": "profile1.jpg",
+                      "createdAt": "2025-08-05 02:31:35"
+                    }
+                  ],
+                  "hasNext": false
+                }
               }
             }
           }
@@ -685,7 +696,7 @@ export const createCrewPostComment = async (req, res, next) => {
             properties: {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
-              success: {
+              data: {
                 type: "string", example: 
                 {
                   "commentId": 4,
@@ -772,7 +783,7 @@ export const updateCrewPostComment = async (req, res, next) => {
             properties: {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
-              success: {
+              data: {
                 type: "string", example: 
                 {
                   "commentId": 3,
@@ -856,7 +867,7 @@ export const deleteCrewPostComment = async (req, res, next) => {
             properties: {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
-              success: {
+              data: {
                 type: "string", example: 
                 {
                   "commentId": 3,

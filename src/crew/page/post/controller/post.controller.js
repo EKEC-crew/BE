@@ -27,29 +27,61 @@ export const readPostsByCrew = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:  
-                [
-                  {
-                    "postId": 2,
-                    "title": "크루 22222",
-                    "createdAt": "2025-07-18T01:52:40.886Z",
-                    "nickname": "길동이",
-                    "commentCount": 0,
-                    "likeCount": 0,
-                    "imageCount": 0,
-                    "isPopular": true
-                  },
-                  {
-                    "postId": 1,
-                    "title": "크루 첫 게시글",
-                    "createdAt": "2025-07-18T01:42:20.494Z",
-                    "nickname": "길동이",
-                    "commentCount": 0,
-                    "likeCount": 0,
-                    "imageCount": 0,
-                    "isPopular": true
-                  }
-                ]
+                type: "string", example:{
+                "posts": [
+                      {
+                        "postId": 9,
+                        "title": "게시글 제목입니다",h
+                        "createdAt": "2025-08-04 18:33:37",
+                        "nickname": "이병차은우",
+                        "commentCount": 0,
+                        "likeCount": 1,
+                        "imageCount": 0,
+                        "isPopular": true
+                      },
+                      {
+                        "postId": 25,
+                        "title": "게시글 제목입니다",
+                        "createdAt": "2025-08-04 18:33:43",
+                        "nickname": "이병차은우",
+                        "commentCount": 0,
+                        "likeCount": 0,
+                        "imageCount": 0,
+                        "isPopular": false
+                      },
+                      {
+                        "postId": 24,
+                        "title": "게시글 제목입니다",
+                        "createdAt": "2025-08-04 18:33:42",
+                        "nickname": "이병차은우",
+                        "commentCount": 0,
+                        "likeCount": 0,
+                        "imageCount": 0,
+                        "isPopular": false
+                      },
+                      {
+                        "postId": 23,
+                        "title": "게시글 제목입니다",
+                        "createdAt": "2025-08-04 18:33:42",
+                        "nickname": "이병차은우",
+                        "commentCount": 0,
+                        "likeCount": 0,
+                        "imageCount": 0,
+                        "isPopular": false
+                      },
+                      {
+                        "postId": 22,
+                        "title": "게시글 제목입니다",
+                        "createdAt": "2025-08-04 18:33:42",
+                        "nickname": "이병차은우",
+                        "commentCount": 0,
+                        "likeCount": 0,
+                        "imageCount": 0,
+                        "isPopular": false
+                      }
+                    ],
+                    "hasNext": true
+                }
               }
             }
           }

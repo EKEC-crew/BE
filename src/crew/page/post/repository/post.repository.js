@@ -537,6 +537,13 @@ export const isExistPost = async ({ postId }) => {
 			{
 				where: {
 					id: postId,
+				},
+				include: {
+					crewMember: {
+						select: {
+							role: true,
+						}
+					}
 				}
 			}
 		)
@@ -554,6 +561,18 @@ export const isExistComment = async ({ commentId }) => {
 			{
 				where: {
 					id: commentId,
+				},
+				include: {
+					crewMember: {
+						select: {
+							role: true,
+						}
+					},
+					crewPost: {
+						select: {
+							crewId: true,
+						}
+					}
 				}
 			}
 		)

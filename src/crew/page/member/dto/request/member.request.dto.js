@@ -1,20 +1,23 @@
-export const readMemberListRequest = (crewId, page, size) => {
+export const readMemberListRequest = (userId, crewId, page, size) => {
     return {
+        userId: Number(userId),
         crewId: Number(crewId),
         page: Number(page),
         size: Number(size),
     }
 }
 
-export const changeRoleMemberRequest = (crewId, memberId) => {
+export const changeRoleMemberRequest = (userId, crewId, memberId) => {
     return {
+        userId: Number(userId),
         crewId: Number(crewId),
         crewMemberId: Number(memberId),
     };
 }
 
-export const kickCrewMemberRequest = (crewId, memberId) => {
+export const kickCrewMemberRequest = (userId, crewId, memberId) => {
     return {
+        userId: Number(userId),
         crewId: Number(crewId),
         crewMemberId: Number(memberId),
     }

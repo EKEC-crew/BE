@@ -143,6 +143,18 @@ export class NotFoundPostError extends Error {
   }
 }
 
+//해당 크루에 속하지 않은 게시글
+export class NotBelongToCrewError extends Error {
+  errorCode = "B001";
+  statusCode = 403;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
+
 //존재하지 않는 댓글
 export class NotFoundCommentError extends Error {
   errorCode = "N004";

@@ -820,7 +820,7 @@ export const handleCreateCrew = async (req, res, next) => {
   // ✅ 유효성 검사 (배너 이미지)
   const validImageExtensions = ["jpg", "jpeg", "png", "gif"];
   if (
-    req.file === undefined ||
+    req.file &&
     validImageExtensions.every(
       (extension) => req.file.originalname.split(".").at(-1) !== extension,
     )

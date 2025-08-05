@@ -72,6 +72,7 @@ export const login = async (body) => {
     email: user.email,
     name: user.name,
     nickname: user.nickname,
+    profileImage: user.image,
     isCompleted: user.isCompleted,
   };
   // 🪙 리프레시 토큰 생성
@@ -123,6 +124,7 @@ export const refresh = async (cookies) => {
     name: user.name,
     nickname: user.nickname,
     isCompleted: user.isCompleted,
+    profileImage: user.image,
   };
   const tokens = {
     refresh: generateRefreshToken(newPayload),
@@ -132,7 +134,7 @@ export const refresh = async (cookies) => {
 
   if ((await updateRefreshToken(cookies.refreshToken, tokens.refresh)) === -1)
     throw new InvalidTokenError("유효하지 않은 인증 토큰입니다.");
-  return responseFromRefresh(tokens);
+  return responseFromRefresh({ tokens, newPayload });
 };
 /**
  * **[Auth]**

@@ -62,6 +62,7 @@ export const findAccount = async (data) => {
       email: true,
       id: true,
       password: true,
+      image: true,
       isCompleted: true,
     },
     where: {

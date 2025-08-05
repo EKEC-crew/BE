@@ -29,6 +29,8 @@ export const responseFromLogin = (data) => {
       email: data.payload.email,
       name: data.payload.name,
       nickname: data.payload.nickname,
+      profileImage: data.payload.profileImage,
+      isCompleted: data.payload.isCompleted,
     },
   };
 };
@@ -42,8 +44,16 @@ export const responseFromLogin = (data) => {
  */
 export const responseFromRefresh = (data) => {
   return {
-    accessToken: data.access,
-    refreshToken: data.refresh,
+    accessToken: data.tokens.access,
+    refreshToken: data.tokens.refresh,
+    user: {
+      id: data.newPayload.id,
+      email: data.newPayload.email,
+      name: data.newPayload.name,
+      nickname: data.newPayload.nickname,
+      profileImage: data.newPayload.profileImage,
+      isCompleted: data.newPayload.isCompleted,
+    },
   };
 };
 /**

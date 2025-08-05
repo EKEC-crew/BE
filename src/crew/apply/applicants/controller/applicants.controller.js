@@ -22,12 +22,14 @@ export const getApplicants = async (req, res, next) => {
                 totalCount: 2,
                 applicants: [
                   {
+                    applyId: 3,
                     nickname: "지민",
                     profileImage: "https://example.com/profile.png",
                     appliedAt: "2025-08-05T14:30:00.000Z",
                     status: 1
                   },
                   {
+                    applyId: 7,
                     nickname: "현수",
                     profileImage: "https://example.com/profile2.png",
                     appliedAt: "2025-08-04T17:15:00.000Z",

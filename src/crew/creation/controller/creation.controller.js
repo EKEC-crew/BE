@@ -50,7 +50,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                       age:{type: "number", example: 1},
                                       gender:{type: "number", example: 0},
                                       recruitMessage: {type: "string", example:"선택해주셔서 감사합니다!"},
-                                      admin:{type: "number", example: 1}
                                   }
                               },
                               applicationForm: {
@@ -149,8 +148,7 @@ export const handleCreateCrew = async (req, res, next) => {
                                   required: { type: "number", example: 1 }
                                 }
                               }
-                            },
-                            admin: { type: "number", example: 2 }
+                            }
                           }
                         }
                       }
@@ -197,7 +195,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                               "recruitMessage": "선택해주셔서 감사합니다!",
                                               "name": "새로운 크루",
                                               "activities": [1,2],
-                                              "admin": 1,
                                               "region": 1,
                                               "description": "가족같은 분위기의 크루",
                                               "category": 1,
@@ -225,7 +222,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                               "recruitMessage": "선택해주셔서 감사합니다!",
                                               "name": "새로운 크루",
                                               "activities": [1,2],
-                                              "admin": 1,
                                               "region": 1,
                                               "description": "가족같은 분위기의 크루",
                                               "category": 1,
@@ -262,7 +258,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -299,7 +294,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "",
                                           "category": 1,
@@ -336,7 +330,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -373,7 +366,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": "a",
@@ -410,7 +402,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": ["a"],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -447,7 +438,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -484,7 +474,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": "a",
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -521,7 +510,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -558,7 +546,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -595,7 +582,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -624,7 +610,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "recruitMessage": "선택해주셔서 감사합니다!",
                                           "name": "새로운 크루",
                                           "activities": [1,2],
-                                          "admin": 1,
                                           "region": 1,
                                           "description": "가족같은 분위기의 크루",
                                           "category": 1,
@@ -683,7 +668,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "required": 1
                                           }
                                       ],
-                                      "admin": 1
                                       }
                                   },
                                   "data": null
@@ -716,7 +700,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "required": 1
                                           }
                                       ],
-                                      "admin": 1
                                       }
                                   },
                                   "data": null
@@ -749,7 +732,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "required": 1
                                           }
                                       ],
-                                      "admin": 1
                                       }
                                   },
                                   "data": null
@@ -782,7 +764,6 @@ export const handleCreateCrew = async (req, res, next) => {
                                           "required": 1
                                           }
                                       ],
-                                      "admin": 1
                                       }
                                   },
                                   "data": null
@@ -988,7 +969,9 @@ export const handleCreateCrew = async (req, res, next) => {
     );
   }
   // DTO를 거쳐 서비스 레이어로 새로운 크루 생성 요청
-  const crew = await createNewCrew(bodyToCreateNewCrew(req.body, req.file));
+  const crew = await createNewCrew(
+    bodyToCreateNewCrew(req.body, req.file, req.payload),
+  );
   // 결과값 클라이언트로 응답
   res.status(StatusCodes.CREATED).success(crew);
 };

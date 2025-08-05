@@ -455,7 +455,7 @@ export const deleteCrewPost = async (req, res, next) => {
       }
     };
     #swagger.responses[400] = {
-      description: "특정 크루 특정 게시글 수정 실패 응답",
+      description: "특정 크루 특정 게시글 삭제 실패 응답",
       content: {
         "application/json": {
           schema: {
@@ -843,12 +843,7 @@ export const deleteCrewPostComment = async (req, res, next) => {
               data: {
                 type: "string", example: 
                 {
-                  "commentId": 3,
-                  "content": "삭제된 댓글의 내용입니다.",
-                  "nickname": "홍길동",
-                  "createdAt": "2025-07-18 02:04:54.410",
-                  "nickname": "길동이",
-                  "image": "profile.jpg",
+                  "success" : true
                 }
               }
             }
@@ -881,5 +876,5 @@ export const deleteCrewPostComment = async (req, res, next) => {
   */
   // #endregion
 
-  res.status(StatusCodes.OK).success(response);
+  res.status(StatusCodes.OK).success({ success: true });
 };

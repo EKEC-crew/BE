@@ -182,8 +182,8 @@ export const handleLogin = async (req, res, next) => {
           schema: {
             type: 'object',
             properties: {
-              email: { type: 'string', format: 'email', example: 'user@example.com' },
-              password: { type: 'string', example: 'p@ssword123' }
+              email: { type: 'string', format: 'email', example: 'example@example.com' },
+              password: { type: 'string', example: 'password123!' }
             },
             required: ['email', 'password']
           }
@@ -206,6 +206,8 @@ export const handleLogin = async (req, res, next) => {
                   email:{type: "string", example:"user@example.com"},
                   name:{type: "string", example:"홍길동"},
                   nickname:{type: "string", example:"길동이"},
+                  profileImage:{type: "string", example:"profile.jpg"},
+                  isCompleted: {type:"boolean", example: true},
                 }
               }
             }
@@ -370,7 +372,14 @@ export const handleRefresh = async (req, res, next) => {
             properties:{
               resultType: {type: "string", example: "SUCCESS"},
               error: {type: "object", nullable: true, example: null},
-              data: {type: "object", nullable: true, example: null}
+              data: {type: "object", properties:{
+                id: {type:"number", example: 1},
+                email: {type:"string", example: "example@example.com"},
+                name: {type:"string", example: "홍길동"},
+                nickname: {type:"string", example: "길동이"},
+                profileImage: {type:"string", example: "profile.jpg"},
+                isCompleted: {type:"boolean", example: true},
+              }}
             }
           }
         }
@@ -425,22 +434,22 @@ export const handleRefresh = async (req, res, next) => {
 
   console.log("엑세스 토큰 리프레시가 요청되었습니다!");
   console.log("cookies:", req.cookies);
-  const tokens = await refresh(bodyToRefresh(req.cookies));
+  const result = await refresh(bodyToRefresh(req.cookies));
   // 🍪 엑세스 토큰을 쿠키로 저장(Http-only)
-  res.cookie("accessToken", tokens.accessToken, {
+  res.cookie("accessToken", result.accessToken, {
     httpOnly: true,
     secure: process.env.SERVER_ENV === "production",
     sameSite: "lax",
     maxAge: 1000 * 60 * 10,
   });
   // 🍪 리프레시 토큰을 쿠키로 저장(Http-only)
-  res.cookie("refreshToken", tokens.refreshToken, {
+  res.cookie("refreshToken", result.refreshToken, {
     httpOnly: true,
     secure: process.env.SERVER_ENV === "production",
     sameSite: "lax",
     maxAge: 1000 * 60 * 60 * 24 * 7,
   });
-  res.status(StatusCodes.OK).success(null);
+  res.status(StatusCodes.OK).success(result.user);
 };
 /**
  * **[Auth]**

@@ -80,7 +80,11 @@ export const readPostsByCrew = async (req, res, next) => {
                         "isPopular": false
                       }
                     ],
-                    "hasNext": true
+                    "totalElements": 13,
+                    "totalPages": 1,
+                    "hasNext": true,
+                    "pageNum": 1,
+                    "pageSize": 10
                 }
               }
             }
@@ -622,7 +626,11 @@ export const readCommentsByCrewPost = async (req, res, next) => {
                       "createdAt": "2025-08-05 02:31:35"
                     }
                   ],
-                  "hasNext": false
+                  "totalElements": 3,
+                  "totalPages": 1,
+                  "hasNext": false,
+                  "pageNum": 1,
+                  "pageSize": 5
                 }
               }
             }

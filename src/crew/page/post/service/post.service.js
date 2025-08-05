@@ -12,8 +12,12 @@ export const readPostsByCrew = async ({ crewId, page, size }) => {
 		}
 		const data = await postRepository.getPostsByCrewId({ crewId, page, size });
 		const posts = data.posts;
+		const totalElements = data.totalElements;
+		const totalPages = data.totalPages;
 		const hasNext = data.hasNext;
-		return postResponse.CrewPostListResponse({ posts, hasNext });
+		const pageNum = data.pageNum;
+		const pageSize = data.pageSize;
+		return postResponse.CrewPostListResponse({ posts, totalElements, totalPages, hasNext, pageNum, pageSize });
 	} catch (err) {
 		throw err;
 	}
@@ -209,8 +213,12 @@ export const readCommentsByCrewPost = async ({ crewId, postId, page, size }) => 
 
 		const data = await postRepository.getCommentsByPostId({ postId, page, size });
 		const comments = data.comments;
+		const totalElements = data.totalElements;
+		const totalPages = data.totalPages;
 		const hasNext = data.hasNext;
-		return postResponse.CrewCommentListResponse({ comments, hasNext });
+		const pageNum = data.pageNum;
+		const pageSize = data.pageSize;
+		return postResponse.CrewCommentListResponse({ comments, totalElements, totalPages, hasNext, pageNum, pageSize });
 	} catch (err) {
 		throw err;
 	}

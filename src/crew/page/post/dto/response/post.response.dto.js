@@ -1,6 +1,6 @@
 import { formatInTimeZone } from "date-fns-tz";
 
-export const CrewPostListResponse = ({ posts, hasNext }) => {
+export const CrewPostListResponse = ({ posts, totalElements, totalPages, hasNext, pageNum, pageSize }) => {
 	const items = posts.map(post => ({
 		postId: post.id,
 		title: post.title,
@@ -13,7 +13,11 @@ export const CrewPostListResponse = ({ posts, hasNext }) => {
 	}));
 	const response = {
 		posts: items,
+		totalElements: totalElements,
+		totalPages: totalPages,
 		hasNext: hasNext,
+		pageNum: pageNum,
+		pageSize: pageSize,
 	}
 	return response;
 }
@@ -50,7 +54,7 @@ export const likeCrewPostResponse = (body) => {
 	return response;
 }
 
-export const CrewCommentListResponse = ({ comments, hasNext }) => {
+export const CrewCommentListResponse = ({ comments, totalElements, totalPages, hasNext, pageNum, pageSize }) => {
 	const items = comments.map(comment => ({
 		commentId: comment.id,
 		content: comment.content,
@@ -60,7 +64,11 @@ export const CrewCommentListResponse = ({ comments, hasNext }) => {
 	}))
 	const response = {
 		comments: items,
-		hasNext: hasNext
+		totalElements: totalElements,
+		totalPages: totalPages,
+		hasNext: hasNext,
+		pageNum: pageNum,
+		pageSize: pageSize,
 	}
 
 	return response;

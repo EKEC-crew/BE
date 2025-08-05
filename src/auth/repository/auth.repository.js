@@ -262,3 +262,29 @@ export const deleteExpiredRefreshTokens = async () => {
     },
   });
 };
+/**
+ * **[Auth]**
+ * **\<📦 Repository\>**
+ * ***deleteUncompletedUsers***
+ * 가입 미완료 사용자를 삭제합니다.
+ */
+export const deleteUncompletedUsers = async () => {
+  const currentTime = DateTime.fromISO(
+    DateTime.now({ zone: "Asia/Seoul" })
+      .toFormat("yyyy-MM-dd'T'HH:mm:ss")
+      .toString(),
+    { zone: "utc" },
+  );
+  const adjustedTime = currentTime.minus({ days: 1 });
+  await prisma.user.deleteMany({
+    where: {
+      modifiedAt: {
+        lt: adjustedTime.toJSDate(),
+      },
+      isCompleted: false,
+      refreshToken: {
+        none: {},
+      },
+    },
+  });
+};

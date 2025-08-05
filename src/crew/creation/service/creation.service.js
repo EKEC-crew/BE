@@ -21,7 +21,7 @@ export const createNewCrew = async (body) => {
   // 크루를 생성하고 크루 ID를 저장합니다.
   const crewId = await createCrew(body);
   // 에러 값 반환을 위해 파일부를 제외한 body (restBody)
-  const { bannerImage, ...restBody } = body;
+  const { bannerImage, admin, ...restBody } = body;
   // 유효하지 않는 카테고리일 경우
   if (crewId === -1)
     throw new UnprocessableInputValueError(

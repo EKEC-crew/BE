@@ -30,6 +30,7 @@ import {
   findRefreshTokenByUserId,
   updateProfile,
   updateRefreshToken,
+  deleteUncompletedUsers,
 } from "../repository/auth.repository.js";
 /**
  * **[Auth]**
@@ -209,4 +210,13 @@ export const setProfile = async (data) => {
  */
 export const cleanExpiredRefreshTokens = async () => {
   await deleteExpiredRefreshTokens();
+};
+/**
+ * **[Auth]**
+ * **\<🛠️ Service\>**
+ * ***cleanUncompletedUsers***
+ * '가입 미 완료 사용자 삭제 스케줄러' 기능 서비스 레이어 입니다. 가입이 완료되지 않은체 하루가 지난 사용자를 삭제합니다.
+ */
+export const cleanUncompletedUsers = async () => {
+  await deleteUncompletedUsers();
 };

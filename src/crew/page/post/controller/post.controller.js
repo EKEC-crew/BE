@@ -122,7 +122,7 @@ export const readPostsByCrew = async (req, res, next) => {
 export const createCrewPost = async (req, res, next) => {
   console.log("특정 크루 게시글 작성을 요청했습니다.");
   const { crewId } = req.params;
-
+  const userId = req.payload.id;
   const validImageExtensions = ["jpg", "jpeg", "png", "gif"];
   if (req.files.length > 5) {
     throw new baseError.InvalidNumOfInputError("이미지는 5개까지 등록 가능합니다.");
@@ -135,10 +135,10 @@ export const createCrewPost = async (req, res, next) => {
     throw new baseError.InvalidInputValueError("올바른 이미지를 등록 해 주세요.", req.body);
   }
 
-  const response = await postService.createCrewPost(postRequest.createCrewPostRequest(crewId, req.body, req.files));
+  const response = await postService.createCrewPost(postRequest.createCrewPostRequest(userId, crewId, req.body, req.files));
   // #region Swagger: 게시글 작성 API
   /*
-    #swagger.summary = '게시글 작성 API';
+    #swagger.summary = '게시글 작성 API(로그인 필요)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -156,10 +156,9 @@ export const createCrewPost = async (req, res, next) => {
                 }
               },
               title: { type: "string", example: "게시글 제목입니다" },
-              content: { type: "string", example: "게시글 내용입니다" },
-              userId: { type: "number", example: 1 }
+              content: { type: "string", example: "게시글 내용입니다" }
             },
-            required: ["title", "content", "userId"]
+            required: ["title", "content"]
           }
         }
       }
@@ -203,7 +202,7 @@ export const createCrewPost = async (req, res, next) => {
       }
     };
     #swagger.responses[400] = {
-      description: "게시글 리스트 조회 실패 응답",
+      description: "게시글 작성 실패 응답",
       content: {
         "application/json": {
           schema: {
@@ -234,7 +233,6 @@ export const readCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 상세 조회를 요청했습니다.");
 
   const { crewId, postId } = req.params;
-  console.log(req.params);
 
   const response = await postService.readCrewPost(
     postRequest.readPostRequest(crewId, postId)
@@ -313,7 +311,7 @@ export const updateCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 수정을 요청했습니다.");
 
   const { crewId, postId } = req.params;
-
+  const userId = req.payload.id;
   const validImageExtensions = ["jpg", "jpeg", "png", "gif"];
   if (req.files.some(file => {
     const ext = file.originalname.split('.').pop().toLowerCase();
@@ -324,11 +322,11 @@ export const updateCrewPost = async (req, res, next) => {
   }
 
   const response = await postService.updateCrewPost(
-    postRequest.updateCrewPostRequest(crewId, postId, req.body, req.files)
+    postRequest.updateCrewPostRequest(userId, crewId, postId, req.body, req.files)
   );
-  // #region Swagger: 특정 크루 특정 게시글 수정 API
+  // #region Swagger: 특정 크루 특정 게시글 수정 API 
   /*
-    #swagger.summary = '특정 크루 특정 게시글 수정 API';
+    #swagger.summary = '특정 크루 특정 게시글 수정 API (로그인 필요)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -350,10 +348,9 @@ export const updateCrewPost = async (req, res, next) => {
                 example: [1, 3]
               },
               title: { type: "string", example: "게시글 제목입니다" },
-              content: { type: "string", example: "게시글 내용입니다" },
-              userId: { type: "number", example: 1 }
+              content: { type: "string", example: "게시글 내용입니다" }
             },
-            required: ["title", "content", "userId"]
+            required: ["title", "content" ]
           }
         }
       }
@@ -428,30 +425,15 @@ export const deleteCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 삭제를 요청했습니다.");
 
   const { crewId, postId } = req.params;
-
-  console.log("user : ", req.body.userId, "params: ", req.params);
+  const userId = req.payload.id;
 
   const response = await postService.deleteCrewPost(
-    postRequest.deleteCrewPostRequest(crewId, postId, req.body)
+    postRequest.deleteCrewPostRequest(userId, crewId, postId)
   );
   // #region Swagger: 특정 크루 특정 게시글 삭제 API
   /*
-    #swagger.summary = '특정 크루 특정 게시글 삭제 API';
+    #swagger.summary = '특정 크루 특정 게시글 삭제 API (로그인 필요)';
     #swagger.tags = ["Crew Post"]
-    #swagger.requestBody = {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              userId: { type: "number", example: "1" }
-            },
-            required: ["userId"]
-          }
-        }
-      }
-    }
     #swagger.responses[200] = {
       description: "특정 크루 특정 게시글 삭제 성공 응답",
       content: {
@@ -504,14 +486,14 @@ export const toggleCrewPostLike = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 좋아요를 요청했습니다.");
 
   const { crewId, postId } = req.params;
-  console.log("user : ", req.body.userId, "params: ", req.params);
+  const userId = req.payload.id;
 
   const response = await postService.toggleCrewPostLike(
-    postRequest.toggleCrewPostLikeRequest(crewId, postId, req.body)
+    postRequest.toggleCrewPostLikeRequest(userId, crewId, postId)
   );
   // #region Swagger: 특정 크루 특정 게시글 좋아요 API
   /*
-    #swagger.summary = '특정 크루 특정 게시글 좋아요 API';
+    #swagger.summary = '특정 크루 특정 게시글 좋아요 API (로그인 필요)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -520,9 +502,7 @@ export const toggleCrewPostLike = async (req, res, next) => {
           schema: {
             type: "object",
             properties: {
-              userId: { type: "number", example: "1" }
             },
-            required: ["userId"]
           }
         }
       }
@@ -670,14 +650,14 @@ export const createCrewPostComment = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 댓글 작성을 요청했습니다.");
 
   const { crewId, postId } = req.params;
-  console.log("user : ", req.body.userId, "params: ", req.params);
+  const userId = req.payload.id;
 
   const response = await postService.createCrewPostComment(
-    postRequest.createCrewPostCommentRequest(crewId, postId, req.body)
+    postRequest.createCrewPostCommentRequest(userId, crewId, postId, req.body)
   );
   // #region Swagger: 댓글 작성 API
   /*
-    #swagger.summary = '댓글 작성 API';
+    #swagger.summary = '댓글 작성 API (로그인 필요)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -687,10 +667,9 @@ export const createCrewPostComment = async (req, res, next) => {
             type: "object",
             properties: {
               content: { type: "string", example: "댓글 작성 테스트 내용입니다." },
-              isPublic: { type: "number", example: "0" },
-              userId: { type: "number", example: "1" }
+              isPublic: { type: "number", example: "0" }
             },
-            required: ["content", "isPublic", "userId"]
+            required: ["content", "isPublic"]
           }
         }
       }
@@ -752,10 +731,11 @@ export const updateCrewPostComment = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 댓글 수정을 요청했습니다.");
 
   const { crewId, postId, commentId } = req.params;
-  console.log("user : ", req.body.userId, "params: ", req.params);
+  const userId = req.payload.id;
 
   const response = await postService.updateCrewPostComment(
     postRequest.updateCrewPostCommentRequest(
+      userId,
       crewId,
       postId,
       commentId,
@@ -764,7 +744,7 @@ export const updateCrewPostComment = async (req, res, next) => {
   );
   // #region Swagger: 특정 댓글 수정 API
   /*
-    #swagger.summary = '특정 댓글 수정 API';
+    #swagger.summary = '특정 댓글 수정 API (로그인 필요)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -774,10 +754,9 @@ export const updateCrewPostComment = async (req, res, next) => {
             type: "object",
             properties: {
               content: { type: "string", example: "댓글 수정 테스트 내용입니다." },
-              isPublic: { type: "number", example: "0" },
-              userId: { type: "number", example: "1" }
+              isPublic: { type: "number", example: "0" }
             },
-            required: ["content", "isPublic", "userId"]
+            required: ["content", "isPublic"]
           }
         }
       }
@@ -838,34 +817,20 @@ export const deleteCrewPostComment = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 특정 댓글 삭제를 요청했습니다.");
 
   const { crewId, postId, commentId } = req.params;
-  console.log("user : ", req.body.userId, "params: ", req.params);
+  const userId = req.payload.id;
 
   const response = await postService.deleteCrewPostComment(
     postRequest.deleteCrewPostCommentRequest(
+      userId,
       crewId,
       postId,
       commentId,
-      req.body
     )
   );
   // #region Swagger: 특정 댓글 삭제 API
   /*
-    #swagger.summary = '특정 댓글 삭제 API';
+    #swagger.summary = '특정 댓글 삭제 API (로그인 필요)';
     #swagger.tags = ["Crew Post"]
-    #swagger.requestBody = {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              userId: { type: "number", example: "1" }
-            },
-            required: ["userId"]
-          }
-        }
-      }
-    }
     #swagger.responses[200] = {
       description: "특정 댓글 삭제 성공 응답",
       content: {

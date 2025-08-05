@@ -60,9 +60,16 @@ export const getPostsByCrewId = async ({ crewId, page, size }) => {
 				}
 			}
 		});
+		const totalElements = await prisma.crewPost.count({
+			where: { crewId: crewId },
+		})
+		const totalPages = Math.ceil(totalElements / size);
+
 		const hasNext = postList.length > size;
 		const posts = postList.slice(0, size);
-		return { posts, hasNext };
+		const pageNum = page;
+		const pageSize = posts.length;
+		return { posts, totalElements, totalPages, hasNext, pageNum, pageSize };
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
@@ -379,9 +386,15 @@ export const getCommentsByPostId = async ({ postId, page, size }) => {
 				}
 			}
 		});
+		const totalElements = await prisma.crewPostComment.count({
+			where: { postId: postId }
+		});
+		const totalPages = Math.ceil(totalElements / size);
 		const hasNext = commentList > size;
 		const comments = commentList.slice(0, size);
-		return { comments, hasNext };
+		const pageNum = page;
+		const pageSize = comments.length;
+		return { comments, totalElements, totalPages, hasNext, pageNum, pageSize };
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

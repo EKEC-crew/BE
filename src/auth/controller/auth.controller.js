@@ -339,14 +339,14 @@ export const handleLogin = async (req, res, next) => {
   res.cookie("accessToken", user.accessToken, {
     httpOnly: true,
     secure: false,
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: 1000 * 60 * 10,
   });
   // 🍪 리프레시 토큰을 쿠키로 저장(Http-only)
   res.cookie("refreshToken", user.refreshToken, {
     httpOnly: true,
     secure: false,
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: 1000 * 60 * 60 * 24 * 7,
   });
   res.status(StatusCodes.OK).success(user.user);
@@ -439,14 +439,14 @@ export const handleRefresh = async (req, res, next) => {
   res.cookie("accessToken", result.accessToken, {
     httpOnly: true,
     secure: process.env.SERVER_ENV === "production",
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: 1000 * 60 * 10,
   });
   // 🍪 리프레시 토큰을 쿠키로 저장(Http-only)
   res.cookie("refreshToken", result.refreshToken, {
     httpOnly: true,
     secure: process.env.SERVER_ENV === "production",
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: 1000 * 60 * 60 * 24 * 7,
   });
   res.status(StatusCodes.OK).success(result.user);
@@ -510,14 +510,14 @@ export const handleLogout = async (req, res, next) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
     secure: process.env.SERVER_ENV === "production",
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: 1000 * 60 * 10,
   });
   // 🍪 리프레시 토큰을 쿠키 저장소에서 제거
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: process.env.SERVER_ENV === "production",
-    sameSite: "lax",
+    sameSite: "none",
     maxAge: 1000 * 60 * 60 * 24 * 7,
   });
   res.status(StatusCodes.OK).success(null);

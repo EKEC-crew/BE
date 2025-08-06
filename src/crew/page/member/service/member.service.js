@@ -97,3 +97,26 @@ export const kickCrewMember = async ({ userId, crewId, crewMemberId }) => {
         throw err;
     }
 }
+
+export const addCrewMember = async ({ crewId, userId }) => {
+    try {
+        const isExistCrew = await memberRepository.isExistCrew({ crewId });
+        if (!isExistCrew) {
+            throw new baseError.NotFoundCrewError("존재하지 않는 크루입니다.", { crewId })
+        }
+        const crewMember = await memberRepository.findCrewMember({
+            userId,
+            crewId,
+        })
+        if (crewMember) {
+            throw new baseError.NotCrewMemberError("이미 해당 크루에 속해있습니다.", { userId });
+        }
+        const member = await memberRepository.addCrewMember({ userId, crewId });
+        const memberId = member.id;
+        const role = member.role;
+
+        return { userId, crewId, memberId, role };
+    } catch (err) {
+        throw err;
+    }
+}

@@ -18,7 +18,7 @@ export const readMembersByCrew = async (req, res, next) => {
     #swagger.parameters['page'] = { in: 'query', required: false, type: 'integer', description: '페이지 번호 (기본1)' }
     #swagger.parameters['size'] = { in: 'query', required: false, type: 'integer', description: '페이지 크기 (기본24)' }
     #swagger.responses[200] = {
-      description: "크루원 리스트 조회 성공 응답",
+      description: "크루원 리스트 조회 성공 응답",    
       content: {
         "application/json": {
           schema: {
@@ -215,3 +215,77 @@ export const kickCrewMember = async (req, res, next) => {
 
   res.status(StatusCodes.OK).success({ success: true });
 };
+
+export const addCrewMember = async (req, res, next) => {
+  console.log("특정 크루원 저장을 요청했습니다.");
+
+  const { crewId } = req.params;
+
+  const response = await memberService.addCrewMember(memberRequest.addCrewMemberRequest(crewId, req.body));
+  // #region Swagger: (개발용)특정 크루 특정 크루원 저장 API
+  /*
+    #swagger.summary = '(개발용) 특정 크루 특정 크루원 저장 API';
+    #swagger.tags = ["Crew Member"]
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              userId: { type: "number", example: 1 }
+            },
+            required: ["userId"]
+          }
+        }
+      }
+    }
+    #swagger.responses[200] = {
+      description: "특정 크루 특정 크루원 저장 성공 응답",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "SUCCESS" },
+              error: { type: "object", nullable: true, example: null },
+              data: {
+                type: "string", example: 
+                {
+                  "userId": 1,
+                  "crewId": 2,
+                  "memberId": 3
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+    #swagger.responses[400] = {
+      description: "특정 크루 특정 크루원 저장 실패 응답",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "FAIL" },
+              error: {
+                type: "object",
+                properties: {
+                  errorCode: { type: "string", example: "400" },
+                  reason: { type: "string" },
+                  data: { type: "object" }
+                }
+              },
+              success: { type: "object", nullable: true, example: null }
+            }
+          }
+        }
+      }
+    };
+  */
+  // #endregion
+
+  res.status(StatusCodes.OK).success(response);
+}

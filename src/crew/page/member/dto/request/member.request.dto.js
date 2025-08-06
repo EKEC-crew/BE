@@ -22,3 +22,11 @@ export const kickCrewMemberRequest = (userId, crewId, memberId) => {
         crewMemberId: Number(memberId),
     }
 }
+
+//개발용
+export const addCrewMemberRequest = (crewId, body) => {
+    return {
+        crewId: Number(crewId),
+        userId: Number(body.userId),
+    };
+}

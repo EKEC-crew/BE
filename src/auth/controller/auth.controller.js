@@ -106,7 +106,8 @@ export const handleSignUp = async (req, res, next) => {
                     email: "exampleexample.com",
                     password: "password"
                   }
-                }
+                },
+                data:null
               }
             },
             InvalidPassword:{
@@ -120,7 +121,8 @@ export const handleSignUp = async (req, res, next) => {
                     email: "example@example.com",
                     password: "password"
                   }
-                }
+                },
+                data:null
               }
             }
           }
@@ -135,9 +137,15 @@ export const handleSignUp = async (req, res, next) => {
             type:"object",
             properties:{
               resultType:{type:"string", example:"FAIL"},
-              errorCode:{type:"string", example:"U001"},
-              reason:{type:"string", example:"이미 존재하는 이메일 입니다."},
-              data:{type:"object", example:{email:"example@example.com", password:"password"}}
+              error:{
+                type:"object",
+                properties:{
+                  errorCode:{type:"string", example:"U001"},
+                  reason:{type:"string", example:"이미 존재하는 이메일 입니다."},
+                  data:{type:"object", example:{email:"example@example.com", password:"password"}}
+                }
+              },
+              data:{type:"object", nullable:true, example:null}
             }
           }
         }

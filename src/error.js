@@ -30,7 +30,21 @@ export class DuplicateUserPhoneError extends Error {
     this.data = data;
   }
 }
+/**
+ * **\<💥 Error\>**
+ * ***LoginRequiredError***
+ * 로그인이 필요한 요청에 로그인하지 않았을때 발생하는 에러
+ */
+export class LoginRequiredError extends Error {
+  errorCode = "U003";
+  statusCode = 401;
 
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
 /**
  * **\<💥 Error\>**
  * ***InvalidInputValueError***
@@ -214,7 +228,6 @@ export class NotFoundPlanError extends Error {
     this.data = data;
   }
 }
-
 
 //권한이 없는 유저
 export class PermissionDeniedError extends Error {

@@ -1,5 +1,5 @@
 import { verifyAccessToken } from "../../utils/jwt.js";
-import { InvalidTokenError } from "../../error.js";
+import { InvalidTokenError, LoginRequiredError } from "../../error.js";
 import { detectDuplicateLogin } from "../service/auth.service.js";
 /**
  * **[Auth]**
@@ -12,7 +12,10 @@ import { detectDuplicateLogin } from "../service/auth.service.js";
  */
 export const authenticateAccessToken = async (req, res, next) => {
   // 쿠키로 부터 액세스 토큰만 추출
-  const { accessToken } = req.cookies;
+  const { accessToken, refreshToken } = req.cookies;
+  // 엑세스 토큰, 리프레시 토큰이 모두 존재하지 않는 경우 비로그인 상태로 간주하고 에러 throw
+  if (!accessToken && !refreshToken)
+    throw new LoginRequiredError("로그인이 필요합니다.");
   // 액세스 토큰이 존재하지 않은 경우 에러를 반환합니다.
   if (!accessToken)
     throw new InvalidTokenError("유효하지 않은 인증 토큰 입니다.");

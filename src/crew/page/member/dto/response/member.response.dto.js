@@ -28,3 +28,13 @@ export const CrewMemberResponse = (body) => {
 
     return response;
 }
+
+export const AddCrewMemberResponse = ({ userId, crewId, memberId, role }) => {
+    const response = {
+        userId: userId,
+        crewId: crewId,
+        memberId: memberId,
+        role: role
+    }
+    return response;
+}

@@ -27,6 +27,8 @@ import { initSchedulers } from "./config/scheduler/scheduler.js";
 const app = express();
 const port = process.env.PORT;
 
+app.set("trust proxy", 1);
+
 /**
  *  AWS S3 설정
  */
@@ -74,7 +76,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const corsOptions = {
-  origin: [process.env.LOCAL_ORIGIN, process.env.PROD_ORIGIN, process.env.FRONT_LOCAL_ORIGIN, process.env.FRONT_DOMAIN],
+  origin: [
+    process.env.LOCAL_ORIGIN,
+    process.env.PROD_ORIGIN,
+    process.env.FRONT_LOCAL_ORIGIN,
+    process.env.FRONT_DOMAIN,
+  ],
   credentials: true,
 };
 

@@ -2,7 +2,7 @@ import { prisma } from "../../../../db.config.js";
 
 export const getMembersByCrewId = async ({ crewId, page, size }) => {
     try {
-        const memberList = await prisma.crewMember.findMany({
+        const members = await prisma.crewMember.findMany({
             where: {
                 crewId,
             },
@@ -10,7 +10,7 @@ export const getMembersByCrewId = async ({ crewId, page, size }) => {
                 role: 'desc',
             },
             skip: (page - 1) * size,
-            take: size,
+            take: size + 1,
             include: {
                 user: {
                     select: {
@@ -19,7 +19,14 @@ export const getMembersByCrewId = async ({ crewId, page, size }) => {
                 }
             }
         });
-        return memberList;
+        const totalElements = await prisma.crewMember.count({
+            where: { crewId }
+        });
+        const totalPages = Math.ceil(totalElements / size);
+        const hasNext = members.length > size;
+        const pageNum = page;
+        const pageSize = members.length;
+        return { members, totalElements, totalPages, hasNext, pageNum, pageSize };
     } catch (err) {
         throw new Error(
             `오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
@@ -67,6 +74,25 @@ export const removeMemberByCrewMemberId = async ({ crewMemberId }) => {
             }
         })
         return member;
+    } catch (err) {
+        throw new Error(
+            `오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+        )
+    }
+}
+
+// 유저 아이디로 크루멤버아이디 찾기(인증)
+export const findCrewMember = async ({ userId, crewId }) => {
+    try {
+        const crewMember = await prisma.crewMember.findFirst(
+            {
+                where: {
+                    userId: userId,
+                    crewId: crewId,
+                }
+            }
+        )
+        return crewMember;
     } catch (err) {
         throw new Error(
             `오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

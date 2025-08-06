@@ -162,7 +162,7 @@ export const deleteCrewPost = async ({ userId, crewId, postId }) => {
 		if (!crewMember) {
 			throw new baseError.NotCrewMemberError("크루 멤버에 속하지 않은 유저입니다.", { userId });
 		}
-		if (isExistPost.crewMemberId !== userId && crewMember.role === 0) {
+		if (isExistPost.crewMemberId !== crewMember.id && (isExistPost.crewMember.role === 2 || crewMember.role === 0)) {
 			throw new baseError.PermissionDeniedError("권한이 없는 유저입니다.", { userId });
 		}
 
@@ -336,7 +336,7 @@ export const deleteCrewPostComment = async ({ crewId, postId, userId, commentId 
 		if (!isExistComment) {
 			throw new baseError.NotFoundCommentError("존재하지 않는 댓글입니다.", { commentId });
 		}
-		if (isExistComment.crewId !== crewId) {
+		if (isExistComment.crewPost.crewId !== crewId) {
 			throw new baseError.NotBelongToCrewError("해당 크루에 속하지 않은 댓글입니다.", { commentId });
 		}
 		if (isExistComment.postId !== postId) {
@@ -350,7 +350,7 @@ export const deleteCrewPostComment = async ({ crewId, postId, userId, commentId 
 		if (!crewMember) {
 			throw new baseError.NotCrewMemberError("크루 멤버에 속하지 않은 유저입니다.", { userId });
 		}
-		if (isExistComment.crewMemberId !== crewMember.id && crewMember.role === 0) {
+		if (isExistComment.crewMemberId !== crewMember.id && (isExistComment.crewMember.role === 2 || crewMember.role === 0)) {
 			throw new baseError.PermissionDeniedError("권한이 없는 유저입니다.", { userId });
 		}
 

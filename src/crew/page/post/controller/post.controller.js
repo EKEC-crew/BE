@@ -138,7 +138,7 @@ export const createCrewPost = async (req, res, next) => {
   const response = await postService.createCrewPost(postRequest.createCrewPostRequest(userId, crewId, req.body, req.files));
   // #region Swagger: 게시글 작성 API
   /*
-    #swagger.summary = '게시글 작성 API(로그인 필요)';
+    #swagger.summary = '게시글 작성 API (로그인 필요: 크루원)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -326,7 +326,7 @@ export const updateCrewPost = async (req, res, next) => {
   );
   // #region Swagger: 특정 크루 특정 게시글 수정 API 
   /*
-    #swagger.summary = '특정 크루 특정 게시글 수정 API (로그인 필요)';
+    #swagger.summary = '특정 크루 특정 게시글 수정 API (로그인 필요: 작성자)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -432,7 +432,7 @@ export const deleteCrewPost = async (req, res, next) => {
   );
   // #region Swagger: 특정 크루 특정 게시글 삭제 API
   /*
-    #swagger.summary = '특정 크루 특정 게시글 삭제 API (로그인 필요)';
+    #swagger.summary = '특정 크루 특정 게시글 삭제 API (로그인 필요: 작성자, 운영진, 크루장)';
     #swagger.tags = ["Crew Post"]
     #swagger.responses[200] = {
       description: "특정 크루 특정 게시글 삭제 성공 응답",
@@ -493,20 +493,8 @@ export const toggleCrewPostLike = async (req, res, next) => {
   );
   // #region Swagger: 특정 크루 특정 게시글 좋아요 API
   /*
-    #swagger.summary = '특정 크루 특정 게시글 좋아요 API (로그인 필요)';
+    #swagger.summary = '특정 크루 특정 게시글 좋아요 API (로그인 필요: 크루원)';
     #swagger.tags = ["Crew Post"]
-    #swagger.requestBody = {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-            },
-          }
-        }
-      }
-    }
     #swagger.responses[200] = {
       description: "특정 크루 특정 게시글 좋아요 성공 응답",
       content: {
@@ -657,7 +645,7 @@ export const createCrewPostComment = async (req, res, next) => {
   );
   // #region Swagger: 댓글 작성 API
   /*
-    #swagger.summary = '댓글 작성 API (로그인 필요)';
+    #swagger.summary = '댓글 작성 API (로그인 필요: 크루원)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -744,7 +732,7 @@ export const updateCrewPostComment = async (req, res, next) => {
   );
   // #region Swagger: 특정 댓글 수정 API
   /*
-    #swagger.summary = '특정 댓글 수정 API (로그인 필요)';
+    #swagger.summary = '특정 댓글 수정 API (로그인 필요: 작성자)';
     #swagger.tags = ["Crew Post"]
     #swagger.requestBody = {
       required: true,
@@ -829,7 +817,7 @@ export const deleteCrewPostComment = async (req, res, next) => {
   );
   // #region Swagger: 특정 댓글 삭제 API
   /*
-    #swagger.summary = '특정 댓글 삭제 API (로그인 필요)';
+    #swagger.summary = '특정 댓글 삭제 API (로그인 필요: 작성자, 운영진, 크루장)';
     #swagger.tags = ["Crew Post"]
     #swagger.responses[200] = {
       description: "특정 댓글 삭제 성공 응답",

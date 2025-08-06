@@ -777,18 +777,30 @@ export const handleCreateCrew = async (req, res, next) => {
             description: "크루 생성 실패 응답 (유효하지 않은 토큰)",
             content:{
               "application/json":{
-                schema:{
-                  type:"object",
-                  properties:{
-                    resultType: {type:"string", example:"FAIL"},
-                    error:{
-                      type:"object",
-                      properties:{
-                        reason: {type:"string", example:"유효하지 않은 인증 토큰입니다."},
-                        data: {type:"object", nullable:true, example:null}
-                      }
-                    },
-                    data: {type:"object", nullable:true, example:null}
+                examples:{
+                  InvalidToken:{
+                    summary:"유효하지 않은 토큰",
+                    value:{
+                      resultType: "FAIL",
+                      error:{
+                        errorCode: "I003",
+                        reason: "유효하지 않은 인증 토큰 입니다.",
+                        data:null
+                      },
+                      data:null
+                    }
+                  },
+                  LoginRequired:{
+                    summary:"로그인 필요",
+                    value:{
+                      resultType: "FAIL",
+                      error:{
+                        errorCode: "U003",
+                        reason: "로그인이 필요합니다.",
+                        data:null
+                      },
+                      data:null
+                    }
                   }
                 }
               }

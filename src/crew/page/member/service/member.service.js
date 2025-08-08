@@ -17,13 +17,12 @@ export const readMembersByCrew = async ({ userId, crewId, page, size }) => {
         }
         const data = await memberRepository.getMembersByCrewId({ crewId, page, size });
         const members = data.members;
-        const userRole = crewMember.role;
         const totalElements = data.totalElements;
         const totalPages = data.totalPages;
         const hasNext = data.hasNext;
         const pageNum = data.pageNum;
         const pageSize = data.pageSize;
-        return memberResponse.CrewMemberListResponse({ members, userRole, totalElements, totalPages, hasNext, pageNum, pageSize });
+        return memberResponse.CrewMemberListResponse({ members, totalElements, totalPages, hasNext, pageNum, pageSize });
     } catch (err) {
         throw err;
     }

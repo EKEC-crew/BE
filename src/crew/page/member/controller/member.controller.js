@@ -51,7 +51,6 @@ export const readMembersByCrew = async (req, res, next) => {
                       "role": 1
                     }
                   ],
-                  "userRole": 2,
                   "totalElements": 4,
                   "totalPages": 1,
                   "hasNext": false,

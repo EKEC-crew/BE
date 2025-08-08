@@ -1,4 +1,4 @@
-export const CrewMemberListResponse = ({ members, userRole, totalElements, totalPages, hasNext, pageNum, pageSize }) => {
+export const CrewMemberListResponse = ({ members, totalElements, totalPages, hasNext, pageNum, pageSize }) => {
     const items = members.map(member => ({
         memberId: member.id,
         nickname: member.user?.nickname,
@@ -6,7 +6,6 @@ export const CrewMemberListResponse = ({ members, userRole, totalElements, total
     }))
     const response = {
         members: items,
-        userRole: userRole,
         totalElements: totalElements,
         totalPages: totalPages,
         hasNext: hasNext,

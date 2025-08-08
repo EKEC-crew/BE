@@ -192,6 +192,7 @@ model CrewMember {
   crewPost          CrewPost[]
   crewPostComment   CrewPostComment[]
   crewPostLike      CrewPostLike[]
+  @@unique([userId, crewId])
 
   @@index([crewId], map: "crew_member_crew_id_fkey")
   @@index([userId], map: "crew_member_user_id_fkey")

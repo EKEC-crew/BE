@@ -66,13 +66,24 @@ export const createCrewApplicationDetailResponse = (application) => {
     };
 };
 
-export const createCrewRecruitFormResponse = (forms) => {
-    return forms.map((form) => ({
-        id: form.id,
-        question: form.question,
-        questionType: form.questionType,
-        choiceList: form.choiceList,
-        isEtc: form.isEtc,
-        required: form.required,
-    }));
+export const createCrewApplicationFormResponse = ({ step1, step2, recruitMessage }) => {
+    return {
+        step1: {
+            gender: step1.gender,
+            styles: step1.styles,
+            activities: step1.activities,
+            region: step1.region,
+            category: step1.category,
+            age: step1.age
+        },
+        step2: step2.map((form) => ({
+            id: form.id,
+            question: form.question,
+            questionType: form.questionType,
+            choiceList: form.choiceList,
+            isEtc: form.isEtc,
+            required: form.required,
+        })),
+        recruitMessage,
+    };
 };

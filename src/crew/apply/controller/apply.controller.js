@@ -4,7 +4,7 @@ import {
   ApplySuccessResponseDTO,
   ApplyErrorResponseDTO,
   createCrewApplicationDetailResponse,
-  createCrewRecruitFormResponse,
+  createCrewApplicationFormResponse,
 } from '../dto/response/apply.response.dto.js';
 
 // 크루 지원하기
@@ -277,32 +277,27 @@ export const getCrewApplicationForm = async (req, res, next) => {
               example: {
                   resultType: "SUCCESS",
                   error: null,
-                  success: [
-                      {
-                          id: 1,
-                          question: "어떤 활동을 선호하시나요?",
-                          questionType: 0,
-                          choiceList: ["러닝", "요가"],
-                          isEtc: 0,
-                          required: 1
+                  success: {
+                      step1: {
+                          gender: 1,
+                          styles: [2, 3],
+                          activities: [3, 5],
+                          region: 3,
+                          category: 2,
+                          age: 2
                       },
-                      {
-                          id: 2,
-                          question: "이 크루를 어떻게 알게 되었나요?",
-                          questionType: 1,
-                          choiceList: ["SNS", "지인 추천"],
-                          isEtc: 1,
-                          required: 1
-                      },
-                      {
-                          id: 3,
-                          question: "기타 하고 싶은 말이 있다면 작성해주세요.",
-                          questionType: 2,
-                          choiceList: null,
-                          isEtc: 0,
-                          required: 0
-                      }
-                  ]
+                      step2: [
+                          {
+                              id: 6,
+                              question: "가장 좋아하는 문화 활동은 무엇인가요?",
+                              questionType: 0,
+                              choiceList: ["전시", "연극", "영화"],
+                              isEtc: 1,
+                              required: 1
+                          }
+                      ],
+                      recruitMessage: "문화생활 함께 해요!"
+                  }
               }
           }
       }
@@ -323,6 +318,7 @@ export const getCrewApplicationForm = async (req, res, next) => {
       }
   }
 */
+
   try {
     const { crewId } = req.params;
     const result = await applyService.getRecruitFormByCrewId(+crewId);
@@ -330,7 +326,7 @@ export const getCrewApplicationForm = async (req, res, next) => {
     return res.status(200).json({
       resultType: 'SUCCESS',
       error: null,
-      success: createCrewRecruitFormResponse(result),
+      success: createCrewApplicationFormResponse(result),
     });
   } catch (error) {
     next(error);

@@ -1,11 +1,11 @@
-export const ReadCrewInfoResponse = (crew) => {
+export const ReadCrewInfoResponse = ({ crew, memberCount }) => {
     const response = {
         crewId: crew.id,
         title: crew.title,
         content: crew.content,
         score: crew.score,
+        memberCount: memberCount,
         crewCapacity: crew.crewCapacity,
-        maxCapacity: crew.maxCapacity,
         bannerImage: crew.bannerImage,
         nickname: crew.user.nickname,
         profileImage: crew.user.image,

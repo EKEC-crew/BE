@@ -1,4 +1,5 @@
 import * as planService from "../service/plan.service.js";
+import { InvalidInputValueError } from "../../../../error.js";
 
 export const createPlan = async (req, res, next) => {
   /*
@@ -16,13 +17,12 @@ export const createPlan = async (req, res, next) => {
         "application/json": {
           schema: {
             type: "object",
-            required: ["crewMemberId", "title", "content", "type"],
+            required: ["title", "content", "type"],
             properties: {
-              crewMemberId: { type: "integer", example: 3 },
               title: { type: "string", example: "저녁 모임" },
               content: { type: "string", example: "7시 강남역" },
               day: { type: "string", format: "date-time", example: "2025-07-20T19:00:00.000Z" },
-              type: { type: "integer", example: 0 },
+              type: { type: "integer", example: 0, description: "0: 정기모임(운영진/크루장만), 1: 번개모임(모든 멤버)" },
               isRequired: { type: "boolean", example: false },
               allowComments: { type: "boolean", example: true },
               allowPrivateComments: { type: "boolean", example: true },
@@ -35,6 +35,7 @@ export const createPlan = async (req, res, next) => {
         }
       }
     }
+    #swagger.security = [{"bearerAuth": []}]
     #swagger.responses[200] = {
       description: "일정 생성 성공",
       content: {
@@ -81,7 +82,9 @@ export const createPlan = async (req, res, next) => {
         throw new InvalidInputValueError("유효하지 않은 crewId입니다.");
       }
   
-      const response = await planService.CrewPlanService.createPlan(crewId, req.body);
+      // JWT 토큰에서 사용자 ID 추출
+      const userId = req.payload.id;
+      const response = await planService.CrewPlanService.createPlan(crewId, req.body, userId);
       return res.success(response);
     } catch (err) {
       next(err);
@@ -130,8 +133,10 @@ export const getPlanById = async (req, res, next) => {
  *               hasFee: { type: "boolean" },
  *               fee: { type: "integer" },
  *               feePurpose: { type: "string" },
- *               createdAt: { type: "string", format: "date-time" },
- *               updatedAt: { type: "string", format: "date-time" }
+ *               commentCount: { type: "integer", example: 5 },
+ *               likeCount: { type: "integer", example: 12 },
+ *               createdAt: { type: "string", format: "date-time", example: "2024-01-15 14:30:00" },
+ *               updatedAt: { type: "string", format: "date-time", example: "2024-01-15 15:30:00", nullable: true }
  *             }
  *           }
  *         }
@@ -232,18 +237,22 @@ export const getPlanList = async (req, res, next) => {
                       hasFee: { type: "boolean" },
                       fee: { type: "integer" },
                       feePurpose: { type: "string" },
-                      createdAt: { type: "string", format: "date-time" },
-                      updatedAt: { type: "string", format: "date-time" }
+                      commentCount: { type: "integer", example: 5 },
+                      likeCount: { type: "integer", example: 12 },
+                      createdAt: { type: "string", format: "date-time", example: "2024-01-15 14:30:00" },
+                      updatedAt: { type: "string", format: "date-time", example: "2024-01-15 15:30:00", nullable: true }
                     }
                   }
                 },
                 pagination: {
                   type: "object",
                   properties: {
-                    totalCount: { type: "number", example: 25 },
+                    totalElements: { type: "number", example: 25 },
                     currentPage: { type: "number", example: 1 },
                     pageSize: { type: "number", example: 10 },
-                    totalPages: { type: "number", example: 3 }
+                    totalPages: { type: "number", example: 3 },
+                    hasNext: { type: "boolean", example: true },
+                    hasPrevious: { type: "boolean", example: false }
                   }
                 }
               }
@@ -367,15 +376,16 @@ export const createPlanComment = async (req, res, next) => {
       "application/json": {
         schema: {
           type: "object",
-          required: ["crewMemberId", "content"],
+          required: ["content"],
           properties: {
-            crewMemberId: { type: "integer", example: 3 },
-            content: { type: "string", example: "참석하겠습니다!" }
+            content: { type: "string", example: "참석하겠습니다!" },
+            isPublic: { type: "boolean", example: true, description: "공개 댓글 여부 (기본값: true)" }
           }
         }
       }
     }
   }
+  #swagger.security = [{"bearerAuth": []}]
   #swagger.responses[200] = { 
     description: "댓글 생성 성공",
     content: {
@@ -407,11 +417,15 @@ export const createPlanComment = async (req, res, next) => {
   */
   try {
     const {crewId, planId} = req.params;
+    
+    // JWT 토큰에서 사용자 ID 추출
+    const userId = req.payload.id;
 
     const comment = await planService.CrewPlanCommentService.createComment(
       Number(crewId), 
       Number(planId), 
-      req.body
+      req.body,
+      userId
     );
 
     return res.success(comment);
@@ -498,8 +512,8 @@ export const getPlanCommentList = async (req, res, next) => {
  *                 content: { type: "string", example: "참석하겠습니다!" },
  *                 writer: { type: "string", example: "비쿠" },
  *                 writerImage: { type: "string", example: "https://example.com/image.jpg" },
- *                 createdAt: { type: "string", format: "date-time" },
- *                 updatedAt: { type: "string", format: "date-time" }
+ *                 createdAt: { type: "string", format: "date-time", example: "2024-01-15 14:30:00" },
+ *                 updatedAt: { type: "string", format: "date-time", example: "2024-01-15 15:30:00", nullable: true }
  *               }
  *             }
  *           }
@@ -639,4 +653,162 @@ export const deletePlanComment = async (req, res, next) => {
     next(err);
   }
 };
- 
+
+// 일정 좋아요 추가
+export const likePlan = async (req, res, next) => {
+  /*
+    #swagger.summary = "크루 일정 좋아요 추가"
+    #swagger.tags = ["Crew Plan"]
+    #swagger.parameters['crewId'] = {
+      in: 'path',
+      required: true,
+      description: '크루 ID',
+      schema: { type: 'integer' }
+    }
+    #swagger.parameters['planId'] = {
+      in: 'path',
+      required: true,
+      description: '일정 ID',
+      schema: { type: 'integer' }
+    }
+    #swagger.responses[200] = {
+      description: '좋아요 추가 성공',
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              message: { type: "string", example: "좋아요가 추가되었습니다." },
+              planId: { type: "integer", example: 1 },
+              likeCount: { type: "integer", example: 5 },
+              isLiked: { type: "boolean", example: true }
+            }
+          }
+        }
+      }
+    }
+    #swagger.responses[400] = {
+      description: '이미 좋아요를 누른 일정'
+    }
+  */
+  try {
+    const { crewId, planId } = req.params;
+    const userId = req.payload.id;
+
+    const result = await planService.CrewPlanLikeService.likePlan(
+      Number(crewId),
+      Number(planId),
+      Number(userId)
+    );
+    
+    return res.success(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 일정 좋아요 취소
+export const unlikePlan = async (req, res, next) => {
+  /*
+    #swagger.summary = "크루 일정 좋아요 취소"
+    #swagger.tags = ["Crew Plan"]
+    #swagger.parameters['crewId'] = {
+      in: 'path',
+      required: true,
+      description: '크루 ID',
+      schema: { type: 'integer' }
+    }
+    #swagger.parameters['planId'] = {
+      in: 'path',
+      required: true,
+      description: '일정 ID',
+      schema: { type: 'integer' }
+    }
+    #swagger.responses[200] = {
+      description: '좋아요 취소 성공',
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              message: { type: "string", example: "좋아요가 취소되었습니다." },
+              planId: { type: "integer", example: 1 },
+              likeCount: { type: "integer", example: 4 },
+              isLiked: { type: "boolean", example: false }
+            }
+          }
+        }
+      }
+    }
+    #swagger.responses[400] = {
+      description: '좋아요를 누르지 않은 일정'
+    }
+  */
+  try {
+    const { crewId, planId } = req.params;
+    const userId = req.payload.id;
+
+    const result = await planService.CrewPlanLikeService.unlikePlan(
+      Number(crewId),
+      Number(planId),
+      Number(userId)
+    );
+    
+    return res.success(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 일정 신청
+export const applyToPlan = async (req, res, next) => {
+   /*
+    #swagger.summary = "크루 일정 신청"
+    #swagger.tags = ["Crew Plan"]
+    #swagger.parameters['crewId'] = {
+      in: 'path',
+      required: true,
+      description: '크루 ID',
+      schema: { type: 'integer' }
+    }
+    #swagger.parameters['planId'] = {
+      in: 'path',
+      required: true,
+      description: '일정 ID',
+      schema: { type: 'integer' }
+    }
+    #swagger.responses[200] = {
+      description: '일정 신청 성공',
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              message: { type: "string", example: "일정 신청이 완료되었습니다." },
+              planId: { type: "integer", example: 1 },
+              status: { type: "integer", example: 1 },
+              applicant: { type: "string", example: "홍길동" }
+            }
+          }
+        }
+      }
+    }
+    #swagger.responses[400] = {
+      description: '이미 신청한 일정'
+    }
+  */
+  try {
+    const {crewId, planId } = req.params;
+    const userId = req.payload.id;
+
+    const result = await planService.CrewPlanRequestService.applyToPlan(
+      Number(crewId),
+      Number(planId),
+      Number(userId)
+    );
+
+    return res.success(result);
+  } catch (err) {
+    next(err);
+  }
+}

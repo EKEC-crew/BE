@@ -8,7 +8,9 @@ export const readCrewInfo = async ({ crewId }) => {
         if (!isExistCrew) {
             throw new baseError.NotFoundCrewError("존재하지 않는 크루입니다.", { crewId })
         }
-        return infoResponse.ReadCrewInfoResponse(isExistCrew);
+        const memberCount = await infoRepository.countMember({ crewId });
+        const crew = isExistCrew;
+        return infoResponse.ReadCrewInfoResponse({ crew, memberCount });
     } catch (err) {
         throw err;
     }

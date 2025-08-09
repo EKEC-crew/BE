@@ -62,19 +62,57 @@ const updateStatus = async (crewId, applyId, status) => {
 };
 
 // 특정 크루 지원서 폼 조회
-const findRecruitFormByCrewId = async (crewId) => {
-    return await prisma.crewRecruitForm.findMany({
-        where: { crewId },
+const findCrewApplicationFormById = async (crewId) => {
+    const crew = await prisma.crew.findUnique({
+        where: { id: crewId },
         select: {
-            id: true,
-            question: true,
-            questionType: true,
-            choiceList: true,
-            isEtc: true,
-            required: true,
+            genderLimit: true,
+            ageLimit: true,
+            recruitMessage: true,
+            title: true,
+            userId: true,
+            regionId: true,
+            content: true,
+            categoryId: true,
+            crewCapacity: true,
+            crewActivity: { select: { activityId: true } },
+            crewStyle: { select: { styleId: true } },
+            crewRecruitForm: {
+                select: {
+                    id: true,
+                    question: true,
+                    questionType: true,
+                    choiceList: true,
+                    isEtc: true,
+                    required: true,
+                },
+                orderBy: { id: 'asc' },
+            },
         },
-        orderBy: { id: 'asc' },
     });
+
+    if (!crew) {
+        const error = new Error("해당 크루를 찾을 수 없습니다.");
+        error.status = 404;
+        throw error;
+    }
+
+    return {
+        step1: {
+            gender: crew.genderLimit,
+            styles: crew.crewStyle.map((s) => s.styleId),
+            name: crew.title,
+            activities: crew.crewActivity.map((a) => a.activityId),
+            admin: crew.userId,
+            region: crew.regionId,
+            description: crew.content,
+            category: crew.categoryId,
+            maxCapacity: crew.maxCapacity,
+            age: crew.ageLimit
+        },
+        step2: crew.crewRecruitForm,
+        recruitMessage: crew.recruitMessage,
+    };
 };
 
 
@@ -83,5 +121,5 @@ export default {
     createApplicationWithTransaction,
     findApplicationById,
     updateStatus,
-    findRecruitFormByCrewId,
+    findCrewApplicationFormById,
 };

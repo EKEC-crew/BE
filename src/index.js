@@ -23,6 +23,8 @@ import routes from "./route/route.js";
 
 import { initS3 } from "./config/aws/s3.js";
 import { initSchedulers } from "./config/scheduler/scheduler.js";
+import initializePassport from "./config/oauth/passport.js";
+import initPassport from "./config/oauth/passport.js";
 
 const app = express();
 const port = process.env.PORT;
@@ -37,6 +39,10 @@ export const s3 = initS3();
  *  스케줄러 설정
  */
 initSchedulers();
+/**
+ * 패스포트 설정
+ */
+initPassport();
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
  */

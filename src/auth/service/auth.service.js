@@ -31,6 +31,8 @@ import {
   updateProfile,
   updateRefreshToken,
   deleteUncompletedUsers,
+  createOAuthAccount,
+  findUserByPlatformId,
 } from "../repository/auth.repository.js";
 /**
  * **[Auth]**
@@ -95,6 +97,51 @@ export const login = async (body) => {
   };
   return responseFromLogin(result);
 };
+/**
+ * **[Auth]**
+ * **\<🛠️ Service\>**
+ * ***oauthLoginRegister***
+ * 'oAuth 로그인 및 회원가입' 기능의 서비스 레이어 입니다. 계정을 검증 / 생성하고, 엑세스 토큰과 리프레시 토큰을 발급합니다.
+ * @param {Object} data
+ * @returns {Object}
+ */
+export const oauthLoginRegister = async (data) => {
+  let user = await findUserByPlatformId(data);
+  if (user == -1) {
+    const account = await createOAuthAccount(data);
+    if (account == -1) return -1;
+    user = await findAccountById(account);
+  }
+  // ✉️ 페이로드 생성
+  const payload = {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    nickname: user.nickname,
+    profileImage: user.image,
+    isCompleted: user.isCompleted,
+  };
+  // 🪙 리프레시 토큰 생성
+  const tokens = {};
+  tokens.refresh = generateRefreshToken(payload);
+  // 🪙 리프레시 토큰 저장 / 업데이트
+  const oldToken = await findRefreshTokenByUserId(user.id);
+  if (oldToken == -1) {
+    payload.refreshTokenId = await createRefreshToken(tokens.refresh, user.id);
+  } else {
+    deleteRefreshToken(oldToken.token);
+    payload.refreshTokenId = await createRefreshToken(tokens.refresh, user.id);
+  }
+  // 🪙 엑세스 토큰 생성
+  tokens.access = generateAccessToken(payload);
+  const result = {
+    tokens,
+    payload,
+  };
+  // ⬆️ 토큰과 유저정보 페이로드를 반환합니다.
+  return result;
+};
+
 /**
  * **[Auth]**
  * **\<🛠️ Service\>**

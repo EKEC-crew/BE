@@ -15,6 +15,7 @@ import {
 } from "../dto/request/auth.request.dto.js";
 import { InvalidInputValueError } from "../../error.js";
 import { DateTime } from "luxon";
+import { clearTokenCookies, setTokenCookies } from "../../utils/cookie.js";
 // 입력값을 검증하기위한 정규표현식
 const regex = {
   email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -343,20 +344,8 @@ export const handleLogin = async (req, res, next) => {
     );
   }
   const user = await login(bodyToLogin(req.body));
-  // 🍪 엑세스 토큰을 쿠키로 저장(Http-only)
-  res.cookie("accessToken", user.accessToken, {
-    httpOnly: true,
-    secure: process.env.SERVER_ENV === "production",
-    sameSite: process.env.SERVER_ENV === "production" ? "none" : "lax",
-    maxAge: 1000 * 60 * 10,
-  });
-  // 🍪 리프레시 토큰을 쿠키로 저장(Http-only)
-  res.cookie("refreshToken", user.refreshToken, {
-    httpOnly: true,
-    secure: process.env.SERVER_ENV === "production",
-    sameSite: process.env.SERVER_ENV === "production" ? "none" : "lax",
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  });
+  // 🍪 토큰을 쿠키로 저장
+  setTokenCookies(res, user.accessToken, user.refreshToken);
   res.status(StatusCodes.OK).success(user.user);
 };
 /**
@@ -443,20 +432,8 @@ export const handleRefresh = async (req, res, next) => {
   console.log("엑세스 토큰 리프레시가 요청되었습니다!");
   console.log("cookies:", req.cookies);
   const result = await refresh(bodyToRefresh(req.cookies));
-  // 🍪 엑세스 토큰을 쿠키로 저장(Http-only)
-  res.cookie("accessToken", result.accessToken, {
-    httpOnly: true,
-    secure: process.env.SERVER_ENV === "production",
-    sameSite: process.env.SERVER_ENV === "production" ? "none" : "lax",
-    maxAge: 1000 * 60 * 10,
-  });
-  // 🍪 리프레시 토큰을 쿠키로 저장(Http-only)
-  res.cookie("refreshToken", result.refreshToken, {
-    httpOnly: true,
-    secure: process.env.SERVER_ENV === "production",
-    sameSite: process.env.SERVER_ENV === "production" ? "none" : "lax",
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  });
+  // 🍪 토큰을 쿠키로 저장(Http-only)
+  setTokenCookies(res, result.accessToken, result.refreshToken);
   res.status(StatusCodes.OK).success(result.user);
 };
 /**
@@ -514,20 +491,8 @@ export const handleLogout = async (req, res, next) => {
   console.log("cookies:", req.cookies);
   // 리프레시 토큰을 DB로부터 제거
   await logout(bodyToLogout(req.cookies));
-  // 🍪 엑세스 토큰을 쿠키 저장소에서 제거
-  res.clearCookie("accessToken", {
-    httpOnly: true,
-    secure: process.env.SERVER_ENV === "production",
-    sameSite: process.env.SERVER_ENV === "production" ? "none" : "lax",
-    maxAge: 1000 * 60 * 10,
-  });
-  // 🍪 리프레시 토큰을 쿠키 저장소에서 제거
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    secure: process.env.SERVER_ENV === "production",
-    sameSite: process.env.SERVER_ENV === "production" ? "none" : "lax",
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  });
+  // 🍪 토큰을 쿠키 저장소에서 제거
+  clearTokenCookies(res);
   res.status(StatusCodes.OK).success(null);
 };
 /**

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { Strategy } from "passport-jwt";
 // 토큰 만료 시간 설정
 const expirations = {
   access: "10m",

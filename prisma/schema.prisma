@@ -7,11 +7,25 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+enum LoginPlatform {
+  GOOGLE
+  NAVER
+  KAKAO
+  EMAIL
+}
+model OAuth {
+  id          Int    @id @default(autoincrement())
+  platform    LoginPlatform
+  platformId  String @db.VarChar(60)
+  user        User   @relation(fields: [userId], references: [id])
+  userId      Int    @unique @map("user_id")
 
+  @@map("oauth")
+}
 model User {
   id                      Int                       @id @default(autoincrement())
   email                   String                    @unique(map: "email") @db.VarChar(40)
-  password                String                    @db.VarChar(60)
+  password                String?                   @db.VarChar(60)
   name                    String?                   @db.VarChar(10)
   nickname                String?                   @db.VarChar(10)
   gender                  Int?
@@ -28,8 +42,10 @@ model User {
   crewRecruitAppliedStep2 CrewRecruitAppliedStep2[]
   crewRegister            CrewRegister[]
   refreshToken            RefreshToken[]
+  oauth                   OAuth[]
   @@map("user")
 }
+
 
 model Region {
   id   Int    @id @default(autoincrement())

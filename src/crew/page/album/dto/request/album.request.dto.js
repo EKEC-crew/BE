@@ -4,10 +4,10 @@ export const readAlbumImagesRequest = (crewId) => {
     };
 }
 
-export const createAlbumImageRequest = (crewId, body, file) => {
+export const createAlbumImageRequest = (userId, crewId, file) => {
     return {
+        userId: Number(userId),
         crewId: Number(crewId),
-        userId: Number(body.userId),
         image: file,
     };
 }

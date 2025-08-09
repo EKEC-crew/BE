@@ -76,14 +76,14 @@ export const readAlbumImages = async (req, res, next) => {
 
 export const createAlbumImage = async (req, res, next) => {
     const { crewId } = req.params;
-
+    const userId = req.payload.id;
     const validImageExtensions = ["jpg", "jpeg", "png", "gif"];
     const ext = req.file.originalname.split('.').pop().toLowerCase();
     if (!validImageExtensions.includes(ext)) {
         throw new baseError.InvalidInputValueError("올바른 이미지를 등록 해 주세요.", req.body);
     }
 
-    const response = await albumService.createAlbumImage(albumRequest.createAlbumImageRequest(crewId, req.body, req.file));
+    const response = await albumService.createAlbumImage(albumRequest.createAlbumImageRequest(userId, crewId, req.file));
     // #region Swagger: 앨범 작성 API
     /*
     #swagger.summary = '앨범 작성 API';
@@ -98,10 +98,9 @@ export const createAlbumImage = async (req, res, next) => {
                         image: {
                             type: "string",
                             format: "binary",
-                        },
-                        userId: { type: "number", example: 1 },
+                        }
                     },
-                    required: ["image", "userId"]
+                    required: ["image"]
                 }
             }
             }

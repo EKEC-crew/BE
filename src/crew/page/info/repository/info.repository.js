@@ -13,6 +13,19 @@ export const createCrewIntroduce = async ({ crewId, introduction }) => {
     }
 }
 */
+
+export const countMember = async ({ crewId }) => {
+    try {
+        const memberCount = await prisma.crewMember.count({
+            where: { crewId: crewId }
+        });
+        return memberCount;
+    } catch (err) {
+        throw new Error(
+            `오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+        )
+    }
+}
 export const updateCrewIntroduce = async ({ crewId, introduction }) => {
     try {
         const crew = await prisma.crew.update({

@@ -25,7 +25,7 @@ export class ApplyRequestDTO {
         this.region = region;
         this.age = age;
         this.gender = gender;
-        this.categoryId = categoryId;
+        this.categoryId = (categoryId ?? null);
         this.answers = Array.isArray(answers)
             ? answers.map((a) => new ApplyStep2AnswerDTO(a))
             : [];
@@ -40,7 +40,7 @@ export class CrewApplyRequestDto {
         this.region = body.region;
         this.age = body.age;
         this.gender = body.gender;
-        this.categoryId = body.categoryId;
+        this.categoryId = (body.categoryId ?? null);
         this.answers = body.answers;
     }
 
@@ -48,7 +48,11 @@ export class CrewApplyRequestDto {
         return (
             Number.isInteger(this.userId) &&
             Array.isArray(this.activityList) &&
-            Array.isArray(this.styleList)
+            Array.isArray(this.styleList) &&
+            (this.categoryId === undefined ||
+                this.categoryId === null ||
+                Number.isInteger(this.categoryId)
+            )
         );
     }
 }

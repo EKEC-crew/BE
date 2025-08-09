@@ -23,12 +23,12 @@ const applyToCrew = async (dto) => {
     const step1Data = {
         userId,
         crewId,
-        activityList,
-        styleList,
-        region,
-        age,
-        gender,
-        categoryId,
+        activityList: Array.isArray(activityList) ? activityList : [], // 빈배열 보정
+        styleList: Array.isArray(styleList) ? styleList : [],         // 빈배열 보정
+        region: Number.isInteger(region) ? region : 0,                // 미선택=0
+        age: Number.isInteger(age) ? age : 0,                         // 미선택=0
+        gender: Number.isInteger(gender) ? gender : 0,                // 미선택=0
+        categoryId: (categoryId ?? null),                             // 미선택=null
     };
 
     const step2Data = answers.map((a) => ({

@@ -2,18 +2,18 @@ import { prisma } from "../../../../db.config.js";
 
 // Prisma의 create()메소드는 DB에 저장하는 메소드
 export const CrewPlanRepository = {
-    createPlan: async (crewId, data) => {
-        const { crewMemberId, day, ...rest } = data;
+    createPlan: async (crewId, data, crewMemberId) => {
+        const { day, ...rest } = data;
 
         return await prisma.crewPlan.create({
           data: {
             crewId: Number(crewId), //URL에서 받기
-            crewMemberId: Number(crewMemberId), // crewMember 관계 설정
+            crewMemberId: Number(crewMemberId), // 서비스에서 결정된 crewMemberId 사용
             day: new Date(day), //날짜 세팅
             ...rest, // 나머지 정보는 DTO에서 받기
             crewPlanRequest: {
               create: {
-                crewMemberId: crewMemberId,
+                crewMemberId: Number(crewMemberId),
                 status: 0
               },
             },
@@ -138,13 +138,17 @@ export const CrewPlanRepository = {
         })
       ]);
 
+      const totalPages = Math.ceil(totalCount / size);
+      
       return {
         plans,
         pagination: {
-          totalCount,
+          totalElements: totalCount,
           currentPage: page,
           pageSize: size,
-          totalPages: Math.ceil(totalCount / size)
+          totalPages: totalPages,
+          hasNext: page < totalPages,
+          hasPrevious: page > 1
         }
       };
     },
@@ -224,32 +228,47 @@ export const CrewPlanRepository = {
     
 }
 
+
+
 export const CrewPlanCommentRepository = {
   
   /**
    * 댓글 생성
    */
   createComment: async (crewId, planId, crewMemberId, content, isPublic = true) => {
-    return await prisma.crewPlanComment.create({
-      data: {
-        content,
-        crewPlanId: Number(planId),
-        crewMemberId: Number(crewMemberId),
-        isPublic: isPublic,
-      },
-      include: {
-        crewMember: {
-          include: {
-            user: {
-              select: {
-                nickname: true,
-                image: true,
+    // 트랜잭션으로 댓글 생성 + commentCount 증가
+    return await prisma.$transaction(async (tx) => {
+      // 댓글 생성
+      const comment = await tx.crewPlanComment.create({
+        data: {
+          content,
+          crewPlanId: Number(planId),
+          crewMemberId: Number(crewMemberId),
+          isPublic: isPublic,
+        },
+        include: {
+          crewMember: {
+            include: {
+              user: {
+                select: {
+                  nickname: true,
+                  image: true,
+                }
               }
             }
           }
         }
-      }
+      });
+
+      // commentCount 증가
+      await tx.crewPlan.update({
+        where: { id: Number(planId) },
+        data: { commentCount: { increment: 1 } }
+      });
+
+      return comment;
     })
+    
   },
 
 
@@ -333,13 +352,17 @@ export const CrewPlanCommentRepository = {
       })
     ]);
 
+    const totalPages = Math.ceil(totalCount / size);
+    
     return {
       comments,
       pagination: {
-        totalCount,
+        totalElements: totalCount,
         currentPage: page,
         pageSize: size,
-        totalPages: Math.ceil(totalCount / size)
+        totalPages: totalPages,
+        hasNext: page < totalPages,
+        hasPrevious: page > 1
       }
     };
   },
@@ -397,9 +420,159 @@ export const CrewPlanCommentRepository = {
 
     if (!comment) return null;
 
-    return await prisma.crewPlanComment.delete({
-      where: { id: Number(commentId) },
-    });
+    return await prisma.$transaction(async (tx) => {
+      //댓글 삭제
+      const deletedComment = await tx.crewPlanComment.delete({
+        where: { id: Number(commentId) },
+      });
+
+      // commentCount 감소
+      await tx.crewPlan.update({
+        where: { id: Number(planId) },
+        data: { commentCount: { decrement: 1 } }
+      });
+
+      return deletedComment;
+    })
   }
 }
 
+// 일정 좋아요 Repository
+export const CrewPlanLikeRepository = {
+  
+  /**
+   * 일정 좋아요 추가
+   */
+  createLike: async (planId, crewMemberId) => {
+    // 이미 좋아요가 있는지 확인
+    const existingLike = await prisma.crewPlanLike.findUnique({
+      where: {
+        planId_crewMemberId: {
+          planId: Number(planId),
+          crewMemberId: Number(crewMemberId)
+        }
+      }
+    });
+
+    if (existingLike) {
+      throw new Error("이미 좋아요를 누른 일정입니다.");
+    }
+
+    /**
+     * 왜 트랜잭션을 사용했나?
+     * 현재 코드에서 2가지 작업을 수행합니다:
+     * - CrewPlanLike 테이블에 좋아요 추가
+     * - CrewPlan 테이블의 likeCount 증가
+     * 
+     * tx : 트랜잭션 컨텍스트(특별한 prisma 객체)
+     * - 트랜잭션이 실행되는 동안의 작업환경
+     * - 이 tx로 하는 모든 작업들이 하나로 묶임
+     */
+    // 트랜잭션으로 좋아요 추가 + likeCount 증가
+    return await prisma.$transaction(async (tx) => {
+      // 좋아요 추가
+      const like = await tx.crewPlanLike.create({
+        data: {
+          planId: Number(planId),
+          crewMemberId: Number(crewMemberId),
+          isLiked: 1
+        }
+      });
+
+      // likeCount 증가
+      await tx.crewPlan.update({
+        where: { id: Number(planId) },
+        data: { likeCount: { increment: 1 } }
+      });
+
+      return like;
+    });
+  },
+
+  /**
+   * 일정 좋아요 취소
+   */
+  deleteLike: async (planId, crewMemberId) => {
+    // 좋아요가 있는지 확인
+    const existingLike = await prisma.crewPlanLike.findUnique({
+      where: {
+        planId_crewMemberId: {
+          planId: Number(planId),
+          crewMemberId: Number(crewMemberId)
+        }
+      }
+    });
+
+    if (!existingLike) {
+      throw new Error("좋아요를 누르지 않은 일정입니다.");
+    }
+
+    // 트랜잭션으로 좋아요 삭제 + likeCount 감소
+    return await prisma.$transaction(async (tx) => {
+      // 좋아요 삭제
+      await tx.crewPlanLike.delete({
+        where: {
+          planId_crewMemberId: {
+            planId: Number(planId),
+            crewMemberId: Number(crewMemberId)
+          }
+        }
+      });
+
+      // likeCount 감소 (0 미만으로 가지 않도록)
+      await tx.crewPlan.update({
+        where: { id: Number(planId) },
+        data: { likeCount: { decrement: 1 } }
+      });
+
+      return { message: "좋아요가 취소되었습니다." };
+    });
+  },
+
+
+}
+
+/**
+ * 크루 일정 신청하는 Repository
+ */
+export const CrewPlanRequestRepository = {
+
+  /**
+   * 일정 신청
+   */
+  createRequest: async (planId, crewMemberId) => {
+    //이미 신청했는지 확인
+    const existingRequest = await prisma.crewPlanRequest.findFirst({
+      where: {
+        crewPlanId: Number(planId),
+        crewMemberId: Number(crewMemberId)
+      }
+    });
+
+    if (existingRequest) {
+      throw new Error("이미 신청한 일정입니다.");
+    }
+
+    // 신청 생성 (status: 1 = 신청완료)
+    return await prisma.crewPlanRequest.create({
+      data: {
+        crewPlanId: Number(planId),
+        crewMemberId: Number(crewMemberId),
+        status: 1
+      },
+      include: {
+        crewMember: {
+          include: {
+            user: {
+              select: {
+                nickname: true,
+              }
+            }
+          }
+        }
+      }
+    });
+  },
+
+
+}

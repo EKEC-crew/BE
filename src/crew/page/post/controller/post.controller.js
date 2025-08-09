@@ -31,7 +31,7 @@ export const readPostsByCrew = async (req, res, next) => {
                 "posts": [
                       {
                         "postId": 9,
-                        "title": "게시글 제목입니다",h
+                        "title": "게시글 제목입니다",
                         "createdAt": "2025-08-04 18:33:37",
                         "nickname": "이병차은우",
                         "commentCount": 0,

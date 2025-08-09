@@ -29,6 +29,9 @@ export const createAlbumImage = async ({ userId, crewId, image }) => {
         if (!crewMember) {
             throw new baseError.NotCrewMemberError("크루 멤버에 속하지 않은 유저입니다.", { userId })
         }
+        if (crewMember.role === 0) {
+            throw new baseError.PermissionDeniedError("권한이 없는 유저입니다.", { userId });
+        }
         const crewMemberId = crewMember.id;
         const imageName = await s3Function.uploadToS3(image, 3);
         const imageInfo = await albumRepository.addImage({ crewId, crewMemberId, imageName });

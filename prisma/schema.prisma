@@ -28,6 +28,7 @@ model User {
   crewRecruitAppliedStep2 CrewRecruitAppliedStep2[]
   crewRegister            CrewRegister[]
   refreshToken            RefreshToken[]
+
   @@map("user")
 }
 
@@ -192,31 +193,32 @@ model CrewMember {
   crewPost          CrewPost[]
   crewPostComment   CrewPostComment[]
   crewPostLike      CrewPostLike[]
-  @@unique([userId, crewId])
 
+  @@unique([userId, crewId])
   @@index([crewId], map: "crew_member_crew_id_fkey")
   @@index([userId], map: "crew_member_user_id_fkey")
   @@map("crew_member")
 }
 
 model CrewPost {
-  id  Int @id @default(autoincrement())
-  title String @db.VarChar(50)
-  content String @db.Text
-  commentCount Int @map("comment_count") @default(0)
-  likeCount Int @map("like_count") @default(0)
-  isPopular Boolean @map("is_popular") @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-  modifiedAt DateTime? @updatedAt @map("modified_at")
-  crewId  Int @map("crew_id")
-  crewMemberId Int @map("crew_member_id")
+  id           Int       @id @default(autoincrement())
+  title        String    @db.VarChar(50)
+  content      String    @db.Text
+  commentCount Int       @default(0) @map("comment_count")
+  likeCount    Int       @default(0) @map("like_count")
+  isPopular    Boolean   @default(false) @map("is_popular")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  modifiedAt   DateTime? @updatedAt @map("modified_at")
+  crewId       Int       @map("crew_id")
+  crewMemberId Int       @map("crew_member_id")
 
-  crew Crew @relation(fields: [crewId], references: [id], onDelete: Cascade)
-  crewMember CrewMember @relation(fields: [crewMemberId], references: [id])
+  crew            Crew              @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  crewMember      CrewMember        @relation(fields: [crewMemberId], references: [id])
   crewPostComment CrewPostComment[]
   crewPostImage   CrewPostImage[]
   crewPostLike    CrewPostLike[]
   alarm           Alarm[]
+
   @@index([crewId], map: "crew_post_crew_id_fkey")
   @@index([crewMemberId], map: "crew_post_crew_member_id_fkey")
   @@map("crew_post")
@@ -384,20 +386,20 @@ model CrewRecruitForm {
 }
 
 model CrewRecruitAppliedStep1 {
-  id           Int          @id @default(autoincrement())
-  activityList Json         @map("activity_list")
-  styleList    Json         @map("style_list")
-  region       Int
-  age          Int
-  gender       Int
-  createdAt    DateTime     @default(now()) @map("created_at")
-  crewId       Int          @map("crew_id")
-  userId       Int          @map("user_id")
-  categoryId   Int          @map("category_id")
-  status       Int          @default(0)
-  crewCategory CrewCategory @relation(fields: [categoryId], references: [id])
-  crew         Crew         @relation(fields: [crewId], references: [id])
-  user         User         @relation(fields: [userId], references: [id])
+  id           Int           @id @default(autoincrement())
+  activityList Json          @map("activity_list")
+  styleList    Json          @map("style_list")
+  region       Int           @default(0) // 미선택 = 0
+  age          Int           @default(0) // 미선택 = 0
+  gender       Int           @default(0) // 미선택 = 0
+  createdAt    DateTime      @default(now()) @map("created_at")
+  crewId       Int           @map("crew_id")
+  userId       Int           @map("user_id")
+  categoryId   Int?          @map("category_id")
+  status       Int           @default(0)
+  crewCategory CrewCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  crew         Crew          @relation(fields: [crewId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
 
   @@index([categoryId], map: "crew_recruit_applied_step1_category_id_fkey")
   @@index([crewId], map: "crew_recruit_applied_step1_crew_id_fkey")
@@ -455,12 +457,13 @@ enum AlarmType {
   CREW_WARNED
   CREW_KICKED
 }
+
 model RefreshToken {
-  id  Int @id @default(autoincrement())
-  token String @db.Text
-  userId Int @map("user_id")
+  id         Int       @id @default(autoincrement())
+  token      String    @db.Text
+  userId     Int       @map("user_id")
   modifiedAt DateTime? @updatedAt @map("modified_at")
-  user User @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
 
   @@map("refresh_token")
 }

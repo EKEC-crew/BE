@@ -24,7 +24,36 @@ export const createAccount = async (data) => {
   });
   return user.id;
 };
-
+export const createOAuthAccount = async (data) => {
+  const isExistEmail = await prisma.user.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
+  if (isExistEmail) return -1;
+  const user = await prisma.user.create({
+    data: {
+      email: data.email,
+      password: null,
+    },
+  });
+  await prisma.oAuth.create({
+    data: {
+      userId: user.id,
+      platform: data.platform,
+      platformId: data.id,
+    },
+  });
+  return user.id;
+};
+/**
+ * **[Auth]**
+ * **\<📦 Repository\>**
+ * ***updateProfile***
+ * '프로필 수정' 기능의 레포지토리 레이어 입니다. 지정한 유저의 프로필 정보를 수정합니다.
+ * @param {object} data
+ * @returns {object}
+ */
 export const updateProfile = async (data) => {
   const user = await prisma.user.update({
     where: {
@@ -288,4 +317,34 @@ export const deleteUncompletedUsers = async () => {
       },
     },
   });
+};
+/**
+ * **[Auth]**
+ * **\<📦 Repository\>**
+ * ***findUserByPlatformId***
+ * 플랫폼 ID로 사용자를 찾습니다.
+ */
+export const findUserByPlatformId = async (data) => {
+  const user = await prisma.oAuth.findFirst({
+    select: {
+      user: {
+        select: {
+          name: true,
+          nickname: true,
+          email: true,
+          phone: true,
+          id: true,
+          password: true,
+          image: true,
+          isCompleted: true,
+        },
+      },
+    },
+    where: {
+      platformId: data.id,
+      platform: data.platform,
+    },
+  });
+  if (!user) return -1;
+  return user.user;
 };

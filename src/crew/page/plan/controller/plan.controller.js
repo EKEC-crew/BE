@@ -760,7 +760,7 @@ export const unlikePlan = async (req, res, next) => {
   }
 };
 
-// 일정 신청
+// 일정 신청 
 export const applyToPlan = async (req, res, next) => {
    /*
     #swagger.summary = "크루 일정 신청"

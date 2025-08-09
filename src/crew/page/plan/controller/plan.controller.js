@@ -1,5 +1,4 @@
 import * as planService from "../service/plan.service.js";
-import { InvalidInputValueError } from "../../../../error.js";
 
 export const createPlan = async (req, res, next) => {
   /*
@@ -17,12 +16,13 @@ export const createPlan = async (req, res, next) => {
         "application/json": {
           schema: {
             type: "object",
-            required: ["title", "content", "type"],
+            required: ["crewMemberId", "title", "content", "type"],
             properties: {
+              crewMemberId: { type: "integer", example: 3 },
               title: { type: "string", example: "저녁 모임" },
               content: { type: "string", example: "7시 강남역" },
               day: { type: "string", format: "date-time", example: "2025-07-20T19:00:00.000Z" },
-              type: { type: "integer", example: 0, description: "0: 정기모임(운영진/크루장만), 1: 번개모임(모든 멤버)" },
+              type: { type: "integer", example: 0 },
               isRequired: { type: "boolean", example: false },
               allowComments: { type: "boolean", example: true },
               allowPrivateComments: { type: "boolean", example: true },
@@ -35,7 +35,6 @@ export const createPlan = async (req, res, next) => {
         }
       }
     }
-    #swagger.security = [{"bearerAuth": []}]
     #swagger.responses[200] = {
       description: "일정 생성 성공",
       content: {
@@ -82,9 +81,7 @@ export const createPlan = async (req, res, next) => {
         throw new InvalidInputValueError("유효하지 않은 crewId입니다.");
       }
   
-      // JWT 토큰에서 사용자 ID 추출
-      const userId = req.payload.id;
-      const response = await planService.CrewPlanService.createPlan(crewId, req.body, userId);
+      const response = await planService.CrewPlanService.createPlan(crewId, req.body);
       return res.success(response);
     } catch (err) {
       next(err);
@@ -133,10 +130,8 @@ export const getPlanById = async (req, res, next) => {
  *               hasFee: { type: "boolean" },
  *               fee: { type: "integer" },
  *               feePurpose: { type: "string" },
- *               commentCount: { type: "integer", example: 5 },
- *               likeCount: { type: "integer", example: 12 },
- *               createdAt: { type: "string", format: "date-time", example: "2024-01-15 14:30:00" },
- *               updatedAt: { type: "string", format: "date-time", example: "2024-01-15 15:30:00", nullable: true }
+ *               createdAt: { type: "string", format: "date-time" },
+ *               updatedAt: { type: "string", format: "date-time" }
  *             }
  *           }
  *         }
@@ -237,22 +232,18 @@ export const getPlanList = async (req, res, next) => {
                       hasFee: { type: "boolean" },
                       fee: { type: "integer" },
                       feePurpose: { type: "string" },
-                      commentCount: { type: "integer", example: 5 },
-                      likeCount: { type: "integer", example: 12 },
-                      createdAt: { type: "string", format: "date-time", example: "2024-01-15 14:30:00" },
-                      updatedAt: { type: "string", format: "date-time", example: "2024-01-15 15:30:00", nullable: true }
+                      createdAt: { type: "string", format: "date-time" },
+                      updatedAt: { type: "string", format: "date-time" }
                     }
                   }
                 },
                 pagination: {
                   type: "object",
                   properties: {
-                    totalElements: { type: "number", example: 25 },
+                    totalCount: { type: "number", example: 25 },
                     currentPage: { type: "number", example: 1 },
                     pageSize: { type: "number", example: 10 },
-                    totalPages: { type: "number", example: 3 },
-                    hasNext: { type: "boolean", example: true },
-                    hasPrevious: { type: "boolean", example: false }
+                    totalPages: { type: "number", example: 3 }
                   }
                 }
               }
@@ -376,16 +367,15 @@ export const createPlanComment = async (req, res, next) => {
       "application/json": {
         schema: {
           type: "object",
-          required: ["content"],
+          required: ["crewMemberId", "content"],
           properties: {
-            content: { type: "string", example: "참석하겠습니다!" },
-            isPublic: { type: "boolean", example: true, description: "공개 댓글 여부 (기본값: true)" }
+            crewMemberId: { type: "integer", example: 3 },
+            content: { type: "string", example: "참석하겠습니다!" }
           }
         }
       }
     }
   }
-  #swagger.security = [{"bearerAuth": []}]
   #swagger.responses[200] = { 
     description: "댓글 생성 성공",
     content: {
@@ -417,15 +407,11 @@ export const createPlanComment = async (req, res, next) => {
   */
   try {
     const {crewId, planId} = req.params;
-    
-    // JWT 토큰에서 사용자 ID 추출
-    const userId = req.payload.id;
 
     const comment = await planService.CrewPlanCommentService.createComment(
       Number(crewId), 
       Number(planId), 
-      req.body,
-      userId
+      req.body
     );
 
     return res.success(comment);
@@ -512,8 +498,8 @@ export const getPlanCommentList = async (req, res, next) => {
  *                 content: { type: "string", example: "참석하겠습니다!" },
  *                 writer: { type: "string", example: "비쿠" },
  *                 writerImage: { type: "string", example: "https://example.com/image.jpg" },
- *                 createdAt: { type: "string", format: "date-time", example: "2024-01-15 14:30:00" },
- *                 updatedAt: { type: "string", format: "date-time", example: "2024-01-15 15:30:00", nullable: true }
+ *                 createdAt: { type: "string", format: "date-time" },
+ *                 updatedAt: { type: "string", format: "date-time" }
  *               }
  *             }
  *           }

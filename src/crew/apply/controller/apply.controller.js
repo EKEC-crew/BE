@@ -25,23 +25,44 @@ const applyToCrew = async (req, res, next) => {
               schema: {
                   type: "object",
                   properties: {
-                      userId: { type: "integer", example: 2 },
+                      userId: { type: "integer", example: 2, description: "지원자 사용자 ID" },
+
                       activityList: {
                           type: "array",
                           items: { type: "integer" },
-                          example: [1, 2]
+                          description: "선택 활동 ID 배열 (미선택 시 빈 배열 [])"
                       },
+
                       styleList: {
                           type: "array",
                           items: { type: "integer" },
-                          example: [1, 3]
+                          description: "선택 성향/스타일 ID 배열 (미선택 시 빈 배열 [])"
                       },
-                      region: { type: "integer", example: 1 },
-                      age: { type: "integer", example: 2 },
-                      gender: { type: "integer", example: 0 },
-                      categoryId: { type: "integer", example: 1 },
+
+                      region: {
+                          type: "integer",
+                          description: "0=미선택, 1=선택(제한 있음)"
+                      },
+
+                      age: {
+                          type: "integer",
+                          description: "0=미선택, 1=선택(제한 있음)"
+                      },
+
+                      gender: {
+                          type: "integer",
+                          description: "0=미선택(제한 없음), 1=선택(제한 있음)"
+                      },
+
+                      categoryId: {
+                          type: "integer",
+                          description: "선택값 (미선택 시 null 또는 필드 생략 가능)",
+                          nullable: true
+                      },
+
                       answers: {
                           type: "array",
+                          description: "Step2 답변 목록",
                           items: {
                               type: "object",
                               properties: {
@@ -49,27 +70,52 @@ const applyToCrew = async (req, res, next) => {
                                   checkedChoices: {
                                       type: "array",
                                       items: { type: "string" },
-                                      example: ["러닝"]
+                                      example: ["러닝"],
+                                      nullable: true
                                   },
                                   answer: {
                                       type: "string",
-                                      example: "함께 산에 오르고 싶어요!"
+                                      example: "함께 산에 오르고 싶어요!",
+                                      nullable: true
                                   }
                               }
-                          },
-                          example: [
-                              {
-                                  recruitFormId: 1,
-                                  checkedChoices: ["러닝"]
-                              },
-                              {
-                                  recruitFormId: 2,
-                                  checkedChoices: ["지인 추천", "SNS"]
-                              },
-                              {
-                                  recruitFormId: 3,
-                                  answer: "함께 산에 오르고 싶어요!"
-                              }
+                          }
+                      }
+                  },
+                  required: ["userId", "activityList", "styleList", "region", "age", "gender", "answers"]
+              },
+              examples: {
+                  "✅ 모든 값 선택 시나리오": {
+                      summary: "필수 선택 완료",
+                      value: {
+                          userId: 2,
+                          activityList: [1, 2],
+                          styleList: [1, 3],
+                          region: 1,
+                          age: 1,
+                          gender: 1,
+                          categoryId: 1,
+                          answers: [
+                              { recruitFormId: 1, checkedChoices: ["러닝"] },
+                              { recruitFormId: 2, checkedChoices: ["지인 추천", "SNS"] },
+                              { recruitFormId: 3, answer: "함께 산에 오르고 싶어요!" }
+                          ]
+                      }
+                  },
+                  "⬜ 미선택 기본값 시나리오": {
+                      summary: "모든 선택 미선택",
+                      value: {
+                          userId: 2,
+                          activityList: [],
+                          styleList: [],
+                          region: 0,
+                          age: 0,
+                          gender: 0,
+                          categoryId: null,
+                          answers: [
+                              { recruitFormId: 1, checkedChoices: ["러닝"] },
+                              { recruitFormId: 2, checkedChoices: ["지인 추천", "SNS"] },
+                              { recruitFormId: 3, answer: "함께 산에 오르고 싶어요!" }
                           ]
                       }
                   }

@@ -27,7 +27,7 @@ export const readMembersByCrew = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:  
+                type: "object", example:  
                 {
                   "members": [
                     {
@@ -114,7 +114,7 @@ export const changeRoleCrewMember = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example: 
+                type: "object", example: 
                 {
                   "memberId": 1,
                   "nickname": "유저닉",
@@ -177,7 +177,7 @@ export const kickCrewMember = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example: 
+                type: "object", example: 
                 {
                   "success" : true
                 }
@@ -249,7 +249,7 @@ export const addCrewMember = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example: 
+                type: "object", example: 
                 {
                   "userId": 1,
                   "crewId": 2,

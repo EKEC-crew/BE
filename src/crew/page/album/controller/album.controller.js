@@ -23,14 +23,25 @@ export const readAlbumImages = async (req, res, next) => {
                 resultType: { type: "string", example: "SUCCESS" },
                 error: { type: "object", nullable: true, example: null },
                 data: {
-                    type: "array", items:
-                   {
-                    type:"object",
-                    properties:{
-                        albumId: { type: "number", example: 1 },
-                        imageName: { type: "string", example: "c4ea80a6-e9e2-478e-92ff-0ca31579bb21.png" }
-                    }
-                   }
+                    type: "object", example:  
+                    [
+                        {
+                            "albumId": 1,
+                            "imageName": "c4ea80a6-e9e2-478e-92ff-0ca31579bb21.png"
+                        },
+                        {
+                            "albumId": 2,
+                            "imageName": "c4ea80a6-e9e2-478e-92ff-0ca31579bb21.png"
+                        },
+                        {
+                            "albumId": 3,
+                            "imageName": "c4ea80a6-e9e2-478e-92ff-0ca31579bb21.png"
+                        },
+                        {
+                            "albumId": 4,
+                            "imageName": "c4ea80a6-e9e2-478e-92ff-0ca31579bb21.png"
+                        }
+                    ]
                 }
             }
             }
@@ -110,7 +121,7 @@ export const createAlbumImage = async (req, res, next) => {
                         resultType: { type: "string", example: "SUCCESS" },
                         error: { type: "object", nullable: true, example: null },
                         data: {
-                        type: "string", example: {
+                        type: "object", example: {
                             "albumId": 35,
                             "imageName": "c4ea80a6-e9e2-478e-92ff-0ca31579bb21.png"
                   }

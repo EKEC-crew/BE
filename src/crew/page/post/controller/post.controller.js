@@ -29,7 +29,7 @@ export const readPostsByCrew = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:{
+                type: "object", example:{
                 "posts": [
                       {
                         "postId": 9,
@@ -83,7 +83,7 @@ export const readPostsByCrew = async (req, res, next) => {
                       }
                     ],
                     "totalElements": 13,
-                    "totalPages": 1,
+                    "totalPages": 2,
                     "hasNext": true,
                     "pageNum": 1,
                     "pageSize": 10
@@ -261,7 +261,7 @@ export const readCrewPost = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:
+                type: "object", example:
                 {
                   "postId": 19,
                   "title": "조회한 게시글 제목",
@@ -364,13 +364,13 @@ export const updateCrewPost = async (req, res, next) => {
               },
               existingImageIds:{
                 type: "array",
-                items: { type: "number"},
+                items: { type: "integer"},
                 example: [1, 3]
               },
               title: { type: "string", example: "게시글 제목입니다" },
               content: { type: "string", example: "게시글 내용입니다" }
             },
-            required: ["title", "content" ]
+            required: ["title", "content"]
           }
         }
       }
@@ -385,7 +385,7 @@ export const updateCrewPost = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:
+                type: "object", example:
                 {
                   "postId": 19,
                   "title": "수정된 게시글 제목",
@@ -464,7 +464,7 @@ export const deleteCrewPost = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:
+                type: "object", example:
                 {
                   success: true
                 }
@@ -525,11 +525,11 @@ export const toggleCrewPostLike = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:
+                type: "object", example:
                 {
                   "postId": 2,
                   "isLiked": true,
-                  "likeCount": 3,
+                  "likeCount": 3
                 }
               }
             }
@@ -592,7 +592,7 @@ export const readCommentsByCrewPost = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:{
+                type: "object", example:{
                   "comments": [
                     {
                       "commentId": 1,
@@ -677,7 +677,7 @@ export const createCrewPostComment = async (req, res, next) => {
             type: "object",
             properties: {
               content: { type: "string", example: "댓글 작성 테스트 내용입니다." },
-              isPublic: { type: "number", example: "0" }
+              isPublic: { type: "integer", example: 0 }
             },
             required: ["content", "isPublic"]
           }
@@ -685,7 +685,7 @@ export const createCrewPostComment = async (req, res, next) => {
       }
     }
     #swagger.responses[200] = {
-      description: "게시글 작성 성공 응답",
+      description: "댓글 작성 성공 응답",
       content: {
         "application/json": {
           schema: {
@@ -694,14 +694,13 @@ export const createCrewPostComment = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:
+                type: "object", example:
                 {
                   "commentId": 4,
                   "content": "댓글 작성 테스트 내용입니다.",
                   "nickname": "홍길동",
                   "createdAt": "2025-07-18T02:04:54.410Z",
-                  "nickname": "길동이",
-                  "image": "profile.jpg",
+                  "image": "profile.jpg"
                 }
               }
             }
@@ -710,7 +709,7 @@ export const createCrewPostComment = async (req, res, next) => {
       }
     };
     #swagger.responses[400] = {
-      description: "게시글 리스트 조회 실패 응답",
+      description: "댓글 작성 실패 응답",
       content: {
         "application/json": {
           schema: {
@@ -764,7 +763,7 @@ export const updateCrewPostComment = async (req, res, next) => {
             type: "object",
             properties: {
               content: { type: "string", example: "댓글 수정 테스트 내용입니다." },
-              isPublic: { type: "number", example: "0" }
+              isPublic: { type: "integer", example: 0 }
             },
             required: ["content", "isPublic"]
           }
@@ -772,7 +771,7 @@ export const updateCrewPostComment = async (req, res, next) => {
       }
     }
     #swagger.responses[200] = {
-      description: "게시글 작성 성공 응답",
+      description: "특정 댓글 수정 성공 응답",
       content: {
         "application/json": {
           schema: {
@@ -781,14 +780,13 @@ export const updateCrewPostComment = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:
+                type: "object", example:
                 {
                   "commentId": 3,
                   "content": "댓글 수정 테스트 내용입니다.",
                   "nickname": "홍길동",
                   "createdAt": "2025-07-18 02:04:54.410",
-                  "nickname": "길동이",
-                  "image": "profile.jpg",
+                  "image": "profile.jpg"
                 }
               }
             }
@@ -797,7 +795,7 @@ export const updateCrewPostComment = async (req, res, next) => {
       }
     };
     #swagger.responses[400] = {
-      description: "게시글 리스트 조회 실패 응답",
+      description: "특정 댓글 수정 실패 응답",
       content: {
         "application/json": {
           schema: {
@@ -846,7 +844,7 @@ export const deleteCrewPostComment = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example:
+                type: "object", example:
                 {
                   "success" : true
                 }
@@ -857,7 +855,7 @@ export const deleteCrewPostComment = async (req, res, next) => {
       }
     };
     #swagger.responses[400] = {
-      description: "특정 크루 특정 게시글 수정 실패 응답",
+      description: "특정 댓글 삭제 실패 응답",
       content: {
         "application/json": {
           schema: {

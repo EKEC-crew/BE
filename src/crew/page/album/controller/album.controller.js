@@ -22,7 +22,7 @@ export const readAlbumImages = async (req, res, next) => {
                 resultType: { type: "string", example: "SUCCESS" },
                 error: { type: "object", nullable: true, example: null },
                 data: {
-                    type: "string", example:  
+                    type: "object", example:  
                     [
                         {
                             "albumId": 1,
@@ -115,7 +115,7 @@ export const createAlbumImage = async (req, res, next) => {
                         resultType: { type: "string", example: "SUCCESS" },
                         error: { type: "object", nullable: true, example: null },
                         data: {
-                        type: "string", example: {
+                        type: "object", example: {
                             "albumId": 35,
                             "imageName": "c4ea80a6-e9e2-478e-92ff-0ca31579bb21.png"
                   }

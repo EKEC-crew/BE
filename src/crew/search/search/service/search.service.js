@@ -1,8 +1,10 @@
 import {
   responseFromAdvancedSearch,
   responseFromDefaultSearch,
+  responseFromGetByCategory,
 } from "../dto/response/search.response.dto.js";
 import {
+  findCrewsByCategory,
   findCrewsByName,
   findCrewsByOptions,
 } from "../repository/search.repository.js";
@@ -118,4 +120,37 @@ export const crewAdvancedSearch = async (data) => {
   const crewCounts = crews.crewCounts ? crews.crewCounts : 0;
   // DTO 형식에 맞추어 컨트롤러로 반환
   return responseFromAdvancedSearch({ filteredItems, crewCounts });
+};
+/**
+ * **[Crew Search]**
+ * **\<Service\>**
+ * ***crewSearchByCategory***
+ * '크루 카테고리로 조회' 기능의 서비스 레이어 입니다. 레포지토리로 부터 카테고리로 조회 결과를 가져오는 역할을 합니다.
+ * @param {object} data
+ * @returns
+ */
+export const crewSearchByCategory = async (data) => {
+  // 입력된 정렬 기준에 맞추어 data 값 수정
+  if (data.sort != undefined) {
+    switch (data.sort) {
+      case 1: // 최신 순 정렬
+        data.sort = { createdAt: "desc" };
+        break;
+      case 2: // 인기 순 정렬
+        data.sort = { postCount: "desc" };
+        break;
+      case 3: // 맴버 수 정렬 (오름차 순)
+        data.sort = { crewCapacity: "asc" };
+        break;
+      case 4: // 맴버 수 정렬 (내림차 순)
+        data.sort = { crewCapacity: "desc" };
+        break;
+    }
+  }
+  // 최대 인원이 입력되지 않았을때 모든 크루가 검색되도록 필터 적용
+  if (data.capacity == null) data.capacity = { gt: 0 };
+  const crews = await findCrewsByCategory(data);
+  const filteredItems = crews.crews ? formatCrewList(crews.crews) : [];
+  const crewCounts = crews.crewCounts ? crews.crewCounts : 0;
+  return responseFromGetByCategory({ filteredItems, crewCounts });
 };

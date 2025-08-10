@@ -1,7 +1,7 @@
 import { prisma } from "../../../../db.config.js";
 /**
  * **[Crew Search]**
- * **\<Repository\>**
+ * **\<📦 Repository\>**
  * ***findCrewsByName***
  * '크루명으로 검색' 기능의 레포지토리 레이어 입니다. DB로부터 검색결과를 가져와 서비스 레이어로 반환합니다.
  * @param {object} data
@@ -90,7 +90,7 @@ export const findCrewsByName = async (data) => {
 
 /**
  * **[Crew Search]**
- * **\<Repository\>**
+ * **\<📦 Repository\>**
  * ***findCrewsByOptions***
  * '크루 찾아보기 (고급 검색)' 기능의 레포지토리 레이어 입니다. DB로부터 검색결과를 가져와 서비스 레이어로 반환합니다.
  * @param {object} data
@@ -255,5 +255,87 @@ export const findCrewsByOptions = async (data) => {
     finallyFilteredResult,
   };
   // 최종 DB 쿼리 결과 반환
+  return result;
+};
+/**
+ * **[Crew Search]**
+ * **\<📦 Repository\>**
+ * ***findCrewsByCategory***
+ * '크루 카테고리로 조회' 기능의 레포지토리 레이어 입니다. 카테고리로 크루를 조회합니다.
+ * @param {object} data
+ * @returns
+ */
+export const findCrewsByCategory = async (data) => {
+  const crews = await prisma.crew.findMany({
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      introduction: true,
+      crewCapacity: true,
+      createdAt: true,
+      noticeCount: true,
+      postCount: true,
+      bannerImage: true,
+      ageLimit: true,
+      genderLimit: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
+      crewCategory: {
+        select: {
+          content: true,
+        },
+      },
+      region: {
+        select: {
+          sido: true,
+          goo: true,
+        },
+      },
+      crewActivity: {
+        select: {
+          activity: {
+            select: {
+              content: true,
+            },
+          },
+        },
+      },
+      crewStyle: {
+        select: {
+          style: {
+            select: {
+              content: true,
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          crewUser: true,
+        },
+      },
+    },
+    where: {
+      categoryId: data.category,
+      crewCapacity: data.capacity,
+    },
+    orderBy: data.sort, // 지정받은 크루 정렬 방식
+    skip: 10 * (data.page - 1), // 페이지네이션 구문
+    take: 10,
+  });
+  const crewCounts = await prisma.crew.count({
+    where: {
+      categoryId: data.category,
+      crewCapacity: data.capacity,
+    },
+  });
+  const result = {
+    crewCounts,
+    crews,
+  };
   return result;
 };

@@ -23,10 +23,10 @@ export const getMemberRole = async (req, res, next) => {
                 resultType: { type: "string", example: "SUCCESS" },
                 error: { type: "object", nullable: true, example: null },
                 data: {
-                    type: "string", example: 
+                    type: "object", example: 
                     {
                         "memberId": 3,
-                        "role": 0,
+                        "role": 0
                     }
                 }
                 }

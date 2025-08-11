@@ -37,3 +37,19 @@ export const bodyToAdvancedSearch = (query) => {
     sort: parseInt(query.sort),
   };
 };
+/**
+ * **[Crew Search]**
+ * **\<Request DTO>\>**
+ * ***bodyToGetByCategory***
+ * '크루 카테고리로 조회'기능의 요청 값을 서비스 레이어로 옮기기 위한 DTO
+ * @param {Object} query
+ * @returns}
+ */
+export const bodyToGetByCategory = (query) => {
+  return {
+    category: parseInt(query.category),
+    page: parseInt(query.page),
+    capacity: parseInt(query.capacity) || null,
+    sort: parseInt(query.sort),
+  };
+};

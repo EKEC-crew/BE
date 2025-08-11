@@ -20,7 +20,7 @@ export const readCrewInfo = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example: 
+                type: "object", example: 
                 {
                   "crewId": 2,
                   "title": "사이클링히트",
@@ -32,7 +32,7 @@ export const readCrewInfo = async (req, res, next) => {
                   "nickname": "일병차은우",
                   "profileImage": "profile.png",
                   "category": "스포츠관람",
-                  "introduction": "여러분 환영해요! 잠실구장에서 야구를 함께 즐기고 싶은 분...(긴 부분 크루 소개)",
+                  "introduction": "여러분 환영해요! 잠실구장에서 야구를 함께 즐기고 싶은 분...(긴 부분 크루 소개)"
                 }
               }
             }
@@ -100,7 +100,7 @@ export const updateCrewIntroduce = async (req, res, next) => {
               resultType: { type: "string", example: "SUCCESS" },
               error: { type: "object", nullable: true, example: null },
               data: {
-                type: "string", example: 
+                type: "object", example: 
                 {
                   "crewId": 3,
                   "introduction": "안녕하세요 환영합니다! 잠실구장에서 야구를 함께.."

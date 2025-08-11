@@ -26,25 +26,25 @@ export const handleDefaultSearch = async (req, res, next) => {
             description: "크루 검색어",
             required:true,
             example:"모임"
-        },
+        };
         #swagger.parameters['capacity'] = {
             in: 'query',
             description: "크루 최대 인원수",
             required:false,
             example:"10"
-        },
+        };
         #swagger.parameters['page'] = {
             in: 'query',
             description: "페이지 번호",
             required:true,
             example:"1"
-        }
+        };
         #swagger.parameters['sort'] = {
             in: 'query',
             description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
             required:true,
             example:"1"
-        },
+        };
         #swagger.responses[200] = {
             description: "크루 이름으로 검색 성공 응답",
             content: {
@@ -52,7 +52,7 @@ export const handleDefaultSearch = async (req, res, next) => {
                     schema: {
                         type: "object",
                         properties :{
-                            resultTupe: { type: "string", example: "SUCCESS" },
+                            resultType: { type: "string", example: "SUCCESS" },
                             error: { type: "object", nullable: true, example: null},
                             success: {
                                 type: "object",
@@ -241,61 +241,61 @@ export const handleAdvancedSearch = async (req, res, next) => {
         description: "크루 검색어",
         required:false,
         example:"모임"
-    }
+    };
     #swagger.parameters['category'] = {
         in: 'query',
         description: "크루 카테고리",
         required:false,
         example:"1"
-    }
+    };
     #swagger.parameters['activity'] = {
         in: 'query',
         description: "크루 액티비티",
         required:false,
         example:"1,2,3"
-    }
+    };
     #swagger.parameters['style'] = {
         in: 'query',
         description: "크루 스타일",
         required:false,
         example:"1,2"
-    }
+    };
     #swagger.parameters['region'] = {
         in: 'query',
         description: "크루 지역",
         required:false,
         example:"1"
-    }
+    };
     #swagger.parameters['age'] = {
         in: 'query',
         description: "크루 연령대 제한",
         required:false,
         example:"1"
-    }
+    };
     #swagger.parameters['gender'] = {
         in: 'query',
         description: "크루 성별 제한",
         required:false,
         example:"1"
-    }
+    };
     #swagger.parameters['page'] = {
         in: 'query',
         description: "페이지 번호",
         required:true,
         example:"1"
-    },
+    };
     #swagger.parameters['capacity'] = {
         in: 'query',
         description: "크루 최대 인원수",
         required:false,
         example:"10"
-    },
+    };
     #swagger.parameters['sort'] = {
         in: 'query',
         description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
         required:true,
         example:"1"
-    },
+    };
     #swagger.responses[200] = {
         description: "크루 찾아보기 성공 응답",
         content: {
@@ -686,25 +686,25 @@ export const handleGetByCategory = async (req, res) => {
         description: "크루 카테고리",
         required:true,
         example:"1"
-    },
+    };
     #swagger.parameters['capacity'] = {
         in: 'query',
         description: "크루 최대 인원수",
         required:false,
         example:"10"
-    },
+    };
     #swagger.parameters['page'] = {
         in: 'query',
         description: "페이지 번호",
         required:true,
         example:"1"
-    }
+    };
     #swagger.parameters['sort'] = {
         in: 'query',
         description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
         required:true,
         example:"1"
-    },
+    };
     #swagger.responses[200] = {
         description: "크루 찾아보기 성공 응답",
         content: {

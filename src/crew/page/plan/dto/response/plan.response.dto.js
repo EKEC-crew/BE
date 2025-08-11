@@ -5,6 +5,7 @@ export class CreateCrewPlanResponse {
     constructor(plan) {
       this.id = plan.id;
       this.crew_name = plan.crew.title;
+      this.userId = plan.crewMember.user.id;
       this.writer = plan.crewMember.user.nickname;
       this.title = plan.title;
       this.content = plan.content;
@@ -30,6 +31,7 @@ export class CreateCrewPlanResponse {
     constructor(plan) {
       this.id = plan.id;
       this.crew_name = plan.crew.title;
+      this.userId = plan.crewMember.user.id;
       this.writer = plan.crewMember.user.nickname;
       this.title = plan.title;
       this.content = plan.content;
@@ -75,6 +77,7 @@ export class CreateCrewPlanResponse {
       constructor(comment) {
         this.id = comment.id;
         this.content = comment.content;
+        this.userId = comment.crewMember.user.id;
         this.writer = comment.crewMember.user.nickname;
         this.writerImage = comment.crewMember.user.image;
         this.isPublic = comment.isPublic;
@@ -99,5 +102,16 @@ export class CreateCrewPlanResponse {
         hasNext: pagination.hasNext,
         hasPrevious: pagination.hasPrevious
       };
+    }
+  }
+
+  // 일정 신청 응답 DTO
+  export class CrewPlanRequestResponse {
+    constructor(request) {
+      this.message = "일정 신청이 완료되었습니다.";
+      this.planId = request.crewPlanId;
+      this.status = request.status;
+      this.applicant = request.crewMember.user.nickname;
+      this.userId = request.crewMember.user.id;
     }
   }

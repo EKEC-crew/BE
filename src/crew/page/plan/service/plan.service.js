@@ -370,12 +370,7 @@ export const CrewPlanRequestService = {
                 crewMember.id
             );
 
-            return {
-                message: "일정 신청이 완료되었습니다.",
-                planId: Number(planId),
-                status: 1,
-                applicant: request.crewMember.user.nickname
-            };
+            return new planResponse.CrewPlanRequestResponse(request);
         } catch (error) {
             if (error.message === "이미 신청한 일정입니다.") {
                 throw new InvalidInputValueError("이미 신청한 일정입니다.", { crewId, planId, userId });

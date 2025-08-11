@@ -28,7 +28,8 @@ export const CrewPlanRepository = {
                 include: {
                     user: {
                         select: {
-                            nickname: true
+                            nickname: true,
+                            id: true
                         }
                     }
                 }
@@ -67,6 +68,7 @@ export const CrewPlanRepository = {
               user: {
                 select: {
                   nickname: true,
+                  id: true
                 },
               },
             },
@@ -117,6 +119,7 @@ export const CrewPlanRepository = {
                 user: {
                   select: {
                     nickname: true,
+                    id: true
                   }
                 }
               }
@@ -169,7 +172,7 @@ export const CrewPlanRepository = {
           crew: { select: { title: true } },
           crewMember: {
             include: {
-              user: { select: { nickname: true } },
+              user: { select: { nickname: true, id: true } },
             },
           },
           crewPlanRequest: {
@@ -253,6 +256,7 @@ export const CrewPlanCommentRepository = {
                 select: {
                   nickname: true,
                   image: true,
+                  id: true
                 }
               }
             }
@@ -291,6 +295,7 @@ export const CrewPlanCommentRepository = {
               select: {
                 nickname: true,
                 image: true,
+                id: true
               }
             }
           }
@@ -344,6 +349,7 @@ export const CrewPlanCommentRepository = {
                   id: true,
                   nickname: true,
                   image: true,
+                  id: true
                 }
               }
             }
@@ -395,6 +401,7 @@ export const CrewPlanCommentRepository = {
               select: {
                 nickname: true,
                 image: true,
+                id: true
               }
             }
           }
@@ -566,6 +573,7 @@ export const CrewPlanRequestRepository = {
             user: {
               select: {
                 nickname: true,
+                id: true
               }
             }
           }

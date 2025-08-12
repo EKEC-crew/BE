@@ -1,27 +1,42 @@
-import { toZonedTime, format } from 'date-fns-tz';
+import { formatInTimeZone } from "date-fns-tz";
 
-export const CrewPostListResponse = (body) => {
-	const response = body.map(post => ({
+export const CrewPostListResponse = ({ posts, totalElements, totalPages, hasNext, pageNum, pageSize }) => {
+	const items = posts.map(post => ({
 		postId: post.id,
 		title: post.title,
-		createdAt: format(toZonedTime(post.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+		createdAt: formatInTimeZone(post.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 		nickname: post.crewMember.user.nickname,
 		commentCount: post.commentCount,
-	}))
-
+		likeCount: post.likeCount,
+		imageCount: post._count.crewPostImage,
+		isPopular: post.isPopular,
+	}));
+	const response = {
+		posts: items,
+		totalElements: totalElements,
+		totalPages: totalPages,
+		hasNext: hasNext,
+		pageNum: pageNum,
+		pageSize: pageSize,
+	}
 	return response;
 }
 
-export const CrewPostResponse = (body) => {
-	const post = body;
-
+export const CrewPostResponse = ({ post, imagesInfo }) => {
 	const response = {
 		postId: post.id,
 		title: post.title,
 		content: post.content,
-		createdAt: format(toZonedTime(post.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+		createdAt: formatInTimeZone(post.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 		nickname: post.crewMember?.user?.nickname,
+		profileImage: post.crewMember?.user?.image,
 		commentCount: post.commentCount,
+		likeCount: post.likeCount,
+		isPopular: post.isPopular,
+		images: imagesInfo.map(image => ({
+			imageId: image.id,
+			imageName: image.imageName,
+		})),
 	}
 
 	return response;
@@ -39,13 +54,22 @@ export const likeCrewPostResponse = (body) => {
 	return response;
 }
 
-export const CrewCommentListResponse = (body) => {
-	const response = body.map(comment => ({
+export const CrewCommentListResponse = ({ comments, totalElements, totalPages, hasNext, pageNum, pageSize }) => {
+	const items = comments.map(comment => ({
 		commentId: comment.id,
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
-		createdAt: format(toZonedTime(comment.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+		image: comment.crewMember.user.image,
+		createdAt: formatInTimeZone(comment.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 	}))
+	const response = {
+		comments: items,
+		totalElements: totalElements,
+		totalPages: totalPages,
+		hasNext: hasNext,
+		pageNum: pageNum,
+		pageSize: pageSize,
+	}
 
 	return response;
 }
@@ -57,7 +81,8 @@ export const CrewCommentResponse = (body) => {
 		commentId: comment.id,
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
-		createdAt: format(toZonedTime(comment.createdAt, 'Asia/Seoul'), 'yyyy-MM-dd HH:mm:ss', { timeZone: 'Asia/Seoul' }),
+		image: comment.crewMember.user.image,
+		createdAt: formatInTimeZone(comment.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 	}
 
 	return response;

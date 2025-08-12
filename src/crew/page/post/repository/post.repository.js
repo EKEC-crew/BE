@@ -1,14 +1,48 @@
 import { prisma } from "../../../../db.config.js";
 
-export const getPostsByCrewId = async ({ crewId }) => {
+export const getPostsByCrewId = async ({ crewId, page, size }) => {
 	try {
+		const popularPosts = await prisma.$queryRaw`
+			SELECT *
+			FROM crew_post
+			WHERE crew_id = ${crewId}
+				AND (like_count + comment_count) > 0
+				AND created_at >= NOW() - INTERVAL 14 DAY
+			ORDER BY (like_count + comment_count) DESC
+			LIMIT 6
+		`;
+		const popularIds = popularPosts.map(post => post.id);
+
+		await Promise.all(
+			popularPosts.map(post =>
+				prisma.crewPost.update({
+					where: { id: post.id },
+					data: { isPopular: true }
+				})
+			)
+		);
+
+		await prisma.crewPost.updateMany({
+			where: {
+				crewId,
+				id: { notIn: popularIds },
+				isPopular: true
+			},
+			data: {
+				isPopular: false
+			}
+		});
+
 		const postList = await prisma.crewPost.findMany({
 			where: {
 				crewId,
 			},
-			orderBy: {
-				createdAt: 'desc',
-			},
+			orderBy: [
+				{ isPopular: 'desc' },
+				{ createdAt: 'desc' },
+			],
+			skip: (page - 1) * size,
+			take: size + 1,
 			include: {
 				crewMember: {
 					include: {
@@ -18,10 +52,24 @@ export const getPostsByCrewId = async ({ crewId }) => {
 							}
 						}
 					}
+				},
+				_count: {
+					select: {
+						crewPostImage: true,
+					}
 				}
 			}
 		});
-		return postList;
+		const totalElements = await prisma.crewPost.count({
+			where: { crewId: crewId },
+		})
+		const totalPages = Math.ceil(totalElements / size);
+
+		const hasNext = postList.length > size;
+		const posts = postList.slice(0, size);
+		const pageNum = page;
+		const pageSize = posts.length;
+		return { posts, totalElements, totalPages, hasNext, pageNum, pageSize };
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
@@ -36,11 +84,30 @@ export const createCrewPost = async ({ crewMemberId, crewId, title, content }) =
 				title,
 				content,
 				commentCount: 0,
-				createdAt: new Date(),
 				crewId,
 				crewMemberId: crewMemberId,
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true,
+								image: true,
+							}
+						}
+					}
+				}
 			}
 		})
+		await prisma.crew.update({
+			where: { id: crewId },
+			data: {
+				postCount: {
+					increment: 1,
+				}
+			}
+		});
 		return post;
 	} catch (err) {
 		throw new Error(
@@ -60,7 +127,8 @@ export const getPostByPostId = async ({ postId }) => {
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
@@ -84,6 +152,18 @@ export const updatePostBypostId = async ({ postId, title, content }) => {
 			data: {
 				title: title,
 				content: content,
+			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true,
+								image: true,
+							}
+						}
+					}
+				}
 			}
 		})
 		return updatedPost;
@@ -100,8 +180,102 @@ export const removeCrewPostBypostId = async ({ postId }) => {
 			where: {
 				id: postId,
 			},
+			include: {
+				crewMember: {
+					include: {
+						user: {
+							select: {
+								nickname: true,
+								image: true,
+							}
+						}
+					}
+				}
+			}
 		})
+		const crewId = deletedPost.crewId;
+		await prisma.crew.update({
+			where: { id: crewId },
+			data: {
+				postCount: {
+					decrement: 1,
+				}
+			}
+		});
 		return deletedPost;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const addImage = async ({ postId, imageName }) => {
+	try {
+		const image = await prisma.crewPostImage.create({
+			data: {
+				imageName: imageName,
+				postId: postId,
+			}
+		})
+		return image;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const getImages = async ({ postId }) => {
+	try {
+		const images = await prisma.crewPostImage.findMany({
+			where: { postId: postId }
+		})
+		return images;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const deleteUpdatedImages = async ({ postId, existingImageIds }) => {
+	try {
+		const deletedImages = await prisma.crewPostImage.findMany({
+			where: {
+				postId: postId,
+				id: {
+					notIn: existingImageIds.length > 0 ? existingImageIds : [0],
+				}
+			}
+		})
+		await prisma.crewPostImage.deleteMany({
+			where: {
+				postId: postId,
+				id: {
+					notIn: existingImageIds.length > 0 ? existingImageIds : [0],
+				},
+			},
+		});
+		return deletedImages;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const deleteImages = async ({ postId }) => {
+	try {
+		const deletedImages = await prisma.crewPostImage.findMany({
+			where: { postId: postId },
+		})
+		await prisma.crewPostImage.deleteMany({
+			where: {
+				postId: postId,
+			}
+		});
+		return deletedImages;
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
@@ -188,7 +362,7 @@ export const likeCrewPost = async ({ crewMemberId, postId }) => {
 
 //크루 게시글 댓글 관련
 
-export const getCommentsByPostId = async ({ postId }) => {
+export const getCommentsByPostId = async ({ postId, page, size }) => {
 	try {
 		const commentList = await prisma.crewPostComment.findMany({
 			where: {
@@ -197,19 +371,30 @@ export const getCommentsByPostId = async ({ postId }) => {
 			orderBy: {
 				createdAt: 'asc',
 			},
+			skip: (page - 1) * size,
+			take: size + 1,
 			include: {
 				crewMember: {
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
 				}
 			}
-		})
-		return commentList;
+		});
+		const totalElements = await prisma.crewPostComment.count({
+			where: { postId: postId }
+		});
+		const totalPages = Math.ceil(totalElements / size);
+		const hasNext = commentList > size;
+		const comments = commentList.slice(0, size);
+		const pageNum = page;
+		const pageSize = comments.length;
+		return { comments, totalElements, totalPages, hasNext, pageNum, pageSize };
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
@@ -230,13 +415,15 @@ export const addCrewPostComment = async ({ crewMemberId, postId, content, isPubl
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
 				}
 			}
 		})
+		await prisma.crewPost.update({ where: { id: postId }, data: { commentCount: { increment: 1 } } });
 		return comment;
 	} catch (err) {
 		throw new Error(
@@ -260,7 +447,8 @@ export const updateCommentByCommentId = async ({ commentId, content, isPublic })
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
@@ -276,7 +464,7 @@ export const updateCommentByCommentId = async ({ commentId, content, isPublic })
 	}
 }
 
-export const removeCrewPostCommentByCommentId = async ({ commentId }) => {
+export const removeCrewPostCommentByCommentId = async ({ commentId, postId }) => {
 	try {
 		const comment = await prisma.crewPostComment.delete({
 			where: {
@@ -287,14 +475,15 @@ export const removeCrewPostCommentByCommentId = async ({ commentId }) => {
 					include: {
 						user: {
 							select: {
-								nickname: true
+								nickname: true,
+								image: true,
 							}
 						}
 					}
 				}
 			}
 		})
-
+		await prisma.crewPost.update({ where: { id: postId }, data: { commentCount: { decrement: 1 } } });
 		return comment;
 	} catch (err) {
 		throw new Error(
@@ -348,6 +537,13 @@ export const isExistPost = async ({ postId }) => {
 			{
 				where: {
 					id: postId,
+				},
+				include: {
+					crewMember: {
+						select: {
+							role: true,
+						}
+					}
 				}
 			}
 		)
@@ -365,11 +561,62 @@ export const isExistComment = async ({ commentId }) => {
 			{
 				where: {
 					id: commentId,
+				},
+				include: {
+					crewMember: {
+						select: {
+							role: true,
+						}
+					},
+					crewPost: {
+						select: {
+							crewId: true,
+						}
+					}
 				}
 			}
 		)
 
 		return isExist;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const isExistImage = async ({ imageId }) => {
+	try {
+		const isExist = await prisma.crewPostImage.findUnique(
+			{
+				where: {
+					id: imageId,
+				}
+			}
+		)
+
+		return isExist;
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const isExistImageInPost = async ({ postId, imageId }) => {
+	try {
+		const image = await prisma.crewPostImage.findUnique(
+			{
+				where: {
+					id: imageId,
+				}
+			}
+		)
+		if (image.postId !== postId) {
+			return false;
+		} else {
+			return true;
+		}
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

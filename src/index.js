@@ -17,19 +17,38 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import session from "express-session";
 import passport from "passport";
 import fs from "fs"; // 추가
+import cookieParser from "cookie-parser";
 
 import routes from "./route/route.js";
 
 import { initS3 } from "./config/aws/s3.js";
+import { initSchedulers } from "./config/scheduler/scheduler.js";
+import initializePassport from "./config/oauth/passport.js";
+import initPassport from "./config/oauth/passport.js";
+import initEventEmitter from "./config/eventEmitter/eventEmitter.js";
 
 const app = express();
 const port = process.env.PORT;
+
+app.set("trust proxy", 1);
 
 /**
  *  AWS S3 설정
  */
 export const s3 = initS3();
+/**
+ * EventEmitter 설정
+ */
+export const eventEmitter = initEventEmitter();
 
+/**
+ *  스케줄러 설정
+ */
+initSchedulers();
+/**
+ * 패스포트 설정
+ */
+initPassport();
 /**
  * 공통 응답을 사용할 수 있는 헬퍼 함수 등록
  */
@@ -63,19 +82,25 @@ app.use(
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
     }),
-  })
+  }),
 );
 app.use(passport.initialize());
 app.use(passport.session());
 
 const corsOptions = {
-  origin: [process.env.LOCAL_ORIGIN, process.env.PROD_ORIGIN],
+  origin: [
+    process.env.LOCAL_ORIGIN,
+    process.env.PROD_ORIGIN,
+    process.env.FRONT_LOCAL_ORIGIN,
+    process.env.FRONT_DOMAIN,
+  ],
   credentials: true,
 };
 
 app.use(cors(corsOptions)); // cors 방식 허용
 app.use(express.static("public")); // 정적 파일 접근
 app.use(express.json()); // request의 본문을 json으로 해석할 수 있도록 함 (JSON 형태의 요청 body를 파싱하기 위함)
+app.use(cookieParser()); // request의 쿠키를 파싱할 수 있도록 함
 app.use(express.urlencoded({ extended: false })); // 단순 객체 문자열 형태로 본문 데이터 해석
 // 미들웨어 설정
 app.use(express.json()); // JSON 본문 파싱
@@ -117,9 +142,11 @@ app.use(
     {
       swaggerOptions: {
         url: "/openapi.json",
+        withCredentials: true,
+        persistAuthorization: true,
       },
-    }
-  )
+    },
+  ),
 );
 
 //Swagger 세팅

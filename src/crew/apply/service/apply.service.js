@@ -1,0 +1,74 @@
+import applyRepository from '../repository/apply.repository.js';
+
+const applyToCrew = async (dto) => {
+    const {
+        userId,
+        crewId,
+        activityList,
+        styleList,
+        region,
+        age,
+        gender,
+        categoryId,
+        answers,
+    } = dto;
+
+    const existing = await applyRepository.findByUserAndCrew(userId, crewId);
+    if (existing) {
+        const error = new Error('이미 이 크루에 지원한 이력이 있습니다.');
+        error.status = 400;
+        throw error;
+    }
+
+    const step1Data = {
+        userId,
+        crewId,
+        activityList: Array.isArray(activityList) ? activityList : [], // 빈배열 보정
+        styleList: Array.isArray(styleList) ? styleList : [],         // 빈배열 보정
+        region: Number.isInteger(region) ? region : 0,                // 미선택=0
+        age: Number.isInteger(age) ? age : 0,                         // 미선택=0
+        gender: Number.isInteger(gender) ? gender : 0,                // 미선택=0
+        categoryId: Number.isInteger(categoryId) && categoryId !== 0 ? categoryId : null, // 미선택=null (DB에는 null로 저장)
+    };
+
+    const step2Data = answers.map((a) => ({
+        userId,
+        recruitFormId: a.recruitFormId,
+        checkedChoices: a.checkedChoices || null,
+        answer: a.answer || null,
+    }));
+
+    await applyRepository.createApplicationWithTransaction(step1Data, step2Data);
+};
+
+const getCrewApplicationById = async (crewId, applyId) => {
+    const application = await applyRepository.findApplicationById(crewId, applyId);
+    if (!application) {
+        const error = new Error('지원서를 찾을 수 없습니다.');
+        error.status = 404;
+        throw error;
+    }
+
+    return application;
+};
+
+const updateStatus = async (crewId, applyId, status) => {
+    // status 1 = 승인, 2 = 거절
+    if (status === 1) {
+        // 승인 시 지원서 상태 변경 + 크루 인원수 증가
+        return await applyRepository.updateStatusWithCrewCapacity(crewId, applyId, status);
+    } else {
+        return await applyRepository.updateStatus(crewId, applyId, status);
+    }
+};
+
+const getRecruitFormByCrewId = async (crewId) => {
+    return await applyRepository.findCrewApplicationFormById(crewId);
+};
+
+export default {
+    applyToCrew,
+    getCrewApplicationById,
+    updateStatus,
+    getRecruitFormByCrewId,
+};

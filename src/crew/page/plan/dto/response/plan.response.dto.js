@@ -50,10 +50,6 @@ export class CreateCrewPlanResponse {
     this.createdAt = plan.createdAt 
     ? formatInTimeZone(plan.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss')
     : null;
-  
-  this.updatedAt = plan.updatedAt 
-    ? formatInTimeZone(plan.updatedAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss')
-    : null;
     }
   }
 
@@ -83,9 +79,6 @@ export class CreateCrewPlanResponse {
         this.isPublic = comment.isPublic;
         this.createdAt = comment.createdAt 
           ? formatInTimeZone(comment.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss')
-          : null;
-        this.updatedAt = comment.updatedAt 
-          ? formatInTimeZone(comment.updatedAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss')
           : null;
       }
     }

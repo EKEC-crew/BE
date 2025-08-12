@@ -77,7 +77,7 @@ export const createCrew = async (body) => {
     data: {
       title: body.name,
       content: body.description,
-      introduction: "",
+      introduction: body.recruitMessage,
       crewCapacity: body.maxCapacity,
       ageLimit: body.age,
       genderLimit: body.gender,

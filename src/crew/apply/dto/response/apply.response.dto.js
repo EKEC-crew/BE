@@ -42,7 +42,7 @@ export const createCrewApplicationDetailResponse = (application) => {
         gender,
         crewId,
         userId,
-        categoryId,
+        categoryId: categoryId || 0, // DB에서 null이면 클라이언트에는 0으로 반환
         activityList,
         styleList,
         user: user
@@ -57,7 +57,7 @@ export const createCrewApplicationDetailResponse = (application) => {
                 id: crewCategory.id,
                 content: crewCategory.content
             }
-            : null,
+            : null, // categoryId가 null(미선택)이면 category 객체도 null
         answers: answers?.map((a) => ({
             recruitFormId: a.recruitFormId,
             checkedChoices: a.checkedChoices,
@@ -73,7 +73,7 @@ export const createCrewApplicationFormResponse = ({ step1, step2, recruitMessage
             styles: step1.styles,
             activities: step1.activities,
             region: step1.region,
-            category: step1.category,
+            category: step1.category || 0, // DB에서 null이면 클라이언트에는 0으로 반환
             age: step1.age
         },
         step2: step2.map((form) => ({

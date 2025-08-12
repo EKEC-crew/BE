@@ -25,7 +25,8 @@ export class ApplyRequestDTO {
         this.region = region;
         this.age = age;
         this.gender = gender;
-        this.categoryId = (categoryId ?? null);
+        // categoryId가 null, undefined, 또는 0이면 0으로 저장
+        this.categoryId = (categoryId == null || categoryId === 0) ? 0 : categoryId;
         this.answers = Array.isArray(answers)
             ? answers.map((a) => new ApplyStep2AnswerDTO(a))
             : [];
@@ -40,7 +41,8 @@ export class CrewApplyRequestDto {
         this.region = body.region;
         this.age = body.age;
         this.gender = body.gender;
-        this.categoryId = (body.categoryId ?? null);
+        // categoryId가 null, undefined, 또는 0이면 0으로 저장
+        this.categoryId = (body.categoryId == null || body.categoryId === 0) ? 0 : body.categoryId;
         this.answers = body.answers;
     }
 
@@ -49,10 +51,7 @@ export class CrewApplyRequestDto {
             Number.isInteger(this.userId) &&
             Array.isArray(this.activityList) &&
             Array.isArray(this.styleList) &&
-            (this.categoryId === undefined ||
-                this.categoryId === null ||
-                Number.isInteger(this.categoryId)
-            )
+            Number.isInteger(this.categoryId)
         );
     }
 }

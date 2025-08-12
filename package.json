@@ -23,6 +23,7 @@
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "dotenv": "^17.2.0",
+    "events": "^3.3.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "http-status-codes": "^2.3.0",

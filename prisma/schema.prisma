@@ -241,6 +241,7 @@ model CrewNotice {
   id  Int @id @default(autoincrement())
   title String @db.VarChar(50)
   content String @db.Text
+  type Int @default(0) // 0: 일반, 1: 필수
   createdAt DateTime @default(now()) @map("created_at")
   modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId  Int @map("crew_id")

@@ -120,6 +120,21 @@ export class InvalidTokenError extends Error {
     this.data = data;
   }
 }
+/**
+ * **\<💥 Error\>**
+ * ***AlarmNotFoundError***
+ * 존재하지 않는 알림에 대한 요청이 발생했을때 발생하는 에러
+ */
+export class AlarmNotFoundError extends Error {
+  errorCode = "A001";
+  statusCode = 404;
+
+  constructor(reason, data) {
+    super(reason);
+    this.reason = reason;
+    this.data = data;
+  }
+}
 
 //유효하지 않은 개수 입력
 export class InvalidNumOfInputError extends Error {

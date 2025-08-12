@@ -25,8 +25,6 @@ const applyToCrew = async (req, res, next) => {
               schema: {
                   type: "object",
                   properties: {
-                      userId: { type: "integer", example: 2, description: "지원자 사용자 ID" },
-
                       activityList: {
                           type: "array",
                           items: { type: "integer" },
@@ -56,8 +54,8 @@ const applyToCrew = async (req, res, next) => {
 
                       categoryId: {
                           type: "integer",
-                          description: "선택값 (미선택 시 null 또는 필드 생략 가능)",
-                          nullable: true
+                          description: "카테고리 ID (미선택 시 0 또는 필드 생략 가능)",
+                          default: 0
                       },
 
                       answers: {
@@ -82,13 +80,12 @@ const applyToCrew = async (req, res, next) => {
                           }
                       }
                   },
-                  required: ["userId", "activityList", "styleList", "region", "age", "gender", "answers"]
+                  required: ["activityList", "styleList", "region", "age", "gender", "answers"]
               },
               examples: {
                   "✅ 모든 값 선택 시나리오": {
                       summary: "필수 선택 완료",
                       value: {
-                          userId: 2,
                           activityList: [1, 2],
                           styleList: [1, 3],
                           region: 1,
@@ -105,13 +102,12 @@ const applyToCrew = async (req, res, next) => {
                   "⬜ 미선택 기본값 시나리오": {
                       summary: "모든 선택 미선택",
                       value: {
-                          userId: 2,
                           activityList: [],
                           styleList: [],
                           region: 0,
                           age: 0,
                           gender: 0,
-                          categoryId: null,
+                          categoryId: 0,
                           answers: [
                               { recruitFormId: 1, checkedChoices: ["러닝"] },
                               { recruitFormId: 2, checkedChoices: ["지인 추천", "SNS"] },
@@ -140,9 +136,15 @@ const applyToCrew = async (req, res, next) => {
 */
   try {
     const crewId = parseInt(req.params.crewId);
+    const userId = req.payload.id; // JWT 토큰에서 추출한 사용자 ID
 
-    // 요청 본문 + crewId DTO로 래핑
-    const dto = new ApplyRequestDTO({ ...req.body, crewId });
+    const { userId: bodyUserId, ...requestBody } = req.body;
+
+    const dto = new ApplyRequestDTO({
+      ...requestBody,
+      crewId,
+      userId // JWT에서 추출한 userId 사용
+    });
 
     // 서비스 로직 실행
     await applyService.applyToCrew(dto);

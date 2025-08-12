@@ -24,7 +24,7 @@ const findApplicationById = async (crewId, applyId) => {
         },
         include: {
             user: true,
-            crewCategory: true,
+            crewCategory: true, // 기존 관계 그대로 유지
         },
     });
 
@@ -48,7 +48,83 @@ const findApplicationById = async (crewId, applyId) => {
     return { ...step1, answers: step2 };
 };
 
-// 지원 상태 변경
+// 지원 상태 변경 (승인 시 크루 인원수 증가 포함)
+const updateStatusWithCrewCapacity = async (crewId, applyId, status) => {
+    return await prisma.$transaction(async (tx) => {
+        // 1. 지원서 정보 확인 (이미 승인된 상태인지 체크)
+        const application = await tx.crewRecruitAppliedStep1.findFirst({
+            where: {
+                id: applyId,
+                crewId,
+            },
+        });
+
+        if (!application) {
+            const error = new Error('지원서를 찾을 수 없습니다.');
+            error.status = 404;
+            throw error;
+        }
+
+        if (application.status === 1) {
+            const error = new Error('이미 승인된 지원서입니다.');
+            error.status = 400;
+            throw error;
+        }
+
+        // 2. 지원서 상태 변경
+        const updateResult = await tx.crewRecruitAppliedStep1.updateMany({
+            where: {
+                id: applyId,
+                crewId,
+            },
+            data: {
+                status,
+            },
+        });
+
+        // 3. 승인 시 크루 인원수 증가 + 크루 멤버로 추가
+        if (status === 1) {
+            // 이미 크루 멤버인지 확인
+            const existingMember = await tx.crewMember.findFirst({
+                where: {
+                    userId: application.userId,
+                    crewId: crewId,
+                },
+            });
+
+            if (existingMember) {
+                const error = new Error('이미 크루 멤버입니다.');
+                error.status = 400;
+                throw error;
+            }
+
+            // 크루 인원수 증가
+            await tx.crew.update({
+                where: {
+                    id: crewId,
+                },
+                data: {
+                    crewCapacity: {
+                        increment: 1,
+                    },
+                },
+            });
+
+            // 크루원으로 추가
+            await tx.crewMember.create({
+                data: {
+                    userId: application.userId,
+                    crewId: crewId,
+                    role: 0,
+                },
+            });
+        }
+
+        return updateResult;
+    });
+};
+
+// 지원 상태 변경 (기본)
 const updateStatus = async (crewId, applyId, status) => {
     return await prisma.crewRecruitAppliedStep1.updateMany({
         where: {
@@ -115,11 +191,11 @@ const findCrewApplicationFormById = async (crewId) => {
     };
 };
 
-
 export default {
     findByUserAndCrew,
     createApplicationWithTransaction,
     findApplicationById,
     updateStatus,
+    updateStatusWithCrewCapacity,
     findCrewApplicationFormById,
 };

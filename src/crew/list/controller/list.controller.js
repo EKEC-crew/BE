@@ -23,7 +23,7 @@ async function handlePopularCrewList(req, res, next) {
                                             properties: {
                                                 id: { type: "number", example: 1 },
                                                 title: { type: "string", example: "사이클링히트" },
-                                                introduction: { type: "string", example: "잠실 2030 여성 야구 직관 동호회" },
+                                                content: { type: "string", example: "잠실 2030 여성 야구 직관 동호회" },
                                                 crewCategory: { type: "string", example: "스포츠직관" },
                                                 regionSido: { type: "string", example: "서울특별시" },
                                                 regionGu: { type: "string", example: "송파구" },
@@ -100,7 +100,7 @@ async function handleLatestCrewList(req, res, next) {
                                             properties: {
                                                 id: { type: "number", example: 1 },
                                                 title: { type: "string", example: "사이클링히트" },
-                                                introduction: { type: "string", example: "잠실 2030 여성 야구 직관 동호회" },
+                                                content: { type: "string", example: "잠실 2030 여성 야구 직관 동호회" },
                                                 crewCategory: { type: "string", example: "스포츠직관" },
                                                 regionSido: { type: "string", example: "서울특별시" },
                                                 regionGu: { type: "string", example: "송파구" },

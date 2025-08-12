@@ -37,6 +37,7 @@ export const CrewPostResponse = ({ post, imagesInfo }) => {
 			imageId: image.id,
 			imageName: image.imageName,
 		})),
+		isLiked: post?.isLiked
 	}
 
 	return response;

@@ -269,3 +269,13 @@ export const cleanExpiredRefreshTokens = async () => {
 export const cleanUncompletedUsers = async () => {
   await deleteUncompletedUsers();
 };
+/**
+ * **[Auth]**
+ * **\<🛠️ Service\>**
+ * ***validateUserIsExist***
+ * 다른 도메인에서 유저가 존재하는지 여부를 확인하기 위한 함수 입니다.
+ */
+export const validateUserIsExist = async (userId) => {
+  const user = await findAccountById(userId);
+  return user != -1;
+};

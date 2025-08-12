@@ -180,7 +180,8 @@ export const getPlanById = async (req, res, next) => {
   try {
     const crewId = parseInt(req.params.crewId);
     const planId = parseInt(req.params.planId);
-    const plan = await planService.CrewPlanService.getPlanById(crewId, planId);
+    const userId = req.payload.id; // JWT 토큰에서 사용자 ID 추출
+    const plan = await planService.CrewPlanService.getPlanById(crewId, planId, userId);
     return res.success(plan);
   } catch (err) {
     next(err);
@@ -276,11 +277,13 @@ export const getPlanList = async (req, res, next) => {
     const crewId = parseInt(req.params.crewId);
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 10;
+    const userId = req.payload.id; // JWT 토큰에서 사용자 ID 추출
 
     const result = await planService.CrewPlanService.getPlanListByCrewId(
       crewId,
       page,
       size,
+      userId
     );
     return res.success(result);
   } catch (err) {

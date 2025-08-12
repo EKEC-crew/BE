@@ -20,6 +20,8 @@ export class CreateCrewPlanResponse {
       this.feePurpose = plan.feePurpose;
       this.commentCount = plan.commentCount;
       this.likeCount = plan.likeCount;
+      this.isLiked = plan.isLiked || false;
+      this.isApplied = plan.isApplied || false;
       this.createdAt = plan.createdAt 
         ? formatInTimeZone(plan.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss')
         : null;
@@ -46,6 +48,8 @@ export class CreateCrewPlanResponse {
       this.feePurpose = plan.feePurpose;
       this.commentCount = plan.commentCount;
       this.likeCount = plan.likeCount;
+      this.isLiked = plan.isLiked || false;
+      this.isApplied = plan.isApplied || false;
       // 안전한 날짜 변환
     this.createdAt = plan.createdAt 
     ? formatInTimeZone(plan.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss')

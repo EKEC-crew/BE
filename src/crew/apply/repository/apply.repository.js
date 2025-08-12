@@ -24,7 +24,7 @@ const findApplicationById = async (crewId, applyId) => {
         },
         include: {
             user: true,
-            crewCategory: true, // 기존 관계 그대로 유지
+            crewCategory: true,
         },
     });
 
@@ -42,6 +42,12 @@ const findApplicationById = async (crewId, applyId) => {
             recruitFormId: true,
             checkedChoices: true,
             answer: true,
+            crewRecruitForm: {
+                select: {
+                    id: true,
+                    questionType: true
+                }
+            }
         },
     });
 

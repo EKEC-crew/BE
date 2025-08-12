@@ -82,11 +82,11 @@ model Crew {
   genderLimit             Int                       @map("gender_limit")
   userId                  Int                       @map("user_id")
   categoryId              Int                       @map("category_id")
-  regionId                Int                       @map("region_id")
+  regionId                Int?                       @map("region_id")
   recruitMessage          String                    @map("recruit_message") @db.Text
   alarm                   Alarm[]
   crewCategory            CrewCategory              @relation(fields: [categoryId], references: [id])
-  region                  Region                    @relation(fields: [regionId], references: [id])
+  region                  Region?                   @relation(fields: [regionId], references: [id])
   user                    User                      @relation(fields: [userId], references: [id])
   crewActivity            CrewActivity[]
   crewAlbum               CrewAlbum[]

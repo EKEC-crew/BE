@@ -41,7 +41,7 @@ export const handleDefaultSearch = async (req, res, next) => {
         };
         #swagger.parameters['sort'] = {
             in: 'query',
-            description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
+            description: "정렬 방식 (1 : 최신순, 2 : 활동 많은 순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
             required:true,
             example:"1"
         };
@@ -292,7 +292,7 @@ export const handleAdvancedSearch = async (req, res, next) => {
     };
     #swagger.parameters['sort'] = {
         in: 'query',
-        description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
+        description: "정렬 방식 (1 : 최신순, 2 : 활동 많은 순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
         required:true,
         example:"1"
     };
@@ -607,16 +607,16 @@ export const handleAdvancedSearch = async (req, res, next) => {
     );
   }
   // 단 하나의 옵션도 지정되지 않은경우 에러 throw
-  if (
-    Object.keys(req.query).length == 2 &&
-    Object.keys(req.query).indexOf("page") != -1 &&
-    Object.keys(req.query).indexOf("sort") != -1
-  ) {
-    throw new InvalidInputValueError(
-      "최소 하나이상의 옵션을 선택/입력 해주세요.",
-      req.query,
-    );
-  }
+  // if (
+  //   Object.keys(req.query).length == 2 &&
+  //   Object.keys(req.query).indexOf("page") != -1 &&
+  //   Object.keys(req.query).indexOf("sort") != -1
+  // ) {
+  //   throw new InvalidInputValueError(
+  //     "최소 하나이상의 옵션을 선택/입력 해주세요.",
+  //     req.query,
+  //   );
+  // }
   // 크루명이 제대로 입력되지 않은 경우 에러 throw
   if (req.query.name != undefined && req.query.name == "") {
     throw new InvalidInputValueError(
@@ -701,7 +701,7 @@ export const handleGetByCategory = async (req, res) => {
     };
     #swagger.parameters['sort'] = {
         in: 'query',
-        description: "정렬 방식 (1 : 최신순, 2 : 인기순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
+        description: "정렬 방식 (1 : 최신순, 2 : 활동 많은 순, 3 : 맴버 수(오름차 순), 4 : 맴버 수(내림차 순))",
         required:true,
         example:"1"
     };

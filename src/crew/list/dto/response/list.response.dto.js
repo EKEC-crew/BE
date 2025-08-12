@@ -2,7 +2,7 @@ export function mapCrewToResponse(crew) {
     return {
         id: crew.id,
         title: crew.title,
-        introduction: crew.introduction,
+        content: crew.content,
         crewCategory: crew.crewCategory.content,
         regionSido: crew.region.sido,
         regionGu: crew.region.goo,

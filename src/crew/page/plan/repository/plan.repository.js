@@ -34,7 +34,6 @@ export const CrewPlanRepository = {
             commentCount: true,
             likeCount: true,
             createdAt: true,
-            updatedAt: true,
             crew: {
                 select: {
                     title: true
@@ -89,7 +88,6 @@ export const CrewPlanRepository = {
           commentCount: true,
           likeCount: true,
           createdAt: true,
-          updatedAt: true,
           crew: {
             select: {
               title: true,
@@ -156,7 +154,6 @@ export const CrewPlanRepository = {
             commentCount: true,
             likeCount: true,
             createdAt: true,
-            updatedAt: true,
             crew: {
               select: {
                 title: true,
@@ -232,7 +229,6 @@ export const CrewPlanRepository = {
           commentCount: true,
           likeCount: true,
           createdAt: true,
-          updatedAt: true,
           crew: { select: { title: true } },
           crewMember: {
             select: {

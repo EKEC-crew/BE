@@ -866,7 +866,7 @@ export const handleCreateCrew = async (req, res, next) => {
   }
   // ✅ 유효성 검사 (최대 모집 인원)
   if (
-    req.body.crewInfo.maxCapacity === undefined ||
+    req.body.crewInfo.maxCapacity !== undefined &&
     typeof req.body.crewInfo.maxCapacity !== "number"
   ) {
     throw new InvalidInputValueError(
@@ -906,26 +906,26 @@ export const handleCreateCrew = async (req, res, next) => {
   }
   // ✅ 유효성 검사 (지역)
   if (
-    req.body.crewInfo.region === undefined ||
+    req.body.crewInfo.region !== undefined &&
     typeof req.body.crewInfo.region !== "number"
   ) {
     throw new InvalidInputValueError("올바른 지역을 선택해주세요.", req.body);
   }
   // ✅ 유효성 검사 (연령대)
   if (
-    req.body.crewInfo.age === undefined ||
-    typeof req.body.crewInfo.age !== "number" ||
-    req.body.crewInfo.age < 0 ||
-    req.body.crewInfo.age > 8
+    req.body.crewInfo.age !== undefined &&
+    (typeof req.body.crewInfo.age !== "number" ||
+      req.body.crewInfo.age < 0 ||
+      req.body.crewInfo.age > 8)
   ) {
     throw new InvalidInputValueError("올바른 연령대를 선택해주세요.", req.body);
   }
   // ✅ 유효성 검사 (성별)
   if (
-    req.body.crewInfo.gender === undefined ||
-    typeof req.body.crewInfo.gender !== "number" ||
-    req.body.crewInfo.gender > 2 ||
-    req.body.crewInfo.gender < 0
+    req.body.crewInfo.gender !== undefined &&
+    (typeof req.body.crewInfo.gender !== "number" ||
+      req.body.crewInfo.gender > 2 ||
+      req.body.crewInfo.gender < 0)
   ) {
     throw new InvalidInputValueError("올바른 성별을 선택해주세요.", req.body);
   }

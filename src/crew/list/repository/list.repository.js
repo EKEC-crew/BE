@@ -7,7 +7,7 @@ async function getPopularCrews() {
         select: {
             id: true,
             title: true,
-            introduction: true,
+            content: true,
             bannerImage: true,
             postCount: true,
             createdAt: true,
@@ -43,7 +43,7 @@ async function getLatestCrews() {
         select: {
             id: true,
             title: true,
-            introduction: true,
+            content: true,
             bannerImage: true,
             postCount: true,
             createdAt: true,

@@ -110,7 +110,7 @@ model CrewPlan {
   title                String            @db.VarChar(30)
   content              String            @db.Text
   likeCount            Int               @default(0) @map("like_count")
-  commentCount            Int            @default(0) @map("comment_count")
+  commentCount         Int               @default(0) @map("comment_count")
   type                 Int               @default(0)
   createdAt            DateTime          @default(now()) @map("created_at")
   crewId               Int               @map("crew_id")
@@ -138,7 +138,6 @@ model CrewPlanComment {
   id           Int        @id @default(autoincrement())
   content      String     @db.Text
   createdAt    DateTime   @default(now()) @map("created_at")
-  modifiedAt   DateTime?  @updatedAt @map("modified_at")
   crewPlanId   Int        @map("crew_plan_id")
   crewMemberId Int        @map("crew_member_id")
   isPublic     Boolean    @map("is_public")

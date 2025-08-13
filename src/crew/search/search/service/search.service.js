@@ -21,6 +21,7 @@ const formatCrewList = (crews) => {
     id: crew.id,
     name: crew.title,
     description: crew.content,
+    score: crew.score,
     introduction: crew.introduction,
     capacity: crew.crewCapacity,
     memberCount: crew._count.crewUser,

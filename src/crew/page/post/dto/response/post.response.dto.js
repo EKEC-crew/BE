@@ -63,6 +63,7 @@ export const CrewCommentListResponse = ({ comments, totalElements, totalPages, h
 		nickname: comment.crewMember.user.nickname,
 		image: comment.crewMember.user.image,
 		userId: comment.crewMember.user.id,
+		isPublic: comment.isPublic,
 		createdAt: formatInTimeZone(comment.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 	}))
 	const response = {
@@ -85,6 +86,7 @@ export const CrewCommentResponse = (body) => {
 		content: comment.content,
 		nickname: comment.crewMember.user.nickname,
 		image: comment.crewMember.user.image,
+		isPublic: comment.isPublic,
 		createdAt: formatInTimeZone(comment.createdAt, 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss'),
 	}
 

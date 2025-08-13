@@ -17,6 +17,7 @@ export const findCrewsByName = async (data) => {
       introduction: true,
       crewCapacity: true,
       createdAt: true,
+      score: true,
       noticeCount: true,
       postCount: true,
       bannerImage: true,
@@ -189,6 +190,7 @@ export const findCrewsByOptions = async (data) => {
       noticeCount: true,
       postCount: true,
       bannerImage: true,
+      score: true,
       ageLimit: true,
       genderLimit: true,
       user: {
@@ -276,6 +278,7 @@ export const findCrewsByCategory = async (data) => {
       noticeCount: true,
       postCount: true,
       bannerImage: true,
+      score: true,
       ageLimit: true,
       genderLimit: true,
       user: {

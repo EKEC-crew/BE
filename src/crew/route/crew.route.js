@@ -10,6 +10,7 @@ const router = express.Router({ mergeParams: true });
 router.use('/search', searchRoutes);
 router.use('/sort', sortRoutes);
 router.use('/create', creationRoutes);
+router.use('/list', listRoutes);
 router.use('/', pageRoutes);
 router.use('/apply', applyRoute);
 

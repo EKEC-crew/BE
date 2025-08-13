@@ -88,6 +88,9 @@ export const findAccount = async (data) => {
     select: {
       name: true,
       nickname: true,
+      gender: true,
+      birth: true,
+      phone: true,
       email: true,
       id: true,
       password: true,
@@ -194,6 +197,9 @@ export const findAccountById = async (id) => {
     select: {
       name: true,
       nickname: true,
+      gender: true,
+      birth: true,
+      phone: true,
       email: true,
       phone: true,
       id: true,

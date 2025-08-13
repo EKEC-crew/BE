@@ -4,6 +4,7 @@ import { InvalidInputValueError, NotFoundPlanError, CrewMemberNotFoundError, Per
 import * as planRepository from "../repository/plan.repository.js";
 import * as planResponse from "../dto/response/plan.response.dto.js";
 import * as planRequest from "../dto/request/plan.request.dto.js";
+import { eventEmitter } from "../../../../index.js";
 
 //함수이름 : 함수정의
 export const CrewPlanService = {
@@ -45,6 +46,31 @@ export const CrewPlanService = {
 
         try {
             const plan = await planRepository.CrewPlanRepository.createPlan(Number(crewId), req, crewMember.id);
+            
+            // 일정 생성 후 크루 멤버들에게 알림 발송
+            const crewMembers = await prisma.crewMember.findMany({
+                where: {
+                    crewId: Number(crewId),
+                    userId: {
+                        not: Number(userId) // 일정 생성자 제외
+                    }
+                },
+                select: {
+                    userId: true
+                }
+            });
+            
+            const userIds = crewMembers.map(member => member.userId);
+            
+            // 알림 이벤트 발송
+            eventEmitter.emit("SCHEDULE_CREATED", {
+                userId: userIds, // 크루 멤버들의 유저 ID 배열(생성자 제외)
+                targetId: {
+                    crewId: Number(crewId),
+                    planId: plan.id,
+                },
+            });
+            
             return new planResponse.CreateCrewPlanResponse(plan);
         } catch (error) {
             if (error.message === "해당 크루의 멤버가 아닙니다.") {
@@ -209,6 +235,21 @@ export const CrewPlanService = {
         }
         
         return { message: "일정이 성공적으로 삭제되었습니다." };
+    },
+
+    //다가오는 일정 리스트 조회 서비스
+    getUpcomingPlans: async (page = 1, size = 5, userId) => {
+        if (!userId) {
+            throw new InvalidInputValueError("사용자 인증이 필요합니다.");
+        }
+
+        const result = await planRepository.CrewPlanRepository.findUpcomingPlansByUserId(
+            Number(userId),
+            page,
+            size
+        );
+        
+        return new planResponse.GetUpcomingPlansResponse(result.plans, result.pagination);
     }
 }
 

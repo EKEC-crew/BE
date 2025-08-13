@@ -49,7 +49,8 @@ const findApplicationById = async (crewId, applyId) => {
                 select: {
                     id: true,
                     questionType: true,
-                    choiceList: true  // 선택지 리스트 추가 (분리 위해 필요)
+                    choiceList: true,  // 선택지 리스트 (분리 위해 필요)
+                    isEtc: true
                 }
             }
         },

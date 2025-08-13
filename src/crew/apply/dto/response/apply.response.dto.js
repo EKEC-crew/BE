@@ -1,3 +1,4 @@
+// 성공/실패 공통 응답 DTO
 export class ApplySuccessResponseDTO {
     constructor(message) {
         this.resultType = 'SUCCESS';
@@ -19,6 +20,12 @@ export class ApplyErrorResponseDTO {
     }
 }
 
+/**
+ * 특정 크루 특정 지원서 조회 응답 생성
+ * - questionType: 0(체크박스), 1(장문)
+ * - checkedChoices: 사용자가 실제로 선택한 값(체크박스형)
+ * - etcChoices: 체크박스형 + isEtc=1 인 문항에서, 기본 choiceList에 없는 “기타 입력값”만 분리 제공
+ */
 export const createCrewApplicationDetailResponse = (application) => {
     const {
         id,
@@ -58,34 +65,76 @@ export const createCrewApplicationDetailResponse = (application) => {
                 content: crewCategory.content
             }
             : null,
-        answers: answers?.map((a) => {
-            const form = a.crewRecruitForm;
-            let etcChoices = [];
 
-            // 체크박스 문항이고 선택된 답변이 있는 경우
-            if (a.checkedChoices && form?.questionType === 0) {
-                const predefinedList = form.choiceList || [];
+        // Step2 응답 매핑
+        answers: (answers || []).map((a) => {
+            const form = a.crewRecruitForm || {};
 
-                a.checkedChoices.forEach(choice => {
-                    if (!predefinedList.includes(choice)) {
-                        etcChoices.push(choice);  // 기타로 입력한 답변만 추출
+            // questionType 보정 (0: 체크박스, 1: 장문)
+            const questionType = Number(form.questionType) === 1 ? 1 : 0;
+
+            // isEtc 보정 (1: 기타 입력 허용, 0: 비허용)
+            const isEtc = Number(form.isEtc) === 1;
+
+            // choiceList 보정 (Json? → 배열 보장)
+            const predefinedList = Array.isArray(form.choiceList) ? form.choiceList : [];
+
+            // checkedChoices 보정 (Json? → 배열 보장)
+            let checked = [];
+            if (Array.isArray(a.checkedChoices)) {
+                checked = a.checkedChoices;
+            } else if (a.checkedChoices != null) {
+                if (typeof a.checkedChoices === 'string') {
+                    // 문자열로 저장된 경우 JSON 파싱 시도
+                    try {
+                        const parsed = JSON.parse(a.checkedChoices);
+                        checked = Array.isArray(parsed) ? parsed : [String(a.checkedChoices)];
+                    } catch {
+                        checked = [String(a.checkedChoices)];
                     }
-                });
+                } else {
+                    // 객체/숫자/불리언 등 비배열 값은 문자열로 변환해 단일 원소 배열로 수용
+                    checked = [String(a.checkedChoices)];
+                }
+            }
+
+            // 장문형(1): checked/etcs는 null, answer만 유지
+            if (questionType === 1) {
+                return {
+                    recruitFormId: a.recruitFormId,
+                    questionType,
+                    etcChoices: null,
+                    checkedChoices: null,
+                    answer: a.answer ?? null,
+                };
+            }
+
+            // 체크박스형(0): isEtc=1일 때만 “기타 입력값” 분리
+            let etcChoices = null;
+            if (isEtc && checked.length) {
+                const etc = checked.filter((c) => !predefinedList.includes(c));
+                etcChoices = etc;
             }
 
             return {
                 recruitFormId: a.recruitFormId,
-                questionType: form?.questionType || 0,
-                // 체크박스 문항인 경우 기타 답변만 제공
-                etcChoices: form?.questionType === 0 ? etcChoices : null,
-                // 기존 checkedChoices 유지 (전체 답변)
-                checkedChoices: a.checkedChoices,
-                answer: a.answer
+                questionType,
+                // 체크박스형에서만 노출, isEtc=0이면 null
+                etcChoices,
+                // 사용자가 실제 선택한 값 전체
+                checkedChoices: checked,
+                // 체크박스형은 answer 사용하지 않음
+                answer: null,
             };
-        }) || []
+        })
     };
 };
 
+/**
+ * 크루 모집 응답 폼 조회 응답 생성
+ * - step1: 제한/선택값(성별/스타일/활동/지역/카테고리/나이)
+ * - step2: 질문 목록 (질문유형, 선택지, 기타 허용, 필수 여부)
+ */
 export const createCrewApplicationFormResponse = ({ step1, step2, recruitMessage }) => {
     return {
         step1: {
@@ -99,9 +148,9 @@ export const createCrewApplicationFormResponse = ({ step1, step2, recruitMessage
         step2: step2.map((form) => ({
             id: form.id,
             question: form.question,
-            questionType: form.questionType,
-            choiceList: form.choiceList,
-            isEtc: form.isEtc,
+            questionType: form.questionType,  // 0: 체크박스, 1: 장문
+            choiceList: form.choiceList,      // 체크박스형에서만 사용, 장문형이면 null 가능
+            isEtc: form.isEtc,                // 1: 기타 입력 허용
             required: form.required,
         })),
         recruitMessage,

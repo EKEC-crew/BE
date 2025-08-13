@@ -18,25 +18,41 @@ export const CrewPlanRepository = {
               },
             },
           },
-          include: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            day: true,
+            type: true,
+            isRequired: true,
+            allowComments: true,
+            allowPrivateComments: true,
+            allowExternalShare: true,
+            hasFee: true,
+            fee: true,
+            feePurpose: true,
+            commentCount: true,
+            likeCount: true,
+            createdAt: true,
             crew: {
                 select: {
                     title: true
                 }
             },
             crewMember: {
-                include: {
+                select: {
                     user: {
                         select: {
-                            nickname: true
+                            nickname: true,
+                            id: true
                         }
                     }
                 }
             },
             crewPlanRequest: {
-                include: {
+                select: {
                   crewMember: {
-                    include: {
+                    select: {
                       user: {
                         select: {
                           nickname: true
@@ -56,25 +72,41 @@ export const CrewPlanRepository = {
           id: Number(planId),
           crewId: Number(crewId)
         },
-        include: {
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          day: true,
+          type: true,
+          isRequired: true,
+          allowComments: true,
+          allowPrivateComments: true,
+          allowExternalShare: true,
+          hasFee: true,
+          fee: true,
+          feePurpose: true,
+          commentCount: true,
+          likeCount: true,
+          createdAt: true,
           crew: {
             select: {
               title: true,
             },
           },
           crewMember: {
-            include: {
+            select: {
               user: {
                 select: {
                   nickname: true,
+                  id: true
                 },
               },
             },
           },
           crewPlanRequest: {
-            include: {
+            select: {
               crewMember: {
-                include: {
+                select: {
                   user: {
                     select: {
                       nickname: true,
@@ -106,25 +138,41 @@ export const CrewPlanRepository = {
           },
           skip,
           take: size,
-          include: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            day: true,
+            type: true,
+            isRequired: true,
+            allowComments: true,
+            allowPrivateComments: true,
+            allowExternalShare: true,
+            hasFee: true,
+            fee: true,
+            feePurpose: true,
+            commentCount: true,
+            likeCount: true,
+            createdAt: true,
             crew: {
               select: {
                 title: true,
               },
             },
             crewMember: {
-              include: {
+              select: {
                 user: {
                   select: {
                     nickname: true,
+                    id: true
                   }
                 }
               }
             },
             crewPlanRequest: {
-              include: {
+              select: {
                 crewMember: {
-                  include: {
+                  select: {
                     user: {
                       select: {
                         nickname: true,
@@ -165,17 +213,32 @@ export const CrewPlanRepository = {
       return await prisma.crewPlan.update({
         where: { id: Number(planId) },
         data: updatedData,
-        include: {
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          day: true,
+          type: true,
+          isRequired: true,
+          allowComments: true,
+          allowPrivateComments: true,
+          allowExternalShare: true,
+          hasFee: true,
+          fee: true,
+          feePurpose: true,
+          commentCount: true,
+          likeCount: true,
+          createdAt: true,
           crew: { select: { title: true } },
           crewMember: {
-            include: {
-              user: { select: { nickname: true } },
+            select: {
+              user: { select: { nickname: true, id: true } },
             },
           },
           crewPlanRequest: {
-            include: {
+            select: {
               crewMember: {
-                include: {
+                select: {
                   user: { select: { nickname: true } },
                 },
               },
@@ -253,6 +316,7 @@ export const CrewPlanCommentRepository = {
                 select: {
                   nickname: true,
                   image: true,
+                  id: true
                 }
               }
             }
@@ -291,6 +355,7 @@ export const CrewPlanCommentRepository = {
               select: {
                 nickname: true,
                 image: true,
+                id: true
               }
             }
           }
@@ -344,6 +409,7 @@ export const CrewPlanCommentRepository = {
                   id: true,
                   nickname: true,
                   image: true,
+                  id: true
                 }
               }
             }
@@ -395,6 +461,7 @@ export const CrewPlanCommentRepository = {
               select: {
                 nickname: true,
                 image: true,
+                id: true
               }
             }
           }
@@ -566,6 +633,7 @@ export const CrewPlanRequestRepository = {
             user: {
               select: {
                 nickname: true,
+                id: true
               }
             }
           }

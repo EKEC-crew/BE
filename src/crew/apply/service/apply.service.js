@@ -28,7 +28,7 @@ const applyToCrew = async (dto) => {
         region: Number.isInteger(region) ? region : 0,                // 미선택=0
         age: Number.isInteger(age) ? age : 0,                         // 미선택=0
         gender: Number.isInteger(gender) ? gender : 0,                // 미선택=0
-        categoryId: (categoryId ?? null),                             // 미선택=null
+        categoryId: Number.isInteger(categoryId) && categoryId !== 0 ? categoryId : null, // 미선택=null (DB에는 null로 저장)
     };
 
     const step2Data = answers.map((a) => ({
@@ -53,7 +53,13 @@ const getCrewApplicationById = async (crewId, applyId) => {
 };
 
 const updateStatus = async (crewId, applyId, status) => {
-    return await applyRepository.updateStatus(crewId, applyId, status);
+    // status 1 = 승인, 2 = 거절
+    if (status === 1) {
+        // 승인 시 지원서 상태 변경 + 크루 인원수 증가
+        return await applyRepository.updateStatusWithCrewCapacity(crewId, applyId, status);
+    } else {
+        return await applyRepository.updateStatus(crewId, applyId, status);
+    }
 };
 
 const getRecruitFormByCrewId = async (crewId) => {

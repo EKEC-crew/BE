@@ -25,6 +25,7 @@ import { initS3 } from "./config/aws/s3.js";
 import { initSchedulers } from "./config/scheduler/scheduler.js";
 import initializePassport from "./config/oauth/passport.js";
 import initPassport from "./config/oauth/passport.js";
+import initEventEmitter from "./config/eventEmitter/eventEmitter.js";
 
 const app = express();
 const port = process.env.PORT;
@@ -35,6 +36,11 @@ app.set("trust proxy", 1);
  *  AWS S3 설정
  */
 export const s3 = initS3();
+/**
+ * EventEmitter 설정
+ */
+export const eventEmitter = initEventEmitter();
+
 /**
  *  스케줄러 설정
  */

@@ -34,8 +34,8 @@ const formatCrewList = (crews) => {
     crewCategory: crew.crewCategory.content,
     crewActivity: crew.crewActivity.map((item) => item.activity.content),
     crewStyle: crew.crewStyle.map((item) => item.style.content),
-    regionSido: crew.region.sido,
-    regionGu: crew.region.goo,
+    regionSido: crew.region?.sido,
+    regionGu: crew.region?.goo,
   }));
   return result;
 };
@@ -55,14 +55,14 @@ export const crewDefaultSearch = async (data) => {
       case 1: // 최신 순 정렬
         data.sort = { createdAt: "desc" };
         break;
-      case 2: // 인기 순 정렬
+      case 2: // 활동 많은 순 정렬
         data.sort = { postCount: "desc" };
         break;
       case 3: // 맴버 수 정렬 (오름차 순)
-        data.sort = { crewCapacity: "asc" };
+        data.sort = { crewUser: { _count: "asc" } };
         break;
       case 4: // 맴버 수 정렬 (내림차 순)
-        data.sort = { crewCapacity: "desc" };
+        data.sort = { crewUser: { _count: "desc" } };
         break;
     }
   }
@@ -97,14 +97,14 @@ export const crewAdvancedSearch = async (data) => {
       case 1: // 최신 순 정렬
         data.sort = { createdAt: "desc" };
         break;
-      case 2: // 인기 순 정렬
+      case 2: // 활동 많은 순 정렬
         data.sort = { postCount: "desc" };
         break;
       case 3: // 맴버 수 정렬 (오름차 순)
-        data.sort = { crewCapacity: "asc" };
+        data.sort = { crewUser: { _count: "asc" } };
         break;
       case 4: // 맴버 수 정렬 (내림차 순)
-        data.sort = { crewCapacity: "desc" };
+        data.sort = { crewUser: { _count: "desc" } };
         break;
     }
   }
@@ -136,14 +136,14 @@ export const crewSearchByCategory = async (data) => {
       case 1: // 최신 순 정렬
         data.sort = { createdAt: "desc" };
         break;
-      case 2: // 인기 순 정렬
+      case 2: // 활동 많은 순 정렬
         data.sort = { postCount: "desc" };
         break;
       case 3: // 맴버 수 정렬 (오름차 순)
-        data.sort = { crewCapacity: "asc" };
+        data.sort = { crewUser: { _count: "asc" } };
         break;
       case 4: // 맴버 수 정렬 (내림차 순)
-        data.sort = { crewCapacity: "desc" };
+        data.sort = { crewUser: { _count: "desc" } };
         break;
     }
   }

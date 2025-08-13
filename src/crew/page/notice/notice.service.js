@@ -4,7 +4,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // 1. 공지 리스트 조회
-export const getNotices = async (crewId) => {
+export const getNotices = async (crewId, userId = null) => {
   try {
     const notices = await prisma.crewNotice.findMany({
       where: {
@@ -13,6 +13,7 @@ export const getNotices = async (crewId) => {
       select: {
         id: true,
         title: true,
+        type: true,
         createdAt: true,
         crewMember: {
           select: {
@@ -28,6 +29,28 @@ export const getNotices = async (crewId) => {
         createdAt: "desc",
       },
     });
+
+    // 사용자가 로그인한 경우 좋아요 상태 확인
+    if (userId) {
+      const noticesWithLikes = await Promise.all(
+        notices.map(async (notice) => {
+          const like = await prisma.crewNoticeLike.findFirst({
+            where: {
+              crewNoticeId: notice.id,
+              crewMember: {
+                userId: userId,
+              },
+            },
+          });
+          return {
+            ...notice,
+            isLiked: !!like,
+          };
+        })
+      );
+      return noticesWithLikes;
+    }
+
     return notices;
   } catch (error) {
     throw new Error("공지사항 목록을 조회하는 중 오류가 발생했습니다.");
@@ -65,6 +88,7 @@ export const createNotice = async (crewId, userId, noticeData) => {
       data: {
         title: noticeData.title,
         content: noticeData.content,
+        type: noticeData.type,
         crew: {
           // crewId를 이용해 Crew와 연결
           connect: {
@@ -91,7 +115,7 @@ export const createNotice = async (crewId, userId, noticeData) => {
 /*
  * 3. 공지 상세 조회
  */
-export const getNoticeDetails = async (noticeId) => {
+export const getNoticeDetails = async (noticeId, userId = null) => {
   try {
     const notice = await prisma.crewNotice.findUnique({
       where: {
@@ -101,10 +125,12 @@ export const getNoticeDetails = async (noticeId) => {
         id: true,
         title: true,
         content: true,
+        type: true,
         createdAt: true,
         modifiedAt: true,
         crewMember: {
           select: {
+            id: true, // crewMemberId 추가
             user: {
               select: {
                 nickname: true,
@@ -122,6 +148,48 @@ export const getNoticeDetails = async (noticeId) => {
       error.errorCode = "NOTICE_NOT_FOUND";
       throw error;
     }
+
+    // 사용자가 로그인한 경우 좋아요 상태 확인
+    if (userId) {
+      const like = await prisma.crewNoticeLike.findFirst({
+        where: {
+          crewNoticeId: notice.id,
+          crewMember: {
+            userId: userId,
+          },
+        },
+      });
+      notice.isLiked = !!like;
+    }
+
+    // 좋아요 관련 정보 조회
+    const likes = await prisma.crewNoticeLike.findMany({
+      where: {
+        crewNoticeId: notice.id,
+      },
+      include: {
+        crewMember: {
+          select: {
+            id: true,
+            user: {
+              select: {
+                nickname: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // 좋아요 정보 추가
+    notice.totalLikes = likes.length;
+    notice.likedBy = likes.map((like) => ({
+      crewMemberId: like.crewMember.id,
+      nickname: like.crewMember.user.nickname,
+      likedAt: like.createdAt,
+    }));
+
     return notice;
   } catch (error) {
     if (error.statusCode) {
@@ -171,6 +239,7 @@ export const updateNotice = async (noticeId, userId, noticeUpdateData) => {
       data: {
         title: noticeUpdateData.title,
         content: noticeUpdateData.content,
+        type: noticeUpdateData.type,
         modifiedAt: new Date(), // 수정 시각 기록
       },
     });
@@ -229,5 +298,115 @@ export const deleteNotice = async (noticeId, userId) => {
       throw error;
     }
     throw new Error("공지사항 삭제 중 오류가 발생했습니다.");
+  }
+};
+
+/**
+ * 6. 공지사항 좋아요 토글
+ * @param {number} noticeId - 공지 ID
+ * @param {number} userId - 사용자 ID
+ * @returns {Object} 좋아요 토글 결과
+ */
+export const toggleNoticeLike = async (noticeId, userId) => {
+  try {
+    // 1. 공지사항 존재 여부 확인
+    const notice = await prisma.crewNotice.findUnique({
+      where: { id: parseInt(noticeId, 10) },
+      include: {
+        crewNoticeLike: {
+          include: {
+            crewMember: {
+              select: {
+                id: true,
+                userId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!notice) {
+      const error = new Error("해당 공지를 찾을 수 없습니다.");
+      error.statusCode = 404;
+      error.errorCode = "NOTICE_NOT_FOUND";
+      throw error;
+    }
+
+    // 2. 사용자가 해당 크루의 멤버인지 확인
+    const crewMember = await prisma.crewMember.findFirst({
+      where: {
+        userId: userId,
+        crewId: notice.crewId,
+      },
+    });
+
+    if (!crewMember) {
+      const error = new Error("크루 멤버만 좋아요를 누를 수 있습니다.");
+      error.statusCode = 403;
+      error.errorCode = "FORBIDDEN";
+      throw error;
+    }
+
+    // 3. 현재 사용자가 이미 좋아요를 눌렀는지 확인
+    const existingLike = await prisma.crewNoticeLike.findFirst({
+      where: {
+        crewNoticeId: parseInt(noticeId, 10),
+        crewMemberId: crewMember.id,
+      },
+    });
+
+    let isLiked, action, likedBy;
+
+    if (existingLike) {
+      // 4. 좋아요가 있으면 제거
+      await prisma.crewNoticeLike.delete({
+        where: { id: existingLike.id },
+      });
+      isLiked = false;
+      action = "removed";
+    } else {
+      // 5. 좋아요가 없으면 추가
+      await prisma.crewNoticeLike.create({
+        data: {
+          crewNoticeId: parseInt(noticeId, 10),
+          crewMemberId: crewMember.id,
+        },
+      });
+      isLiked = true;
+      action = "added";
+    }
+
+    // 6. 업데이트된 좋아요 정보 조회
+    const updatedLikes = await prisma.crewNoticeLike.findMany({
+      where: {
+        crewNoticeId: parseInt(noticeId, 10),
+      },
+      include: {
+        crewMember: {
+          select: {
+            id: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    likedBy = updatedLikes.map((like) => ({
+      crewMemberId: like.crewMember.id,
+      createdAt: like.createdAt,
+    }));
+
+    return {
+      isLiked,
+      totalLikes: updatedLikes.length,
+      action,
+      likedBy,
+    };
+  } catch (error) {
+    if (error.statusCode) {
+      throw error;
+    }
+    throw new Error("좋아요 토글 중 오류가 발생했습니다.");
   }
 };

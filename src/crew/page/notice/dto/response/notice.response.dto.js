@@ -14,8 +14,10 @@ export const noticeListResponseDto = (notices, crewId) => {
     data: notices.map((notice) => ({
       id: notice.id,
       title: notice.title,
+      type: notice.type,
       createdAt: notice.createdAt,
       author: notice.crewMember?.user?.nickname || "알 수 없음",
+      isLiked: notice.isLiked || false,
     })),
   };
 };
@@ -30,12 +32,17 @@ export const noticeDetailResponseDto = (notice) => {
     id: notice.id,
     title: notice.title,
     content: notice.content,
+    type: notice.type,
     createdAt: notice.createdAt,
     modifiedAt: notice.modifiedAt,
     author: {
+      crewMemberId: notice.crewMember?.id || null,
       nickname: notice.crewMember?.user?.nickname || "알 수 없음",
       image: notice.crewMember?.user?.image || null,
     },
+    isLiked: notice.isLiked || false,
+    totalLikes: notice.totalLikes || 0,
+    likedBy: notice.likedBy || [],
   };
 };
 
@@ -49,6 +56,7 @@ export const noticeCreateResponseDto = (notice) => {
     id: notice.id,
     title: notice.title,
     content: notice.content,
+    type: notice.type,
     createdAt: notice.createdAt,
     crewId: notice.crewId,
     crewMemberId: notice.crewMemberId,
@@ -65,6 +73,7 @@ export const noticeUpdateResponseDto = (notice) => {
     id: notice.id,
     title: notice.title,
     content: notice.content,
+    type: notice.type,
     modifiedAt: notice.modifiedAt,
   };
 };

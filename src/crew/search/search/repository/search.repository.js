@@ -118,7 +118,6 @@ export const findCrewsByOptions = async (data) => {
   if (filteredByOptions.length == 0) return filteredByOptions;
   // 검색 결과의 크루 아이디만을 별도의 배열로 저장
   const crewIdOffilteredByOptions = filteredByOptions.map((item) => item.id);
-
   // 액티비티 값으로 필터링을 하기 위한 객체
   const whereOnActivity = {};
   // 액티비티 값이 존재하면 필터링 추가

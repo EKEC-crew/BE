@@ -50,16 +50,18 @@ export const createCrew = async (body) => {
     )._count.id === body.styles.length;
   if (!isStylesValid) return -3;
   // ✅ 유효성 검사 (지역)
-  const isRegionValid =
-    (await prisma.region.findFirst({
-      select: {
-        id: true,
-      },
-      where: {
-        id: body.region,
-      },
-    })) !== null;
-  if (!isRegionValid) return -4;
+  if (body.region !== null) {
+    const isRegionValid =
+      (await prisma.region.findFirst({
+        select: {
+          id: true,
+        },
+        where: {
+          id: body.region,
+        },
+      })) !== null;
+    if (!isRegionValid) return -4;
+  }
   // ✅ 유효성 검사 (유저)
   const isExistUser = await prisma.user.findFirst({
     select: {
@@ -75,7 +77,7 @@ export const createCrew = async (body) => {
     data: {
       title: body.name,
       content: body.description,
-      introduction: "",
+      introduction: body.recruitMessage,
       crewCapacity: body.maxCapacity,
       ageLimit: body.age,
       genderLimit: body.gender,
@@ -91,11 +93,7 @@ export const createCrew = async (body) => {
           id: body.category,
         },
       },
-      region: {
-        connect: {
-          id: body.region,
-        },
-      },
+      region: body.region ? { connect: { id: body.region } } : undefined,
     },
   });
   // 크루 액티비티 테이블에 해당 크루의 액티비티 분류들 추가

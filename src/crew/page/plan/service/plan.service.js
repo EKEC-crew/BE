@@ -55,7 +55,7 @@ export const CrewPlanService = {
     },
 
     //특정 일정 조회 서비스
-    getPlanById: async (crewId, planId) => {
+    getPlanById: async (crewId, planId, userId) => {
         if (!crewId || !planId || isNaN(crewId) || isNaN(planId)) {
             throw new InvalidInputValueError("crewId 또는 planId가 올바르지 않습니다.", {crewId, planId});
         }
@@ -65,12 +65,53 @@ export const CrewPlanService = {
         if (!plan) {
             throw new NotFoundPlanError("해당 일정이 존재하지 않습니다.", {crewId, planId});
         }
+
+        // 사용자의 좋아요 및 신청 상태 조회
+        let isLiked = false;
+        let isApplied = false;
+
+        if (userId) {
+            const crewMember = await prisma.crewMember.findFirst({
+                where: {
+                    crewId: Number(crewId),
+                    userId: Number(userId)
+                }
+            });
+
+            if (crewMember) {
+                // 좋아요 상태 조회
+                const likeStatus = await prisma.crewPlanLike.findUnique({
+                    where: {
+                        planId_crewMemberId: {
+                            planId: Number(planId),
+                            crewMemberId: crewMember.id
+                        }
+                    }
+                });
+                isLiked = likeStatus !== null; //likeStatus가 null이 아니면 isLiked가 true
+
+                // 신청 상태 조회
+                const requestStatus = await prisma.crewPlanRequest.findFirst({
+                    where: {
+                        crewPlanId: Number(planId),
+                        crewMemberId: crewMember.id
+                    }
+                });
+                isApplied = requestStatus !== null; //requestStatus가 null이 아니면 isApplied가 true
+            }
+        }
+
+        const planWithUserStatus = {
+            ...plan,
+            isLiked,
+            isApplied
+        };
         
-        return new planResponse.GetCrewPlanResponse(plan);
+        return new planResponse.GetCrewPlanResponse(planWithUserStatus);
     },
 
     //일정 리스트로 조회 서비스 (페이징 처리 추가)
-    getPlanListByCrewId: async (crewId, page = 1, size = 10) => {
+    getPlanListByCrewId: async (crewId, page = 1, size = 10, userId) => {
         if (!crewId || isNaN(crewId)) {
             throw new InvalidInputValueError("crewId가 올바르지 않습니다.", {crewId});
         }
@@ -82,8 +123,53 @@ export const CrewPlanService = {
 
         const result = await planRepository.CrewPlanRepository.findPlanListByCrewId(Number(crewId), page, size);
         
-        const plans = result.plans.map((plan) => new planResponse.GetCrewPlanResponse(plan));
-        return new planResponse.GetCrewPlanListResponse(plans, result.pagination);
+        // 사용자의 좋아요 및 신청 상태 조회
+        let crewMember = null;
+        if (userId) {
+            crewMember = await prisma.crewMember.findFirst({
+                where: {
+                    crewId: Number(crewId),
+                    userId: Number(userId)
+                }
+            });
+        }
+
+        const plansWithUserStatus = await Promise.all(
+            result.plans.map(async (plan) => {
+                let isLiked = false;
+                let isApplied = false;
+
+                if (crewMember) {
+                    // 좋아요 상태 조회
+                    const likeStatus = await prisma.crewPlanLike.findUnique({
+                        where: {
+                            planId_crewMemberId: {
+                                planId: plan.id,
+                                crewMemberId: crewMember.id
+                            }
+                        }
+                    });
+                    isLiked = likeStatus !== null; //likeStatus가 null이 아니면 isLiked가 true
+
+                    // 신청 상태 조회
+                    const requestStatus = await prisma.crewPlanRequest.findFirst({
+                        where: {
+                            crewPlanId: plan.id,
+                            crewMemberId: crewMember.id
+                        }
+                    });
+                    isApplied = requestStatus !== null; //requestStatus가 null이 아니면 isApplied가 true
+                }
+
+                return new planResponse.GetCrewPlanResponse({
+                    ...plan,
+                    isLiked,
+                    isApplied
+                });
+            })
+        );
+
+        return new planResponse.GetCrewPlanListResponse(plansWithUserStatus, result.pagination);
     },
 
     //일정 수정 서비스
@@ -370,12 +456,7 @@ export const CrewPlanRequestService = {
                 crewMember.id
             );
 
-            return {
-                message: "일정 신청이 완료되었습니다.",
-                planId: Number(planId),
-                status: 1,
-                applicant: request.crewMember.user.nickname
-            };
+            return new planResponse.CrewPlanRequestResponse(request);
         } catch (error) {
             if (error.message === "이미 신청한 일정입니다.") {
                 throw new InvalidInputValueError("이미 신청한 일정입니다.", { crewId, planId, userId });

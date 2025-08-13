@@ -42,7 +42,7 @@ export const createCrewApplicationDetailResponse = (application) => {
         gender,
         crewId,
         userId,
-        categoryId,
+        categoryId: categoryId || 0,
         activityList,
         styleList,
         user: user
@@ -58,11 +58,31 @@ export const createCrewApplicationDetailResponse = (application) => {
                 content: crewCategory.content
             }
             : null,
-        answers: answers?.map((a) => ({
-            recruitFormId: a.recruitFormId,
-            checkedChoices: a.checkedChoices,
-            answer: a.answer
-        })) || []
+        answers: answers?.map((a) => {
+            const form = a.crewRecruitForm;
+            let etcChoices = [];
+
+            // 체크박스 문항이고 선택된 답변이 있는 경우
+            if (a.checkedChoices && form?.questionType === 0) {
+                const predefinedList = form.choiceList || [];
+
+                a.checkedChoices.forEach(choice => {
+                    if (!predefinedList.includes(choice)) {
+                        etcChoices.push(choice);  // 기타로 입력한 답변만 추출
+                    }
+                });
+            }
+
+            return {
+                recruitFormId: a.recruitFormId,
+                questionType: form?.questionType || 0,
+                // 체크박스 문항인 경우 기타 답변만 제공
+                etcChoices: form?.questionType === 0 ? etcChoices : null,
+                // 기존 checkedChoices 유지 (전체 답변)
+                checkedChoices: a.checkedChoices,
+                answer: a.answer
+            };
+        }) || []
     };
 };
 
@@ -73,7 +93,7 @@ export const createCrewApplicationFormResponse = ({ step1, step2, recruitMessage
             styles: step1.styles,
             activities: step1.activities,
             region: step1.region,
-            category: step1.category,
+            category: step1.category || 0, // DB에서 null이면 클라이언트에는 0으로 반환
             age: step1.age
         },
         step2: step2.map((form) => ({

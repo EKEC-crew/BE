@@ -43,6 +43,7 @@ model User {
   crewRegister            CrewRegister[]
   refreshToken            RefreshToken[]
   oauth                   OAuth[]
+  receivedAlarm           ReceivedAlarm[]
   @@map("user")
 }
 
@@ -81,11 +82,11 @@ model Crew {
   genderLimit             Int                       @map("gender_limit")
   userId                  Int                       @map("user_id")
   categoryId              Int                       @map("category_id")
-  regionId                Int                       @map("region_id")
+  regionId                Int?                       @map("region_id")
   recruitMessage          String                    @map("recruit_message") @db.Text
   alarm                   Alarm[]
   crewCategory            CrewCategory              @relation(fields: [categoryId], references: [id])
-  region                  Region                    @relation(fields: [regionId], references: [id])
+  region                  Region?                   @relation(fields: [regionId], references: [id])
   user                    User                      @relation(fields: [userId], references: [id])
   crewActivity            CrewActivity[]
   crewAlbum               CrewAlbum[]
@@ -110,7 +111,7 @@ model CrewPlan {
   title                String            @db.VarChar(30)
   content              String            @db.Text
   likeCount            Int               @default(0) @map("like_count")
-  commentCount            Int            @default(0) @map("comment_count")
+  commentCount         Int               @default(0) @map("comment_count")
   type                 Int               @default(0)
   createdAt            DateTime          @default(now()) @map("created_at")
   crewId               Int               @map("crew_id")
@@ -138,7 +139,6 @@ model CrewPlanComment {
   id           Int        @id @default(autoincrement())
   content      String     @db.Text
   createdAt    DateTime   @default(now()) @map("created_at")
-  modifiedAt   DateTime?  @updatedAt @map("modified_at")
   crewPlanId   Int        @map("crew_plan_id")
   crewMemberId Int        @map("crew_member_id")
   isPublic     Boolean    @map("is_public")
@@ -282,9 +282,11 @@ model CrewPostComment {
 }
 
 model CrewNotice {
+
   id                Int                 @id @default(autoincrement())
   title             String              @db.VarChar(50)
   content           String              @db.Text
+  type              Int                 @default(0) // 0: 일반, 1: 필수
   createdAt         DateTime            @default(now()) @map("created_at")
   modifiedAt        DateTime?           @updatedAt @map("modified_at")
   crewId            Int                 @map("crew_id")
@@ -438,23 +440,34 @@ model CrewRecruitAppliedStep2 {
   @@index([userId], map: "crew_recruit_applied_step2_user_id_fkey")
   @@map("crew_recruit_applied_step2")
 }
-
+enum AlarmType {
+  CREW_JOIN_REQUEST
+  CREW_JOIN_ACCEPTED
+  CREW_JOIN_REJECTED
+  NOTICE_CREATED
+  SCHEDULE_CREATED
+  POST_LIKED
+  POST_COMMENTED
+  CREW_WARNED
+  CREW_KICKED
+}
 model Alarm {
   id         Int        @id @default(autoincrement())
-  content    String     @db.Text
   status     Int        @default(0)
   type       AlarmType
   createdAt  DateTime   @default(now()) @map("created_at")
   userId     Int        @map("user_id")
   crewId     Int        @map("crew_id")
-  noticeId   Int        @map("notice_id")
-  postId     Int        @map("post_id")
-  planId     Int        @map("plan_id")
+  noticeId   Int?        @map("notice_id")
+  postId     Int?        @map("post_id")
+  planId     Int?        @map("plan_id")
   crew       Crew       @relation(fields: [crewId], references: [id])
-  crewNotice CrewNotice @relation(fields: [noticeId], references: [id])
-  crewPlan   CrewPlan   @relation(fields: [planId], references: [id])
-  crewPost   CrewPost   @relation(fields: [postId], references: [id])
+  crewNotice CrewNotice? @relation(fields: [noticeId], references: [id])
+  crewPlan   CrewPlan?   @relation(fields: [planId], references: [id])
+  crewPost   CrewPost?   @relation(fields: [postId], references: [id])
   user       User       @relation(fields: [userId], references: [id])
+
+  received   ReceivedAlarm[]
 
   @@index([crewId], map: "alarm_crew_id_fkey")
   @@index([noticeId], map: "alarm_notice_id_fkey")
@@ -464,15 +477,17 @@ model Alarm {
   @@map("alarm")
 }
 
-enum AlarmType {
-  CREW_JOIN_REQUEST
-  CREW_JOIN_RESULT
-  NOTICE_CREATED
-  SCHEDULE_CREATED
-  POST_LIKED
-  POST_COMMENTED
-  CREW_WARNED
-  CREW_KICKED
+model ReceivedAlarm {
+  id         Int        @id @default(autoincrement())
+  status     Int        @default(0)
+  alarmId    Int        @map("alarm_id")
+  userId     Int        @map("user_id")
+  alarm      Alarm      @relation(fields: [alarmId], references: [id])
+  user       User       @relation(fields: [userId], references: [id])
+
+  @@index([alarmId], map: "received_alarm_alarm_id_fkey")
+  @@index([userId], map: "received_alarm_user_id_fkey")
+  @@map("received_alarm")
 }
 
 model RefreshToken {

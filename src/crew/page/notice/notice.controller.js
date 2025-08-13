@@ -57,17 +57,24 @@ export const getNotices = async (req, res, next) => {
             error: { type: "object", nullable: true, example: null },
             data: {
               type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  id: { type: "integer", example: 1 },
-                  title: { type: "string", example: "공지 제목" },
-                  type: { type: "integer", example: 1, description: "공지 유형 (0: 일반, 1: 필수)" },
-                  createdAt: { type: "string", format: "date-time", example: "2025-07-29T12:00:00.000Z" },
-                  author: { type: "string", example: "작성자" },
-                  isLiked: { type: "boolean", example: false, description: "현재 사용자의 좋아요 여부" }
+                              items: {
+                  type: "object",
+                  properties: {
+                    id: { type: "integer", example: 1 },
+                    title: { type: "string", example: "공지 제목" },
+                    type: { type: "integer", example: 1, description: "공지 유형 (0: 일반, 1: 필수)" },
+                    createdAt: { type: "string", format: "date-time", example: "2025-07-29T12:00:00.000Z" },
+                    author: {
+                      type: "object",
+                      properties: {
+                        crewMemberId: { type: "integer", example: 123, description: "작성자의 크루 멤버 ID" },
+                        role: { type: "integer", example: 2, description: "작성자의 역할 (0: 크루원, 1: 운영진, 2: 크루장)", enum: [0, 1, 2] },
+                        nickname: { type: "string", example: "작성자" }
+                      }
+                    },
+                    isLiked: { type: "boolean", example: false, description: "현재 사용자의 좋아요 여부" }
+                  }
                 }
-              }
             }
           }
         }
@@ -131,7 +138,7 @@ export const createNotice = async (req, res, next) => {
     /*
   #swagger.tags = ['Notice']
   #swagger.summary = '공지 작성 API'
-  #swagger.description = '새로운 공지사항을 작성합니다.'
+  #swagger.description = '새로운 공지사항을 작성합니다. (크루장 또는 운영진만 작성 가능)'
 
   #swagger.parameters['crewId'] = {
     in: 'path',
@@ -197,7 +204,7 @@ export const createNotice = async (req, res, next) => {
               type: "object",
               properties: {
                 errorCode: { type: "string", example: "FORBIDDEN" },
-                reason: { type: "string", example: "공지 작성 권한이 없습니다. 크루 멤버인지 확인하세요." }
+                reason: { type: "string", example: "공지 작성 권한이 없습니다. 크루장 또는 운영진만 공지를 작성할 수 있습니다." }
               }
             },
             success: { type: "object", nullable: true, example: null }
@@ -275,6 +282,7 @@ export const getNoticeDetails = async (req, res, next) => {
                   type: "object",
                   properties: {
                     crewMemberId: { type: "integer", example: 123, description: "작성자의 크루 멤버 ID" },
+                    role: { type: "integer", example: 2, description: "작성자의 역할 (0: 크루원, 1: 운영진, 2: 크루장)", enum: [0, 1, 2] },
                     nickname: { type: "string", example: "작성자" },
                     image: { type: "string", nullable: true, example: null }
                   }
@@ -362,7 +370,7 @@ export const updateNotice = async (req, res, next) => {
     /*
   #swagger.tags = ['Notice']
   #swagger.summary = '공지사항 수정 API'
-  #swagger.description = '특정 공지사항의 내용을 수정합니다.'
+  #swagger.description = '특정 공지사항의 내용을 수정합니다. (작성자 또는 크루장/운영진만 수정 가능)'
 
   #swagger.parameters['crewId'] = {
     in: 'path',
@@ -457,7 +465,7 @@ export const updateNotice = async (req, res, next) => {
               type: "object",
               properties: {
                 errorCode: { type: "string", example: "FORBIDDEN" },
-                reason: { type: "string", example: "공지를 수정할 권한이 없습니다." },
+                reason: { type: "string", example: "공지를 수정할 권한이 없습니다. 작성자 또는 크루장/운영진만 수정할 수 있습니다." },
                 data: { type: "object", nullable: true, example: null }
               }
             },
@@ -501,7 +509,7 @@ export const deleteNotice = async (req, res, next) => {
     /*
   #swagger.tags = ['Notice']
   #swagger.summary = '공지사항 삭제 API'
-  #swagger.description = '특정 공지사항을 삭제합니다.'
+  #swagger.description = '특정 공지사항을 삭제합니다. (작성자 또는 크루장/운영진만 삭제 가능)'
 
   #swagger.parameters['crewId'] = {
     in: 'path',
@@ -575,7 +583,7 @@ export const deleteNotice = async (req, res, next) => {
               type: "object",
               properties: {
                 errorCode: { type: "string", example: "FORBIDDEN" },
-                reason: { type: "string", example: "공지를 삭제할 권한이 없습니다." },
+                reason: { type: "string", example: "공지를 삭제할 권한이 없습니다. 작성자 또는 크루장/운영진만 삭제할 수 있습니다." },
                 data: { type: "object", nullable: true, example: null }
               }
             },

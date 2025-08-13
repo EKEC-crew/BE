@@ -11,6 +11,7 @@ router.use('/search', searchRoutes);
 router.use('/sort', sortRoutes);
 router.use('/create', creationRoutes);
 router.use('/list', listRoutes);
-router.use('/', pageRoutes, applyRoute);
+router.use('/', pageRoutes);
+router.use('/apply', applyRoute);
 
 export default router;

@@ -24,7 +24,7 @@ const findApplicationById = async (crewId, applyId) => {
         },
         include: {
             user: true,
-            crewCategory: true, // 기존 관계 그대로 유지
+            crewCategory: true,
         },
     });
 
@@ -37,11 +37,21 @@ const findApplicationById = async (crewId, applyId) => {
     const step2 = await prisma.crewRecruitAppliedStep2.findMany({
         where: {
             userId: step1.userId,
+            crewRecruitForm: {
+                crewId: crewId  // 해당 크루의 폼에 대한 답변만 조회
+            }
         },
         select: {
             recruitFormId: true,
             checkedChoices: true,
             answer: true,
+            crewRecruitForm: {
+                select: {
+                    id: true,
+                    questionType: true,
+                    choiceList: true  // 선택지 리스트 추가 (분리 위해 필요)
+                }
+            }
         },
     });
 

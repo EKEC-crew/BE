@@ -281,7 +281,8 @@ export const readCrewPost = async (req, res, next) => {
                       "imageId": 22,
                       "imageName": "2e4b97b8-41a3-4686-997b-fc04dea279b2.png"
                     }
-                  ]
+                  ],
+                  "isLiked": true,
                 }
               }
             }

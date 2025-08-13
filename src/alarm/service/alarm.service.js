@@ -46,15 +46,19 @@ const formatAlarm = (alarms) => {
       noticeId: alarm.alarm.noticeId,
       postId: alarm.alarm.postId,
       planId: alarm.alarm.planId,
-      user: {
-        id: alarm.alarm.userId,
-        nickname: alarm.alarm.user.nickname,
-        name: alarm.alarm.user.name,
-      },
-      crew: {
-        id: alarm.alarm.crewId,
-        name: alarm.alarm.crew.title,
-      },
+      user: alarm.alarm.userId
+        ? {
+            id: alarm.alarm.userId,
+            nickname: alarm.alarm.user.nickname,
+            name: alarm.alarm.user.name,
+          }
+        : null,
+      crew: alarm.alarm.crewId
+        ? {
+            id: alarm.alarm.crewId,
+            name: alarm.alarm.crew.title,
+          }
+        : null,
     };
   });
 };

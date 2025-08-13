@@ -212,6 +212,9 @@ export const handleLogin = async (req, res, next) => {
                 type: "object",
                 properties: {
                   id:{type: "number", example:20},
+                  gender:{type: "number", example:0},
+                  phone:{type: "string", example:"01012345678"},
+                  birth:{type: "string", example:"1990-01-01T00:00:00.000Z"},
                   email:{type: "string", example:"user@example.com"},
                   name:{type: "string", example:"홍길동"},
                   nickname:{type: "string", example:"길동이"},
@@ -372,6 +375,9 @@ export const handleRefresh = async (req, res, next) => {
               data: {type: "object", properties:{
                 id: {type:"number", example: 1},
                 email: {type:"string", example: "example@example.com"},
+                gender:{type: "number", example:0},
+                phone:{type: "string", example:"01012345678"},
+                birth:{type: "string", example:"1990-01-01T00:00:00.000Z"},
                 name: {type:"string", example: "홍길동"},
                 nickname: {type:"string", example: "길동이"},
                 profileImage: {type:"string", example: "profile.jpg"},

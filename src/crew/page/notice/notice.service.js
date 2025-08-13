@@ -17,6 +17,8 @@ export const getNotices = async (crewId, userId = null) => {
         createdAt: true,
         crewMember: {
           select: {
+            id: true,
+            role: true, // 작성자의 역할 추가
             user: {
               select: {
                 nickname: true,
@@ -30,10 +32,20 @@ export const getNotices = async (crewId, userId = null) => {
       },
     });
 
+    // 공지 데이터에 author 정보 추가
+    const noticesWithAuthor = notices.map((notice) => ({
+      ...notice,
+      author: {
+        crewMemberId: notice.crewMember.id,
+        role: notice.crewMember.role,
+        nickname: notice.crewMember.user.nickname,
+      },
+    }));
+
     // 사용자가 로그인한 경우 좋아요 상태 확인
     if (userId) {
       const noticesWithLikes = await Promise.all(
-        notices.map(async (notice) => {
+        noticesWithAuthor.map(async (notice) => {
           const like = await prisma.crewNoticeLike.findFirst({
             where: {
               crewNoticeId: notice.id,
@@ -51,7 +63,7 @@ export const getNotices = async (crewId, userId = null) => {
       return noticesWithLikes;
     }
 
-    return notices;
+    return noticesWithAuthor;
   } catch (error) {
     throw new Error("공지사항 목록을 조회하는 중 오류가 발생했습니다.");
   }
@@ -65,11 +77,15 @@ export const getNotices = async (crewId, userId = null) => {
  */
 export const createNotice = async (crewId, userId, noticeData) => {
   try {
-    // 1. 요청을 보낸 사용자가 해당 크루의 맴버인지 확인
+    // 1. 요청을 보낸 사용자가 해당 크루의 맴버인지 확인하고 역할도 함께 조회
     const crewMember = await prisma.crewMember.findFirst({
       where: {
         crewId: parseInt(crewId, 10),
         userId: userId,
+      },
+      select: {
+        id: true,
+        role: true,
       },
     });
 
@@ -83,7 +99,17 @@ export const createNotice = async (crewId, userId, noticeData) => {
       throw error;
     }
 
-    // 3. 공지를 생성하고, 작성자(crewMember) 정보를 연결합니다.
+    // 3. 크루장(2) 또는 운영진(1)만 공지 작성 가능
+    if (crewMember.role !== 2 && crewMember.role !== 1) {
+      const error = new Error(
+        "공지 작성 권한이 없습니다. 크루장 또는 운영진만 공지를 작성할 수 있습니다."
+      );
+      error.statusCode = 403;
+      error.errorCode = "FORBIDDEN";
+      throw error;
+    }
+
+    // 4. 공지를 생성하고, 작성자(crewMember) 정보를 연결합니다.
     const newNotice = await prisma.crewNotice.create({
       data: {
         title: noticeData.title,
@@ -131,6 +157,7 @@ export const getNoticeDetails = async (noticeId, userId = null) => {
         crewMember: {
           select: {
             id: true, // crewMemberId 추가
+            role: true, // 작성자의 역할 추가
             user: {
               select: {
                 nickname: true,
@@ -161,6 +188,16 @@ export const getNoticeDetails = async (noticeId, userId = null) => {
       });
       notice.isLiked = !!like;
     }
+
+    // author 정보 추가
+    console.log("crewMember data:", notice.crewMember); // 디버깅용 로그
+    notice.author = {
+      crewMemberId: notice.crewMember.id,
+      role: notice.crewMember.role,
+      nickname: notice.crewMember.user.nickname,
+      image: notice.crewMember.user.image,
+    };
+    console.log("author object:", notice.author); // 디버깅용 로그
 
     // 좋아요 관련 정보 조회
     const likes = await prisma.crewNoticeLike.findMany({
@@ -204,13 +241,15 @@ export const getNoticeDetails = async (noticeId, userId = null) => {
  */
 export const updateNotice = async (noticeId, userId, noticeUpdateData) => {
   try {
-    // 1. 수정하려는 공지의 작성자 정보를 가져옵니다.
+    // 1. 수정하려는 공지의 작성자 정보와 크루 정보를 가져옵니다.
     const notice = await prisma.crewNotice.findUnique({
       where: { id: parseInt(noticeId, 10) },
       select: {
+        crewId: true,
         crewMember: {
           select: {
             userId: true,
+            role: true,
           },
         },
       },
@@ -223,15 +262,37 @@ export const updateNotice = async (noticeId, userId, noticeUpdateData) => {
       throw error;
     }
 
-    // 2. 요청을 보낸 사용자와 공지 작성자가 동일 인물인지 확인합니다.
-    if (notice.crewMember.userId !== userId) {
+    // 2. 요청을 보낸 사용자가 해당 크루의 멤버인지 확인하고 역할도 함께 조회
+    const currentUser = await prisma.crewMember.findFirst({
+      where: {
+        crewId: notice.crewId,
+        userId: userId,
+      },
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+
+    if (!currentUser) {
       const error = new Error("공지를 수정할 권한이 없습니다.");
       error.statusCode = 403;
       error.errorCode = "FORBIDDEN";
       throw error;
     }
 
-    // 3. 데이터를 수정합니다.
+    // 3. 공지 작성자이거나 크루장(2) 또는 운영진(1)인 경우에만 수정 가능
+    const isAuthor = notice.crewMember.userId === userId;
+    const isAdmin = currentUser.role === 2 || currentUser.role === 1;
+
+    if (!isAuthor && !isAdmin) {
+      const error = new Error("공지를 수정할 권한이 없습니다.");
+      error.statusCode = 403;
+      error.errorCode = "FORBIDDEN";
+      throw error;
+    }
+
+    // 4. 데이터를 수정합니다.
     const updatedNotice = await prisma.crewNotice.update({
       where: {
         id: parseInt(noticeId, 10),
@@ -258,13 +319,15 @@ export const updateNotice = async (noticeId, userId, noticeUpdateData) => {
  */
 export const deleteNotice = async (noticeId, userId) => {
   try {
-    // 1. 삭제하려는 공지의 작성자 정보를 가져옴
+    // 1. 삭제하려는 공지의 작성자 정보와 크루 정보를 가져옴
     const notice = await prisma.crewNotice.findUnique({
       where: { id: parseInt(noticeId, 10) },
       select: {
+        crewId: true,
         crewMember: {
           select: {
             userId: true,
+            role: true,
           },
         },
       },
@@ -277,15 +340,37 @@ export const deleteNotice = async (noticeId, userId) => {
       throw error;
     }
 
-    // 2. 요청을 보낸 사용자와 공지 작성자가 동일 인물인지 확인
-    if (notice.crewMember.userId !== userId) {
+    // 2. 요청을 보낸 사용자가 해당 크루의 멤버인지 확인하고 역할도 함께 조회
+    const currentUser = await prisma.crewMember.findFirst({
+      where: {
+        crewId: notice.crewId,
+        userId: userId,
+      },
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+
+    if (!currentUser) {
       const error = new Error("공지를 삭제할 권한이 없습니다.");
       error.statusCode = 403;
       error.errorCode = "FORBIDDEN";
       throw error;
     }
 
-    // 3. 공지 데이터 삭제
+    // 3. 공지 작성자이거나 크루장(2) 또는 운영진(1)인 경우에만 삭제 가능
+    const isAuthor = notice.crewMember.userId === userId;
+    const isAdmin = currentUser.role === 2 || currentUser.role === 1;
+
+    if (!isAuthor && !isAdmin) {
+      const error = new Error("공지를 삭제할 권한이 없습니다.");
+      error.statusCode = 403;
+      error.errorCode = "FORBIDDEN";
+      throw error;
+    }
+
+    // 4. 공지 데이터 삭제
     await prisma.crewNotice.delete({
       where: {
         id: parseInt(noticeId, 10),

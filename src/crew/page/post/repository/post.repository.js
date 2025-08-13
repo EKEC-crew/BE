@@ -48,6 +48,7 @@ export const getPostsByCrewId = async ({ crewId, page, size }) => {
 					include: {
 						user: {
 							select: {
+								id: true,
 								nickname: true
 							}
 						}
@@ -127,6 +128,7 @@ export const getPostByPostId = async ({ postId }) => {
 					include: {
 						user: {
 							select: {
+								id: true,
 								nickname: true,
 								image: true,
 							}
@@ -378,6 +380,7 @@ export const getCommentsByPostId = async ({ postId, page, size }) => {
 					include: {
 						user: {
 							select: {
+								id: true,
 								nickname: true,
 								image: true,
 							}

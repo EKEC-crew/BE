@@ -23,7 +23,7 @@ export class ApplyErrorResponseDTO {
 /**
  * 특정 크루 특정 지원서 조회 응답 생성
  * - questionType: 0(체크박스), 1(장문)
- * - checkedChoices: 사용자가 실제로 선택한 값(체크박스형)
+ * - checkedChoices: 기본 choiceList에 포함된 선택값만 반환
  * - etcChoices: 체크박스형 + isEtc=1 인 문항에서, 기본 choiceList에 없는 “기타 입력값”만 분리 제공
  */
 export const createCrewApplicationDetailResponse = (application) => {
@@ -120,10 +120,16 @@ export const createCrewApplicationDetailResponse = (application) => {
                 };
             }
 
-            // 체크박스형(0): isEtc=1일 때만 “기타 입력값” 분리
+            // 체크박스형(0)
+            // - etcChoices: isEtc=1일 때만 기본 선택지에 없는 값들
+            // - checkedChoices: 기본 선택지에 포함된 값들만
             let etcChoices = null;
-            if (questionType === 0 && isEtc && checked.length) {
-                etcChoices = checked.filter((c) => !predefinedList.includes(c));
+            let filteredChecked = checked;
+            if (checked.length) {
+                if (isEtc) {
+                    etcChoices = checked.filter((c) => !predefinedList.includes(c));
+                }
+                filteredChecked = checked.filter((c) => predefinedList.includes(c));
             }
 
             return {
@@ -131,8 +137,8 @@ export const createCrewApplicationDetailResponse = (application) => {
                 questionType,
                 // 체크박스형에서만 노출, isEtc=0이면 null
                 etcChoices,
-                // 사용자가 실제 선택한 값 전체
-                checkedChoices: checked,
+                // 기본 choiceList 값만 유지
+                checkedChoices: filteredChecked,
                 // 체크박스형은 answer 사용하지 않음
                 answer: null,
             };

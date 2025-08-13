@@ -112,3 +112,18 @@ export class CreateCrewPlanResponse {
       this.userId = request.crewMember.user.id;
     }
   }
+
+  // 다가오는 일정 리스트 응답 DTO
+  export class GetUpcomingPlansResponse {
+    constructor(plans, pagination) {
+      this.plans = plans;
+      this.pagination = {
+        currentPage: pagination.currentPage,
+        totalPages: pagination.totalPages,
+        totalElements: pagination.totalElements,
+        pageSize: pagination.pageSize,
+        hasNext: pagination.hasNext,
+        hasPrevious: pagination.hasPrevious
+      };
+    }
+  }

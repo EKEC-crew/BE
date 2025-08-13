@@ -17,6 +17,9 @@ router.post('/', authenticateAccessToken, verifyUserIsActive, planController.cre
 // 크루 일정 리스트 조회 (더 구체적인 경로를 먼저 배치)
 router.get('/list', authenticateAccessToken, verifyUserIsActive, planController.getPlanList);
 
+// 다가오는 일정 리스트 조회 (정적 라우트를 동적 라우트보다 먼저 배치)
+router.get("/upcoming", authenticateAccessToken, verifyUserIsActive, planController.getUpcomingPlans);
+
 // 크루 일정 조회
 router.get('/:planId', authenticateAccessToken, verifyUserIsActive, planController.getPlanById);
 

@@ -1,7 +1,5 @@
 // Prisma 클라이언트 가져오기
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../../db.config.js";
 
 // 1. 공지 리스트 조회
 export const getNotices = async (crewId, userId = null) => {

@@ -71,15 +71,25 @@ export const createCrewApplicationDetailResponse = (application) => {
             const form = a.crewRecruitForm || {};
 
             // questionType 보정 (0: 체크박스, 1: 장문)
-            const questionType = Number(form.questionType) === 1 ? 1 : 0;
+            const questionType = Number(form?.questionType) === 1 ? 1 : 0;
 
             // isEtc 보정 (1: 기타 입력 허용, 0: 비허용)
-            const isEtc = Number(form.isEtc) === 1;
+            const isEtc = Number(form?.isEtc) === 1;
 
-            // choiceList 보정 (Json? → 배열 보장)
-            const predefinedList = Array.isArray(form.choiceList) ? form.choiceList : [];
+            // choiceList 보정 (Json? → 배열 또는 { list: [...] } 모두 지원) + 문자열 정규화
+            const rawChoices = form?.choiceList;
+            let predefinedList = [];
+            if (Array.isArray(rawChoices)) {
+                predefinedList = rawChoices;
+            } else if (rawChoices && Array.isArray(rawChoices.list)) {
+                predefinedList = rawChoices.list;
+            } else {
+                predefinedList = [];
+            }
+            const norm = (v) => String(v).trim();
+            predefinedList = predefinedList.map(norm);
 
-            // checkedChoices 보정 (Json? → 배열 보장)
+            // checkedChoices 보정 (Json? → 배열 보장 + 문자열 정규화)
             let checked = [];
             if (Array.isArray(a.checkedChoices)) {
                 checked = a.checkedChoices;
@@ -88,15 +98,16 @@ export const createCrewApplicationDetailResponse = (application) => {
                     // 문자열로 저장된 경우 JSON 파싱 시도
                     try {
                         const parsed = JSON.parse(a.checkedChoices);
-                        checked = Array.isArray(parsed) ? parsed : [String(a.checkedChoices)];
+                        checked = Array.isArray(parsed) ? parsed : [a.checkedChoices];
                     } catch {
-                        checked = [String(a.checkedChoices)];
+                        checked = [a.checkedChoices];
                     }
                 } else {
-                    // 객체/숫자/불리언 등 비배열 값은 문자열로 변환해 단일 원소 배열로 수용
-                    checked = [String(a.checkedChoices)];
+                    // 객체/숫자/불리언 등 비배열 값은 단일 원소 배열로 수용
+                    checked = [a.checkedChoices];
                 }
             }
+            checked = checked.map(norm);
 
             // 장문형(1): checked/etcs는 null, answer만 유지
             if (questionType === 1) {
@@ -111,9 +122,8 @@ export const createCrewApplicationDetailResponse = (application) => {
 
             // 체크박스형(0): isEtc=1일 때만 “기타 입력값” 분리
             let etcChoices = null;
-            if (isEtc && checked.length) {
-                const etc = checked.filter((c) => !predefinedList.includes(c));
-                etcChoices = etc;
+            if (questionType === 0 && isEtc && checked.length) {
+                etcChoices = checked.filter((c) => !predefinedList.includes(c));
             }
 
             return {

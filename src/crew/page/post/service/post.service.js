@@ -289,7 +289,8 @@ export const updateCrewPostComment = async ({ crewId, postId, userId, commentId,
 		if (!isExistComment) {
 			throw new baseError.NotFoundCommentError("존재하지 않는 댓글입니다.", { commentId });
 		}
-		if (isExistComment.crewId !== crewId) {
+
+		if (isExistComment.crewPost.crewId !== crewId) {
 			throw new baseError.NotBelongToCrewError("해당 크루에 속하지 않은 댓글입니다.", { commentId });
 		}
 		if (isExistComment.postId !== postId) {

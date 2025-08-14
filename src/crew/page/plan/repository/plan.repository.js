@@ -44,7 +44,8 @@ export const CrewPlanRepository = {
                     user: {
                         select: {
                             nickname: true,
-                            id: true
+                            id: true,
+                            image: true
                         }
                     }
                 }
@@ -98,7 +99,8 @@ export const CrewPlanRepository = {
               user: {
                 select: {
                   nickname: true,
-                  id: true
+                  id: true,
+                  image: true
                 },
               },
             },
@@ -164,7 +166,8 @@ export const CrewPlanRepository = {
                 user: {
                   select: {
                     nickname: true,
-                    id: true
+                    id: true,
+                    image: true
                   }
                 }
               }

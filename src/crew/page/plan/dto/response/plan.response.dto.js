@@ -7,6 +7,7 @@ export class CreateCrewPlanResponse {
       this.crew_name = plan.crew.title;
       this.userId = plan.crewMember.user.id;
       this.writer = plan.crewMember.user.nickname;
+      this.writerImage = plan.crewMember.user.image;
       this.title = plan.title;
       this.content = plan.content;
       this.day = plan.day;
@@ -35,6 +36,7 @@ export class CreateCrewPlanResponse {
       this.crew_name = plan.crew.title;
       this.userId = plan.crewMember.user.id;
       this.writer = plan.crewMember.user.nickname;
+      this.writerImage = plan.crewMember.user.image;
       this.title = plan.title;
       this.content = plan.content;
       this.day = plan.day;

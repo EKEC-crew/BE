@@ -55,7 +55,7 @@ const getCrewApplicationById = async (crewId, applyId) => {
 const updateStatus = async (crewId, applyId, status) => {
     // status 1 = 승인, 2 = 거절
     if (status === 1) {
-        // 승인 시 지원서 상태 변경 + 크루 인원수 증가
+        // 승인 시 지원서 상태 변경 + 크루 멤버로 추가
         return await applyRepository.updateStatusWithCrewCapacity(crewId, applyId, status);
     } else {
         return await applyRepository.updateStatus(crewId, applyId, status);

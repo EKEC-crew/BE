@@ -874,6 +874,10 @@ export const handleCreateCrew = async (req, res, next) => {
       req.body,
     );
   }
+  // 0 입력시 null로 바꿔 제한 없음으로 처리
+  if (req.body.crewInfo.maxCapacity === 0) {
+    req.body.crewInfo.maxCapacity = null;
+  }
   // ✅ 유효성 검사 (카테고리)
   if (
     req.body.crewInfo.category === undefined ||

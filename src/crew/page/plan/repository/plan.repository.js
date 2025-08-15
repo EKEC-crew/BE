@@ -497,7 +497,7 @@ export const CrewPlanCommentRepository = {
           }
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: 'asc',
         },
         skip, 
         take: size,

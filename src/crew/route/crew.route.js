@@ -5,11 +5,13 @@ import creationRoutes from "../creation/route/creation.route.js";
 import listRoutes from "../list/route/list.route.js";
 import pageRoutes from "../page/route/page.route.js"
 import applyRoute from '../apply/route/apply.route.js';
+import myCrewsRoutes from "../creation/list/route/list.route.js";
 
 const router = express.Router({ mergeParams: true });
 router.use('/search', searchRoutes);
 router.use('/sort', sortRoutes);
 router.use('/create', creationRoutes);
+router.use('/create', myCrewsRoutes);
 router.use('/list', listRoutes);
 router.use('/', pageRoutes);
 router.use('/apply', applyRoute);

@@ -72,7 +72,7 @@ model Crew {
   content                 String                    @db.VarChar(50)
   introduction            String                    @db.Text
   score                   Float
-  crewCapacity            Int                       @map("crew_capacity")
+  crewCapacity            Int?                      @map("crew_capacity")
   createdAt               DateTime                  @default(now()) @map("created_at")
   modifiedAt              DateTime?                 @updatedAt @map("modified_at")
   noticeCount             Int                       @default(0) @map("notice_count")

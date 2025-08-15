@@ -2,6 +2,7 @@ import express from 'express';
 import applyController from '../controller/apply.controller.js';
 import applicantsRoutes from '../applicants/route/applicants.route.js';
 import listRoutes from '../list/route/list.route.js';
+import joinedRoutes from '../joined/route/joined.route.js';
 import { authenticateAccessToken, verifyUserIsActive } from '../../../auth/middleware/auth.middleware.js';
 import { checkCrewLeaderPermission } from '../middleware/crew.middleware.js';
 
@@ -12,6 +13,9 @@ router.use('/', applicantsRoutes);
 
 // 내 지원 목록 관련 라우트
 router.use('/', listRoutes);
+
+// 내가 가입한 크루 목록 관련 라우트
+router.use('/', joinedRoutes);
 
 // 크루 지원하기 (로그인 필요)
 router.post('/:crewId/apply',

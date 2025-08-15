@@ -27,8 +27,8 @@ export const getNotices = async (req, res, next) => {
     // DTO를 사용한 유효성 검증
     const validatedCrewId = validateCrewIdDto(crewId);
 
-    // 테스트를 위해 임시로 사용자 ID를 1로 설정 (실제로는 req.user.id 사용)
-    const userId = 1; // req.user?.id;
+    // 실제 사용자 ID 사용 (선택적)
+    const userId = req.user?.id;
 
     const result = await noticeService.getNotices(validatedCrewId, userId);
     const response = noticeListResponseDto(result, validatedCrewId);
@@ -123,9 +123,15 @@ export const createNotice = async (req, res, next) => {
     const validatedCrewId = validateCrewIdDto(crewId);
     const validatedNoticeData = createNoticeRequestDto(noticeData);
 
-    // 테스트를 위해 임시로 사용자 ID를 1로 설정
-    //const userId = req.user.id;
-    const userId = 1;
+    // 실제 사용자 ID 사용
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).error({
+        errorCode: "UNAUTHORIZED",
+        reason: "사용자 인증이 필요합니다.",
+      });
+    }
 
     const newNotice = await noticeService.createNotice(
       validatedCrewId,
@@ -349,8 +355,8 @@ export const updateNotice = async (req, res, next) => {
     const validatedNoticeId = validateNoticeIdDto(noticeId);
     const validatedUpdateData = updateNoticeRequestDto(noticeUpdateData);
 
-    // 인증 미들웨어로부터 사용자 ID 획득 (테스트를 위해 임시로 1로 설정)
-    const userId = 1; // req.user?.id;
+    // 실제 사용자 ID 사용
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).error({
@@ -492,8 +498,8 @@ export const deleteNotice = async (req, res, next) => {
     // DTO를 사용한 유효성 검증
     const validatedNoticeId = validateNoticeIdDto(noticeId);
 
-    // 인증 미들웨어로부터 사용자 ID 획득 (테스트를 위해 임시로 1로 설정)
-    const userId = 1; // req.user?.id;
+    // 실제 사용자 ID 사용
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).error({
@@ -610,8 +616,8 @@ export const toggleNoticeLike = async (req, res, next) => {
     // DTO를 사용한 유효성 검증
     const validatedNoticeId = validateNoticeIdDto(noticeId);
 
-    // 테스트를 위해 임시로 사용자 ID를 1로 설정 (실제로는 req.user.id 사용)
-    const userId = 1; // req.user?.id;
+    // 실제 사용자 ID 사용
+    const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).error({

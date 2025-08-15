@@ -59,7 +59,7 @@ const findApplicationById = async (crewId, applyId) => {
     return { ...step1, answers: step2 };
 };
 
-// 지원 상태 변경 (승인 시 크루 인원수 증가 포함)
+// 지원 상태 변경 (승인 시 크루 정원 체크 후 멤버 추가)
 const updateStatusWithCrewCapacity = async (crewId, applyId, status) => {
     return await prisma.$transaction(async (tx) => {
         // 1. 지원서 정보 확인 (이미 승인된 상태인지 체크)
@@ -82,19 +82,37 @@ const updateStatusWithCrewCapacity = async (crewId, applyId, status) => {
             throw error;
         }
 
-        // 2. 지원서 상태 변경
-        const updateResult = await tx.crewRecruitAppliedStep1.updateMany({
-            where: {
-                id: applyId,
-                crewId,
-            },
-            data: {
-                status,
-            },
-        });
-
-        // 3. 승인 시 크루 인원수 증가 + 크루 멤버로 추가
+        // 2. 승인 시 크루 정원 체크
         if (status === 1) {
+            // 크루 정보 및 현재 멤버 수 조회
+            const crew = await tx.crew.findUnique({
+                where: { id: crewId },
+                select: {
+                    crewCapacity: true,
+                    _count: {
+                        select: {
+                            crewUser: true // 현재 멤버 수
+                        }
+                    }
+                }
+            });
+
+            if (!crew) {
+                const error = new Error('크루를 찾을 수 없습니다.');
+                error.status = 404;
+                throw error;
+            }
+
+            const currentMemberCount = crew._count.crewUser;
+            const maxCapacity = crew.crewCapacity;
+
+            // 정원 초과 시 대기상태 유지 (status = 0)
+            if (currentMemberCount >= maxCapacity) {
+                const error = new Error('크루 정원이 가득 찼습니다. 대기상태로 유지됩니다.');
+                error.status = 400;
+                throw error;
+            }
+
             // 이미 크루 멤버인지 확인
             const existingMember = await tx.crewMember.findFirst({
                 where: {
@@ -108,20 +126,21 @@ const updateStatusWithCrewCapacity = async (crewId, applyId, status) => {
                 error.status = 400;
                 throw error;
             }
+        }
 
-            // 크루 인원수 증가
-            await tx.crew.update({
-                where: {
-                    id: crewId,
-                },
-                data: {
-                    crewCapacity: {
-                        increment: 1,
-                    },
-                },
-            });
+        // 3. 지원서 상태 변경
+        const updateResult = await tx.crewRecruitAppliedStep1.updateMany({
+            where: {
+                id: applyId,
+                crewId,
+            },
+            data: {
+                status,
+            },
+        });
 
-            // 크루원으로 추가
+        // 4. 승인 시 크루 멤버로 추가 (정원 체크 통과한 경우만)
+        if (status === 1) {
             await tx.crewMember.create({
                 data: {
                     userId: application.userId,

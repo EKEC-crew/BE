@@ -3,16 +3,19 @@ import Kakao from "passport-kakao";
 import { oauthLoginRegister } from "../../service/auth.service.js";
 const KakaoStrategy = Kakao.Strategy;
 
-const strategy = new KakaoStrategy(
-  {
-    clientID: process.env.KAKAO_CLIENT_ID,
-    clientSecret: process.env.KAKAO_CLIENT_SECRET,
-    callbackURL: "/api/auth/oauth/kakao/redirect",
-  },
-  (access_token, refresh_token, profile, done) => {
-    return verify(profile, done);
-  },
-);
+const createKakaoStrategy = () => {
+  return new KakaoStrategy(
+    {
+      clientID: process.env.KAKAO_CLIENT_ID,
+      clientSecret: process.env.KAKAO_CLIENT_SECRET,
+      callbackURL: "/api/auth/oauth/kakao/redirect",
+    },
+    (access_token, refresh_token, profile, done) => {
+      return verify(profile, done);
+    }
+  );
+};
+
 const verify = async (profile, done) => {
   const data = {
     email: profile._json.kakao_account.email,
@@ -23,4 +26,4 @@ const verify = async (profile, done) => {
   done(null, result);
 };
 
-export default strategy;
+export default createKakaoStrategy;

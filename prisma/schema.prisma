@@ -72,7 +72,7 @@ model Crew {
   content                 String                    @db.VarChar(50)
   introduction            String                    @db.Text
   score                   Float
-  crewCapacity            Int                       @map("crew_capacity")
+  crewCapacity            Int?                      @map("crew_capacity")
   createdAt               DateTime                  @default(now()) @map("created_at")
   modifiedAt              DateTime?                 @updatedAt @map("modified_at")
   noticeCount             Int                       @default(0) @map("notice_count")
@@ -456,16 +456,16 @@ model Alarm {
   status     Int        @default(0)
   type       AlarmType
   createdAt  DateTime   @default(now()) @map("created_at")
-  userId     Int        @map("user_id")
-  crewId     Int        @map("crew_id")
+  userId     Int?        @map("user_id")
+  crewId     Int?        @map("crew_id")
   noticeId   Int?        @map("notice_id")
   postId     Int?        @map("post_id")
   planId     Int?        @map("plan_id")
-  crew       Crew       @relation(fields: [crewId], references: [id])
+  crew       Crew?       @relation(fields: [crewId], references: [id])
   crewNotice CrewNotice? @relation(fields: [noticeId], references: [id])
   crewPlan   CrewPlan?   @relation(fields: [planId], references: [id])
   crewPost   CrewPost?   @relation(fields: [postId], references: [id])
-  user       User       @relation(fields: [userId], references: [id])
+  user       User?       @relation(fields: [userId], references: [id])
 
   received   ReceivedAlarm[]
 

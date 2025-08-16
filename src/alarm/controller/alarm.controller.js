@@ -60,7 +60,8 @@ export const handleGetAlarms = async (req, res, next) => {
                         }
                       }
                     }
-                  }
+                  },
+                  count: { type: 'number', example: 1 }
                 }
               }
             }

@@ -7,6 +7,7 @@ export class CreateCrewPlanResponse {
       this.crew_name = plan.crew.title;
       this.userId = plan.crewMember.user.id;
       this.writer = plan.crewMember.user.nickname;
+      this.writerImage = plan.crewMember.user.image;
       this.title = plan.title;
       this.content = plan.content;
       this.day = plan.day;
@@ -35,6 +36,7 @@ export class CreateCrewPlanResponse {
       this.crew_name = plan.crew.title;
       this.userId = plan.crewMember.user.id;
       this.writer = plan.crewMember.user.nickname;
+      this.writerImage = plan.crewMember.user.image;
       this.title = plan.title;
       this.content = plan.content;
       this.day = plan.day;
@@ -110,5 +112,20 @@ export class CreateCrewPlanResponse {
       this.status = request.status;
       this.applicant = request.crewMember.user.nickname;
       this.userId = request.crewMember.user.id;
+    }
+  }
+
+  // 다가오는 일정 리스트 응답 DTO
+  export class GetUpcomingPlansResponse {
+    constructor(plans, pagination) {
+      this.plans = plans;
+      this.pagination = {
+        currentPage: pagination.currentPage,
+        totalPages: pagination.totalPages,
+        totalElements: pagination.totalElements,
+        pageSize: pagination.pageSize,
+        hasNext: pagination.hasNext,
+        hasPrevious: pagination.hasPrevious
+      };
     }
   }

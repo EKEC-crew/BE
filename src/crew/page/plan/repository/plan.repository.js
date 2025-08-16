@@ -44,7 +44,8 @@ export const CrewPlanRepository = {
                     user: {
                         select: {
                             nickname: true,
-                            id: true
+                            id: true,
+                            image: true
                         }
                     }
                 }
@@ -98,7 +99,8 @@ export const CrewPlanRepository = {
               user: {
                 select: {
                   nickname: true,
-                  id: true
+                  id: true,
+                  image: true
                 },
               },
             },
@@ -164,7 +166,8 @@ export const CrewPlanRepository = {
                 user: {
                   select: {
                     nickname: true,
-                    id: true
+                    id: true,
+                    image: true
                   }
                 }
               }
@@ -287,6 +290,103 @@ export const CrewPlanRepository = {
           }
         });
       });
+    },
+
+    // 사용자가 신청완료한 다가오는 일정 조회
+    findUpcomingPlansByUserId: async (userId, page = 1, size = 5) => {
+      const skip = (page - 1) * size;
+      // 한국 시간(KST, UTC+9)으로 오늘 날짜 설정
+      const today = new Date();
+      today.setHours(today.getHours() + 9); // UTC+9 (한국 시간)
+      today.setHours(0, 0, 0, 0); // 오늘 날짜의 시작 (00:00:00)
+
+      //Promise.all : 여러 비동기 작업을 동시에 실행하고 모든 결과를 기다리는 메소드
+      const [totalCount, plans] = await Promise.all([
+        // 첫 번째 Promise: 전체 개수 조회
+        prisma.crewPlanRequest.count({
+          where: {
+            crewMember: {
+              userId: Number(userId)
+            },
+            status: 1, // 신청완료 상태
+            crewPlan: {
+              day: {
+                gte: today // 오늘 이후의 일정만(today: 한국시간 기준 오늘 날짜)
+              }
+            }
+          }
+        }),
+        // 두 번째 Promise: 일정 목록 조회
+        prisma.crewPlanRequest.findMany({
+          where: {
+            crewMember: {
+              userId: Number(userId)
+            },
+            status: 1, // 신청완료 상태
+            crewPlan: {
+              day: {
+                gte: today // 오늘 이후의 일정만
+              }
+            }
+          },
+          orderBy: {
+            crewPlan: {
+              day: 'asc' // 날짜순으로 정렬 (가까운 일정부터)
+            }
+          },
+          skip,
+          take: size,
+          select: {
+            crewPlan: {
+              select: {
+                id: true,
+                title: true,
+                day: true,
+                crew: {
+                  select: {
+                    title: true
+                  }
+                }
+              }
+            }
+          }
+        })
+      ]);
+
+      const totalPages = Math.ceil(totalCount / size);
+      
+      // 일정 데이터를 가공하여 daysUntil 계산
+      const processedPlans = plans.map(request => {
+        const plan = request.crewPlan;
+        const planDate = new Date(plan.day); // 일정 날짜
+        // 한국 시간(KST, UTC+9)으로 오늘 날짜 설정
+        const todayDate = new Date(); // 오늘 날짜
+        todayDate.setHours(todayDate.getHours() + 9); // UTC+9 (한국 시간)
+        todayDate.setHours(0, 0, 0, 0);
+        planDate.setHours(0, 0, 0, 0);
+        
+        const daysUntil = Math.ceil((planDate - todayDate) / (1000 * 60 * 60 * 24)); // 일정 날짜와 오늘날짜의 차이로 남은 날짜 계산 -> D-Day까지 몇일 남았는지 계산
+        
+        return {
+          id: plan.id,
+          crew_name: plan.crew.title,
+          title: plan.title,
+          day: plan.day,
+          daysUntil: daysUntil
+        };
+      });
+      
+      return {
+        plans: processedPlans,
+        pagination: {
+          totalElements: totalCount,
+          currentPage: page,
+          pageSize: size,
+          totalPages: totalPages,
+          hasNext: page < totalPages,
+          hasPrevious: page > 1
+        }
+      };
     }
     
 }
@@ -397,7 +497,7 @@ export const CrewPlanCommentRepository = {
           }
         },
         orderBy: {
-          createdAt: 'desc',
+          createdAt: 'asc',
         },
         skip, 
         take: size,

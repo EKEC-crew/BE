@@ -28,7 +28,7 @@ export const getNotices = async (req, res, next) => {
     const validatedCrewId = validateCrewIdDto(crewId);
 
     // 실제 사용자 ID 사용 (선택적)
-    const userId = req.user?.id;
+    const userId = req.payload?.id;
 
     const result = await noticeService.getNotices(validatedCrewId, userId);
     const response = noticeListResponseDto(result, validatedCrewId);
@@ -124,7 +124,7 @@ export const createNotice = async (req, res, next) => {
     const validatedNoticeData = createNoticeRequestDto(noticeData);
 
     // 실제 사용자 ID 사용
-    const userId = req.user?.id;
+    const userId = req.payload?.id;
 
     if (!userId) {
       return res.status(401).error({
@@ -356,7 +356,7 @@ export const updateNotice = async (req, res, next) => {
     const validatedUpdateData = updateNoticeRequestDto(noticeUpdateData);
 
     // 실제 사용자 ID 사용
-    const userId = req.user?.id;
+    const userId = req.payload?.id;
 
     if (!userId) {
       return res.status(401).error({
@@ -499,7 +499,7 @@ export const deleteNotice = async (req, res, next) => {
     const validatedNoticeId = validateNoticeIdDto(noticeId);
 
     // 실제 사용자 ID 사용
-    const userId = req.user?.id;
+    const userId = req.payload?.id;
 
     if (!userId) {
       return res.status(401).error({
@@ -617,7 +617,7 @@ export const toggleNoticeLike = async (req, res, next) => {
     const validatedNoticeId = validateNoticeIdDto(noticeId);
 
     // 실제 사용자 ID 사용
-    const userId = req.user?.id;
+    const userId = req.payload?.id;
 
     if (!userId) {
       return res.status(401).error({

@@ -30,6 +30,11 @@ export const authenticateAccessToken = async (req, res, next) => {
   }
   // 요청 객체에 디코딩한 페이로드를 첨부하여 다음 미들웨어로 전달합니다.
   req.payload = payload;
+  req.user = {
+    id: payload.id,
+    email: payload.email,
+    isCompleted: payload.isCompleted,
+  };
   next();
 };
 /**

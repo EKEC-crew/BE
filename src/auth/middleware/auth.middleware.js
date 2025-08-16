@@ -33,6 +33,7 @@ export const authenticateAccessToken = async (req, res, next) => {
   req.payload = payload;
   return next();
 };
+
 /**
  * **[Auth]**
  * **\<🔌 Middleware\>**
@@ -66,6 +67,7 @@ export const identifyAccessToken = async (req, res, next) => {
   req.payload = payload;
   return next();
 };
+
 /**
  * **[Auth]**
  * **\<🔌 Middleware\>**

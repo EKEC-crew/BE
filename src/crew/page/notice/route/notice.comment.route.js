@@ -5,6 +5,10 @@ import {
   updateComment,
   deleteComment,
 } from "../notice.comment.controller.js";
+import {
+  authenticateAccessToken,
+  verifyUserIsActive,
+} from "../../../../auth/middleware/auth.middleware.js";
 
 const router = express.Router({ mergeParams: true });
 
@@ -12,12 +16,22 @@ const router = express.Router({ mergeParams: true });
 router.get("/", getComments);
 
 // 공지 댓글 작성
-router.post("/", createComment);
+router.post("/", authenticateAccessToken, verifyUserIsActive, createComment);
 
 // 공지 댓글 수정
-router.put("/:commentId", updateComment);
+router.put(
+  "/:commentId",
+  authenticateAccessToken,
+  verifyUserIsActive,
+  updateComment
+);
 
 // 공지 댓글 삭제
-router.delete("/:commentId", deleteComment);
+router.delete(
+  "/:commentId",
+  authenticateAccessToken,
+  verifyUserIsActive,
+  deleteComment
+);
 
 export default router;

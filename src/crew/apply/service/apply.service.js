@@ -1,4 +1,6 @@
 import applyRepository from '../repository/apply.repository.js';
+import { eventEmitter } from '../../../index.js';
+import { prisma } from '../../../db.config.js';
 
 const applyToCrew = async (dto) => {
     const {
@@ -23,12 +25,12 @@ const applyToCrew = async (dto) => {
     const step1Data = {
         userId,
         crewId,
-        activityList: Array.isArray(activityList) ? activityList : [], // 빈배열 보정
-        styleList: Array.isArray(styleList) ? styleList : [],         // 빈배열 보정
-        region: Number.isInteger(region) ? region : 0,                // 미선택=0
-        age: Number.isInteger(age) ? age : 0,                         // 미선택=0
-        gender: Number.isInteger(gender) ? gender : 0,                // 미선택=0
-        categoryId: Number.isInteger(categoryId) && categoryId !== 0 ? categoryId : null, // 미선택=null (DB에는 null로 저장)
+        activityList: Array.isArray(activityList) ? activityList : [],
+        styleList: Array.isArray(styleList) ? styleList : [],
+        region: Number.isInteger(region) ? region : 0,
+        age: Number.isInteger(age) ? age : 0,
+        gender: Number.isInteger(gender) ? gender : 0,
+        categoryId: Number.isInteger(categoryId) && categoryId !== 0 ? categoryId : null,
     };
 
     const step2Data = answers.map((a) => ({
@@ -38,7 +40,21 @@ const applyToCrew = async (dto) => {
         answer: a.answer || null,
     }));
 
+    // 지원서 생성
     await applyRepository.createApplicationWithTransaction(step1Data, step2Data);
+
+    // 크루장에게 가입 요청 알람 이벤트 발생
+    const crew = await prisma.crew.findUnique({
+        where: { id: crewId },
+        select: { userId: true }
+    });
+
+    if (crew) {
+        eventEmitter.emit('CREW_JOIN_REQUEST', {
+            targetId: { userId, crewId }, // 지원자 정보
+            userId: [crew.userId]  // 크루장이 알람을 받음
+        });
+    }
 };
 
 const getCrewApplicationById = async (crewId, applyId) => {
@@ -53,9 +69,30 @@ const getCrewApplicationById = async (crewId, applyId) => {
 };
 
 const updateStatus = async (crewId, applyId, status) => {
-    // status 1 = 승인, 2 = 거절
+    // 지원서 정보 조회
+    const application = await applyRepository.findApplicationById(crewId, applyId);
+
+    // 크루장 정보 조회
+    const crew = await prisma.crew.findUnique({
+        where: { id: crewId },
+        select: { userId: true }
+    });
+
+    // 상태 변경 전에 먼저 알람 발송
     if (status === 1) {
-        // 승인 시 지원서 상태 변경 + 크루 멤버로 추가
+        eventEmitter.emit('CREW_JOIN_ACCEPTED', {
+            targetId: { userId: crew.userId, crewId }, // 크루장 정보
+            userId: [application.userId] // 지원자가 알람을 받음
+        });
+    } else if (status === 2) {
+        eventEmitter.emit('CREW_JOIN_REJECTED', {
+            targetId: { userId: crew.userId, crewId }, // 크루장 정보
+            userId: [application.userId] // 지원자가 알람을 받음
+        });
+    }
+
+    // 상태 변경
+    if (status === 1) {
         return await applyRepository.updateStatusWithCrewCapacity(crewId, applyId, status);
     } else {
         return await applyRepository.updateStatus(crewId, applyId, status);

@@ -827,3 +827,83 @@ export const applyToPlan = async (req, res, next) => {
     next(err);
   }
 };
+
+// 다가오는 일정 리스트 조회
+export const getUpcomingPlans = async (req, res, next) => {
+  /*
+    #swagger.summary = "다가오는 일정 리스트 조회"
+    #swagger.tags = ["Crew Plan"]
+    #swagger.parameters['page'] = {
+      in: 'query',
+      required: false,
+      type: "integer",
+      description: "페이지 번호 (기본 1)"
+    }
+    #swagger.parameters['size'] = {
+      in: 'query',
+      required: false,
+      type: "integer",
+      description: "페이지 크기 (기본 5)"
+    }
+    #swagger.responses[200] = {
+      description: "다가오는 일정 목록 조회 성공",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              resultType: { type: "string", example: "SUCCESS" },
+              error: { type: "object", nullable: true, example: null },
+              data: {
+                type: "object",
+                properties: {
+                  plans: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        id: { type: "number", example: 12 },
+                        crew_name: { type: "string", example: "사이클링히트" },
+                        title: { type: "string", example: "잠실 두산베어스 VS 삼성라이온즈" },
+                        day: { type: "string", format: "date-time", example: "2025-07-17T19:00:00.000Z" },
+                        daysUntil: { type: "number", example: 0, description: "0: 오늘, 양수: N일 후" }
+                      }
+                    }
+                  },
+                  pagination: {
+                    type: "object",
+                    properties: {
+                      totalElements: { type: "number", example: 25 },
+                      currentPage: { type: "number", example: 1 },
+                      pageSize: { type: "number", example: 5 },
+                      totalPages: { type: "number", example: 5 },
+                      hasNext: { type: "boolean", example: true },
+                      hasPrevious: { type: "boolean", example: false }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    #swagger.responses[400] = {
+      description: "입력값 오류"
+    }
+  */
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const size = parseInt(req.query.size) || 5;
+    const userId = req.payload.id; // JWT 토큰에서 사용자 ID 추출
+
+    const result = await planService.CrewPlanService.getUpcomingPlans(
+      page,
+      size,
+      userId
+    );
+    return res.success(result);
+  } catch (err) {
+    next(err);
+  }
+};

@@ -78,11 +78,11 @@ export const createCrew = async (body) => {
       title: body.name,
       content: body.description,
       introduction: body.recruitMessage,
+      score: Math.trunc((Math.random() * 1.5 + 3.5) * 100) / 100, // 리뷰 기능이 추후 구현 되면 수정하기
       crewCapacity: body.maxCapacity,
       ageLimit: body.age,
       genderLimit: body.gender,
       recruitMessage: body.recruitMessage,
-      score: 0,
       user: {
         connect: {
           id: body.admin,

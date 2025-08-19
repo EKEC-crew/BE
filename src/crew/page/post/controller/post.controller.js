@@ -36,6 +36,7 @@ export const readPostsByCrew = async (req, res, next) => {
                         "title": "게시글 제목입니다",
                         "createdAt": "2025-08-04 18:33:37",
                         "nickname": "이병차은우",
+                        "userId": 1,
                         "commentCount": 0,
                         "likeCount": 1,
                         "imageCount": 0,
@@ -46,6 +47,7 @@ export const readPostsByCrew = async (req, res, next) => {
                         "title": "게시글 제목입니다",
                         "createdAt": "2025-08-04 18:33:43",
                         "nickname": "이병차은우",
+                        "userId": 1,
                         "commentCount": 0,
                         "likeCount": 0,
                         "imageCount": 0,
@@ -56,6 +58,7 @@ export const readPostsByCrew = async (req, res, next) => {
                         "title": "게시글 제목입니다",
                         "createdAt": "2025-08-04 18:33:42",
                         "nickname": "이병차은우",
+                        "userId": 1,
                         "commentCount": 0,
                         "likeCount": 0,
                         "imageCount": 0,
@@ -66,6 +69,7 @@ export const readPostsByCrew = async (req, res, next) => {
                         "title": "게시글 제목입니다",
                         "createdAt": "2025-08-04 18:33:42",
                         "nickname": "이병차은우",
+                        "userId": 1,
                         "commentCount": 0,
                         "likeCount": 0,
                         "imageCount": 0,
@@ -76,6 +80,7 @@ export const readPostsByCrew = async (req, res, next) => {
                         "title": "게시글 제목입니다",
                         "createdAt": "2025-08-04 18:33:42",
                         "nickname": "이병차은우",
+                        "userId": 1,
                         "commentCount": 0,
                         "likeCount": 0,
                         "imageCount": 0,
@@ -191,6 +196,7 @@ export const createCrewPost = async (req, res, next) => {
                   "createdAt": "2025-07-31T10:27:17.103Z",
                   "nickname": "차은우",
                   "profileImage": "profile1.jpg",
+                  "userId": 1,
                   "commentCount": 0,
                   "likeCount": 0,
                   "isPopular": false,
@@ -269,6 +275,7 @@ export const readCrewPost = async (req, res, next) => {
                   "createdAt": "2025-07-31T10:27:17.103Z",
                   "nickname": "차은우",
                   "profileImage": "profile1.jpg",
+                  "userId": 1,
                   "commentCount": 0,
                   "likeCount": 0,
                   "isPopular": false,
@@ -281,7 +288,8 @@ export const readCrewPost = async (req, res, next) => {
                       "imageId": 22,
                       "imageName": "2e4b97b8-41a3-4686-997b-fc04dea279b2.png"
                     }
-                  ]
+                  ],
+                  "isLiked": true,
                 }
               }
             }
@@ -393,6 +401,7 @@ export const updateCrewPost = async (req, res, next) => {
                   "createdAt": "2025-07-31T10:27:17.103Z",
                   "nickname": "차은우",
                   "profileImage": "profile1.jpg",
+                  "userId": 1,
                   "commentCount": 0,
                   "likeCount": 0,
                   "isPopular": false,
@@ -599,6 +608,8 @@ export const readCommentsByCrewPost = async (req, res, next) => {
                       "content": "댓글 작성 테스트 내용입니다.",
                       "nickname": "이병차은우",
                       "image": "profile1.jpg",
+                      "userId": 1,
+                      "isPublic": true,
                       "createdAt": "2025-08-05 01:41:09"
                     },
                     {
@@ -606,6 +617,8 @@ export const readCommentsByCrewPost = async (req, res, next) => {
                       "content": "댓글 작성 테스트 내용입니다.",
                       "nickname": "이병차은우",
                       "image": "profile1.jpg",
+                      "userId": 1,
+                      "isPublic": true,
                       "createdAt": "2025-08-05 02:31:32"
                     },
                     {
@@ -613,6 +626,8 @@ export const readCommentsByCrewPost = async (req, res, next) => {
                       "content": "댓글 작성 테스트 내용입니다.",
                       "nickname": "이병차은우",
                       "image": "profile1.jpg",
+                      "userId": 1,
+                      "isPublic": true,
                       "createdAt": "2025-08-05 02:31:35"
                     }
                   ],
@@ -700,7 +715,8 @@ export const createCrewPostComment = async (req, res, next) => {
                   "content": "댓글 작성 테스트 내용입니다.",
                   "nickname": "홍길동",
                   "createdAt": "2025-07-18T02:04:54.410Z",
-                  "image": "profile.jpg"
+                  "image": "profile.jpg",
+                  "isPublic": true
                 }
               }
             }
@@ -786,7 +802,8 @@ export const updateCrewPostComment = async (req, res, next) => {
                   "content": "댓글 수정 테스트 내용입니다.",
                   "nickname": "홍길동",
                   "createdAt": "2025-07-18 02:04:54.410",
-                  "image": "profile.jpg"
+                  "image": "profile.jpg",
+                  "isPublic": true
                 }
               }
             }

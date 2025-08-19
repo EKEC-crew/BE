@@ -201,7 +201,21 @@ export const getComments = async (req, res, next) => {
     const validatedCrewId = validateCrewIdDto(crewId);
     const validatedNoticeId = validateNoticeIdDto(noticeId);
 
-    const result = await noticeCommentService.getComments(validatedNoticeId);
+    // 실제 사용자 ID 사용
+    const userId = req.payload?.id;
+
+    if (!userId) {
+      return res.status(401).error({
+        errorCode: "UNAUTHORIZED",
+        reason: "사용자 인증이 필요합니다.",
+      });
+    }
+
+    const result = await noticeCommentService.getComments(
+      validatedCrewId,
+      validatedNoticeId,
+      userId
+    );
     const response = commentListResponseDto(result, validatedNoticeId);
     // #region Swagger: 공지사항 댓글 목록 조회 API
     /*
@@ -271,8 +285,15 @@ export const createComment = async (req, res, next) => {
     const validatedNoticeId = validateNoticeIdDto(noticeId);
     const validatedCommentData = createCommentRequestDto(commentData);
 
-    // 테스트를 위해 임시로 사용자 ID를 1로 설정
-    const userId = 1; // req.user?.id;
+    // 실제 사용자 ID 사용
+    const userId = req.payload?.id;
+
+    if (!userId) {
+      return res.status(401).error({
+        errorCode: "UNAUTHORIZED",
+        reason: "사용자 인증이 필요합니다.",
+      });
+    }
 
     const newComment = await noticeCommentService.createComment(
       validatedCrewId,
@@ -362,8 +383,8 @@ export const updateComment = async (req, res, next) => {
     const validatedCommentId = validateCommentIdDto(commentId);
     const validatedUpdateData = updateCommentRequestDto(commentUpdateData);
 
-    // 인증 미들웨어로부터 사용자 ID 획득 (테스트를 위해 임시로 1로 설정)
-    const userId = 1; // req.user?.id;
+    // 실제 사용자 ID 사용
+    const userId = req.payload?.id;
 
     if (!userId) {
       return res.status(401).error({
@@ -509,8 +530,8 @@ export const deleteComment = async (req, res, next) => {
     // DTO를 사용한 유효성 검증
     const validatedCommentId = validateCommentIdDto(commentId);
 
-    // 인증 미들웨어로부터 사용자 ID 획득 (테스트를 위해 임시로 1로 설정)
-    const userId = 1; // req.user?.id;
+    // 실제 사용자 ID 사용
+    const userId = req.payload?.id;
 
     if (!userId) {
       return res.status(401).error({

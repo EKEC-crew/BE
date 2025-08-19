@@ -13,7 +13,7 @@ import {
 const router = express.Router({ mergeParams: true });
 
 // 공지 댓글 목록 조회
-router.get("/", getComments);
+router.get("/", authenticateAccessToken, verifyUserIsActive, getComments);
 
 // 공지 댓글 작성
 router.post("/", authenticateAccessToken, verifyUserIsActive, createComment);

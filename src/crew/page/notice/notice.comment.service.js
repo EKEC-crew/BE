@@ -115,8 +115,27 @@ export const unlikeNotice = async (crewId, noticeId, userId) => {
 };
 
 // 2. 공지 댓글 목록 조회
-export const getComments = async (noticeId) => {
+export const getComments = async (crewId, noticeId, userId) => {
   try {
+    // 1. 요청을 보낸 사용자가 해당 크루의 맴버인지 확인
+    const crewMember = await prisma.crewMember.findFirst({
+      where: {
+        crewId: parseInt(crewId, 10),
+        userId: userId,
+      },
+    });
+
+    // 2. 크루 맴버가 아니라면 에러 발생
+    if (!crewMember) {
+      const error = new Error(
+        "댓글 조회 권한이 없습니다. 크루 멤버인지 확인하세요."
+      );
+      error.statusCode = 403;
+      error.errorCode = "FORBIDDEN";
+      throw error;
+    }
+
+    // 3. 댓글 목록 조회
     const comments = await prisma.crewNoticeComment.findMany({
       where: {
         crewNoticeId: noticeId,
@@ -143,6 +162,9 @@ export const getComments = async (noticeId) => {
     });
     return comments;
   } catch (error) {
+    if (error.statusCode) {
+      throw error;
+    }
     throw new Error("댓글 목록을 조회하는 중 오류가 발생했습니다.");
   }
 };

@@ -1,6 +1,6 @@
 import express from 'express';
 import * as planController from "../controller/plan.controller.js";
-import { authenticateAccessToken, verifyUserIsActive } from "../../../../auth/middleware/auth.middleware.js";
+import { authenticateAccessToken, verifyUserIsActive, identifyAccessToken } from "../../../../auth/middleware/auth.middleware.js";
 
 // crew.route.js 에서 '/:crewId/plan' 으로 mount되므로, 반드시 mergeParams: true
 const router = express.Router({ mergeParams: true });
@@ -15,13 +15,13 @@ JWT 토큰을 검증하고 (authenticateAccessToken)
 router.post('/', authenticateAccessToken, verifyUserIsActive, planController.createPlan);
 
 // 크루 일정 리스트 조회 (더 구체적인 경로를 먼저 배치)
-router.get('/list', authenticateAccessToken, verifyUserIsActive, planController.getPlanList);
+router.get('/list', identifyAccessToken, planController.getPlanList);
 
 // 다가오는 일정 리스트 조회 (정적 라우트를 동적 라우트보다 먼저 배치)
-router.get("/upcoming", authenticateAccessToken, verifyUserIsActive, planController.getUpcomingPlans);
+router.get("/upcoming", identifyAccessToken, planController.getUpcomingPlans);
 
 // 크루 일정 조회
-router.get('/:planId', authenticateAccessToken, verifyUserIsActive, planController.getPlanById);
+router.get('/:planId', identifyAccessToken, planController.getPlanById);
 
 // 크루 일정 수정
 router.put('/:planId', authenticateAccessToken, verifyUserIsActive, planController.updatePlan);
@@ -33,10 +33,10 @@ router.delete('/:planId', authenticateAccessToken, verifyUserIsActive, planContr
 router.post("/:planId/comments", authenticateAccessToken, verifyUserIsActive, planController.createPlanComment);
 
 // 크루 일정 댓글 리스트 조회 (더 구체적인 경로를 먼저 배치)
-router.get("/:planId/comments/list", authenticateAccessToken, verifyUserIsActive, planController.getPlanCommentList);
+router.get("/:planId/comments/list", identifyAccessToken, planController.getPlanCommentList);
 
 // 크루 일정 댓글 조회
-router.get("/:planId/comments/:commentId", authenticateAccessToken, verifyUserIsActive, planController.getPlanCommentById);
+router.get("/:planId/comments/:commentId", identifyAccessToken, planController.getPlanCommentById);
 
 // 크루 일정 댓글 수정
 router.patch("/:planId/comments/:commentId", authenticateAccessToken, verifyUserIsActive, planController.updatePlanComment);

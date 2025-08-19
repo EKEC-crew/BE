@@ -322,7 +322,18 @@ export const CrewPlanService = {
   //다가오는 일정 리스트 조회 서비스
   getUpcomingPlans: async (page = 1, size = 5, userId) => {
     if (!userId) {
-      throw new InvalidInputValueError("사용자 인증이 필요합니다.");
+      // 로그인하지 않은 사용자의 경우 빈 결과 반환
+      return new planResponse.GetUpcomingPlansResponse(
+        [],
+        {
+          totalElements: 0,
+          currentPage: page,
+          pageSize: size,
+          totalPages: 0,
+          hasNext: false,
+          hasPrevious: false
+        }
+      );
     }
 
     const result =

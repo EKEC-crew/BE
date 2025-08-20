@@ -591,7 +591,7 @@ export const handleProfile = async (req, res, next) => {
                         day: 1
                       }},
                       phone: {type: "string", example: "01012345678"},
-                      defaultImage: {type: "boolean", example: false}
+                      iamge: {type: "string", example: "image.png"}
                     }
                   }
                 }
@@ -857,7 +857,8 @@ export const handleProfile = async (req, res, next) => {
   console.log("body:", req.body);
   // ✅ 유효성 검사 (기본 이미지)
   try {
-    if (JSON.parse(req.body.defaultImage)) req.file = null;
+    req.body.defaultImage = JSON.parse(req.body.defaultImage);
+    if (req.body.defaultImage) req.file = null;
   } catch (e) {
     throw new InvalidInputValueError(
       "기본 이미지 설정이 올바르지 않습니다.",

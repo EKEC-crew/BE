@@ -56,7 +56,7 @@ export const createCrewPost = async ({ userId, crewId, title, content, images })
 	}
 }
 
-export const readCrewPost = async ({ crewId, postId }) => {
+export const readCrewPost = async ({ userId, crewId, postId }) => {
 	try {
 		const isExistCrew = await postRepository.isExistCrew({ crewId });
 		if (!isExistCrew) {
@@ -69,10 +69,16 @@ export const readCrewPost = async ({ crewId, postId }) => {
 		if (isExistPost.crewId !== crewId) {
 			throw new baseError.NotBelongToCrewError("해당 크루에 속하지 않은 게시글입니다.", { postId });
 		}
+		const crewMember = await postRepository.findCrewMember({
+			userId,
+			crewId,
+		})
+		const crewMemberId = crewMember?.id;
+		const isLiked = await postRepository.isExistLike({ crewMemberId, postId });
 
 		const post = await postRepository.getPostByPostId({ postId });
 		const imagesInfo = await postRepository.getImages({ postId });
-		return postResponse.CrewPostResponse({ post, imagesInfo });
+		return postResponse.CrewPostResponse({ post, imagesInfo, isLiked });
 	} catch (err) {
 		throw err;
 	}

@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticateAccessToken, verifyUserIsActive } from '../../../../auth/middleware/auth.middleware.js';
+import { authenticateAccessToken, verifyUserIsActive, identifyAccessToken } from '../../../../auth/middleware/auth.middleware.js';
 import * as postController from "../controller/post.controller.js";
 import multer from 'multer';
 
@@ -11,7 +11,7 @@ const upload = multer({
 
 router.get('/list', postController.readPostsByCrew);
 router.post('/', authenticateAccessToken, verifyUserIsActive, upload.array('images', 5), postController.createCrewPost); //인증 필요
-router.get('/:postId', postController.readCrewPost);
+router.get('/:postId', identifyAccessToken, postController.readCrewPost);
 router.put('/:postId', authenticateAccessToken, verifyUserIsActive, upload.array('images', 10), postController.updateCrewPost); //인증 필요
 router.delete('/:postId', authenticateAccessToken, verifyUserIsActive, postController.deleteCrewPost); //인증 필요
 router.post('/:postId/like', authenticateAccessToken, verifyUserIsActive, postController.toggleCrewPostLike); //인증 필요

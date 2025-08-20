@@ -26,8 +26,9 @@ export const readPostListRequest = (crewId, page, size) => {
     }
 }
 
-export const readPostRequest = (crewId, postId) => {
+export const readPostRequest = (userId, crewId, postId) => {
     return {
+        userId: Number(userId),
         crewId: Number(crewId),
         postId: Number(postId),
     }

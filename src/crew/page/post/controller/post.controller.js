@@ -249,9 +249,10 @@ export const readCrewPost = async (req, res, next) => {
   console.log("특정 크루 특정 게시글 상세 조회를 요청했습니다.");
 
   const { crewId, postId } = req.params;
+  const userId = req.payload?.id;
 
   const response = await postService.readCrewPost(
-    postRequest.readPostRequest(crewId, postId),
+    postRequest.readPostRequest(userId, crewId, postId),
   );
   // #region Swagger: 특정 크루 특정 게시글 상세 조회 API
   /*

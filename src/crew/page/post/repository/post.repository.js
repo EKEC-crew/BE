@@ -498,6 +498,7 @@ export const removeCrewPostCommentByCommentId = async ({ commentId, postId }) =>
 // 유저 아이디로 크루멤버아이디 찾기(인증)
 export const findCrewMember = async ({ userId, crewId }) => {
 	try {
+		if (!Number.isInteger(userId)) return null;
 		const crewMember = await prisma.crewMember.findFirst(
 			{
 				where: {
@@ -620,6 +621,26 @@ export const isExistImageInPost = async ({ postId, imageId }) => {
 		} else {
 			return true;
 		}
+	} catch (err) {
+		throw new Error(
+			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`
+		)
+	}
+}
+
+export const isExistLike = async ({ crewMemberId, postId }) => {
+	try {
+		if (!Number.isInteger(crewMemberId)) return null;
+		const like = await prisma.crewPostLike.findFirst(
+			{
+				where: {
+					crewMemberId: crewMemberId,
+					postId: postId
+				}
+			}
+		)
+		if (like === null) return false;
+		else return like.isLiked === 1 ? true : false
 	} catch (err) {
 		throw new Error(
 			`오류가 발생했어요. 요청 파라미터를 확인해주세요. (${err.message})`

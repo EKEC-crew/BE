@@ -90,5 +90,6 @@ export const responseFromProfile = (data) => {
     gender: data.gender,
     birthday: data.birth,
     phone: data.phone,
+    image: data.image,
   };
 };

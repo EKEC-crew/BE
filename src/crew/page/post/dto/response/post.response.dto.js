@@ -23,7 +23,7 @@ export const CrewPostListResponse = ({ posts, totalElements, totalPages, hasNext
 	return response;
 }
 
-export const CrewPostResponse = ({ post, imagesInfo }) => {
+export const CrewPostResponse = ({ post, imagesInfo, isLiked }) => {
 	const response = {
 		postId: post.id,
 		title: post.title,
@@ -38,7 +38,8 @@ export const CrewPostResponse = ({ post, imagesInfo }) => {
 		images: imagesInfo.map(image => ({
 			imageId: image.id,
 			imageName: image.imageName,
-		}))
+		})),
+		isLiked: isLiked
 	}
 
 	return response;

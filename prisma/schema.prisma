@@ -85,9 +85,9 @@ model Crew {
   regionId                Int?                       @map("region_id")
   recruitMessage          String                    @map("recruit_message") @db.Text
   alarm                   Alarm[]
-  crewCategory            CrewCategory              @relation(fields: [categoryId], references: [id])
-  region                  Region?                   @relation(fields: [regionId], references: [id])
-  user                    User                      @relation(fields: [userId], references: [id])
+  crewCategory            CrewCategory              @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  region                  Region?                   @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  user                    User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
   crewActivity            CrewActivity[]
   crewAlbum               CrewAlbum[]
   crewUser                CrewMember[]
@@ -124,8 +124,8 @@ model CrewPlan {
   isRequired           Boolean           @default(false) @map("is_required")
   crewMemberId         Int               @map("crew_member_id")
   alarm                Alarm[]
-  crew                 Crew              @relation(fields: [crewId], references: [id])
-  crewMember           CrewMember        @relation(fields: [crewMemberId], references: [id])
+  crew                 Crew              @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  crewMember           CrewMember        @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
   crewPlanComment      CrewPlanComment[]
   crewPlanLike         CrewPlanLike[]
   crewPlanRequest      CrewPlanRequest[]
@@ -142,8 +142,8 @@ model CrewPlanComment {
   crewPlanId   Int        @map("crew_plan_id")
   crewMemberId Int        @map("crew_member_id")
   isPublic     Boolean    @map("is_public")
-  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewPlan     CrewPlan   @relation(fields: [crewPlanId], references: [id])
+  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
+  crewPlan     CrewPlan   @relation(fields: [crewPlanId], references: [id], onDelete: Cascade)
 
   @@index([crewMemberId], map: "crew_plan_comment_crew_member_id_fkey")
   @@index([crewPlanId], map: "crew_plan_comment_crew_plan_id_fkey")
@@ -155,8 +155,8 @@ model CrewPlanRequest {
   status       Int        @default(0)
   crewMemberId Int        @map("crew_member_id")
   crewPlanId   Int        @map("crew_plan_id")
-  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewPlan     CrewPlan   @relation(fields: [crewPlanId], references: [id])
+  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
+  crewPlan     CrewPlan   @relation(fields: [crewPlanId], references: [id], onDelete: Cascade)
 
   @@index([crewMemberId], map: "crew_plan_request_crew_member_id_fkey")
   @@index([crewPlanId], map: "crew_plan_request_crew_plan_id_fkey")
@@ -168,8 +168,8 @@ model CrewPlanLike {
   isLiked      Int        @default(1) @map("is_liked")
   crewMemberId Int        @map("crew_member_id")
   planId       Int        @map("plan_id")
-  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewPlan     CrewPlan   @relation(fields: [planId], references: [id])
+  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
+  crewPlan     CrewPlan   @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@unique([planId, crewMemberId])
   @@index([crewMemberId], map: "crew_plan_like_crew_member_id_fkey")
@@ -182,8 +182,8 @@ model CrewRegister {
   modifiedAt DateTime? @updatedAt @map("modified_at")
   userId     Int       @map("user_id")
   crewId     Int       @map("crew_id")
-  crew       Crew      @relation(fields: [crewId], references: [id])
-  user       User      @relation(fields: [userId], references: [id])
+  crew       Crew      @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([crewId], map: "crew_register_crew_id_fkey")
   @@index([userId], map: "crew_register_user_id_fkey")
@@ -198,8 +198,8 @@ model CrewMember {
   userId            Int                 @map("user_id")
   crewId            Int                 @map("crew_id")
   crewAlbum         CrewAlbum[]
-  crew              Crew                @relation(fields: [crewId], references: [id])
-  user              User                @relation(fields: [userId], references: [id])
+  crew              Crew                @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   crewNotice        CrewNotice[]
   crewNoticeComment CrewNoticeComment[]
   crewNoticeLike    CrewNoticeLike[]
@@ -230,7 +230,7 @@ model CrewPost {
   crewMemberId Int       @map("crew_member_id")
 
   crew            Crew              @relation(fields: [crewId], references: [id], onDelete: Cascade)
-  crewMember      CrewMember        @relation(fields: [crewMemberId], references: [id])
+  crewMember      CrewMember        @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
   crewPostComment CrewPostComment[]
   crewPostImage   CrewPostImage[]
   crewPostLike    CrewPostLike[]
@@ -292,8 +292,8 @@ model CrewNotice {
   crewId            Int                 @map("crew_id")
   crewMemberId      Int                 @map("crew_member_id")
   alarm             Alarm[]
-  crew              Crew                @relation(fields: [crewId], references: [id])
-  crewMember        CrewMember          @relation(fields: [crewMemberId], references: [id])
+  crew              Crew                @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  crewMember        CrewMember          @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
   crewNoticeComment CrewNoticeComment[]
   crewNoticeLike    CrewNoticeLike[]
 
@@ -309,8 +309,8 @@ model CrewNoticeComment {
   modifiedAt   DateTime?  @updatedAt @map("modified_at")
   crewMemberId Int        @map("crew_member_id")
   crewNoticeId Int        @map("crew_notice_id")
-  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewNotice   CrewNotice @relation(fields: [crewNoticeId], references: [id])
+  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
+  crewNotice   CrewNotice @relation(fields: [crewNoticeId], references: [id], onDelete: Cascade)
 
   @@index([crewMemberId], map: "crew_notice_comment_crew_member_id_fkey")
   @@index([crewNoticeId], map: "crew_notice_comment_crew_notice_id_fkey")
@@ -322,8 +322,8 @@ model CrewNoticeLike {
   createdAt    DateTime   @default(now()) @map("created_at")
   crewNoticeId Int        @map("crew_notice_id")
   crewMemberId Int        @map("crew_member_id")
-  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id])
-  crewNotice   CrewNotice @relation(fields: [crewNoticeId], references: [id])
+  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
+  crewNotice   CrewNotice @relation(fields: [crewNoticeId], references: [id], onDelete: Cascade)
 
   @@unique([crewNoticeId, crewMemberId])
   @@index([crewMemberId], map: "crew_notice_like_crew_member_id_fkey")
@@ -337,8 +337,8 @@ model CrewAlbum {
   modifiedAt   DateTime?  @updatedAt @map("modified_at")
   crewId       Int        @map("crew_id")
   crewMemberId Int        @map("crew_member_id")
-  crew         Crew       @relation(fields: [crewId], references: [id])
-  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id])
+  crew         Crew       @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  crewMember   CrewMember @relation(fields: [crewMemberId], references: [id], onDelete: Cascade)
 
   @@index([crewId], map: "crew_album_crew_id_fkey")
   @@index([crewMemberId], map: "crew_album_crew_member_id_fkey")
@@ -359,8 +359,8 @@ model CrewActivity {
   modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId     Int       @map("crew_id")
   activityId Int       @map("activity_id")
-  activity   Activity  @relation(fields: [activityId], references: [id])
-  crew       Crew      @relation(fields: [crewId], references: [id])
+  activity   Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  crew       Crew      @relation(fields: [crewId], references: [id], onDelete: Cascade)
 
   @@index([activityId], map: "crew_activity_activity_id_fkey")
   @@index([crewId], map: "crew_activity_crew_id_fkey")
@@ -381,8 +381,8 @@ model CrewStyle {
   modifiedAt DateTime? @updatedAt @map("modified_at")
   crewId     Int       @map("crew_id")
   styleId    Int       @map("style_id")
-  crew       Crew      @relation(fields: [crewId], references: [id])
-  style      Style     @relation(fields: [styleId], references: [id])
+  crew       Crew      @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  style      Style     @relation(fields: [styleId], references: [id], onDelete: Cascade)
 
   @@index([crewId], map: "crew_style_crew_id_fkey")
   @@index([styleId], map: "crew_style_style_id_fkey")
@@ -398,7 +398,7 @@ model CrewRecruitForm {
   required                Int
   crewId                  Int                       @map("crew_id")
   crewRecruitAppliedStep2 CrewRecruitAppliedStep2[]
-  crew                    Crew                      @relation(fields: [crewId], references: [id])
+  crew                    Crew                      @relation(fields: [crewId], references: [id], onDelete: Cascade)
 
   @@index([crewId], map: "crew_recruit_form_crew_id_fkey")
   @@map("crew_recruit_form")
@@ -417,8 +417,8 @@ model CrewRecruitAppliedStep1 {
   categoryId   Int?          @map("category_id")
   status       Int           @default(0)
   crewCategory CrewCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  crew         Crew          @relation(fields: [crewId], references: [id])
-  user         User          @relation(fields: [userId], references: [id])
+  crew         Crew          @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([categoryId], map: "crew_recruit_applied_step1_category_id_fkey")
   @@index([crewId], map: "crew_recruit_applied_step1_crew_id_fkey")
@@ -433,8 +433,8 @@ model CrewRecruitAppliedStep2 {
   createdAt       DateTime        @default(now()) @map("created_at")
   recruitFormId   Int             @map("recruit_form_id")
   userId          Int             @map("user_id")
-  crewRecruitForm CrewRecruitForm @relation(fields: [recruitFormId], references: [id])
-  user            User            @relation(fields: [userId], references: [id])
+  crewRecruitForm CrewRecruitForm @relation(fields: [recruitFormId], references: [id], onDelete: Cascade)
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([recruitFormId], map: "crew_recruit_applied_step2_recruit_form_id_fkey")
   @@index([userId], map: "crew_recruit_applied_step2_user_id_fkey")
@@ -461,11 +461,11 @@ model Alarm {
   noticeId   Int?        @map("notice_id")
   postId     Int?        @map("post_id")
   planId     Int?        @map("plan_id")
-  crew       Crew?       @relation(fields: [crewId], references: [id])
-  crewNotice CrewNotice? @relation(fields: [noticeId], references: [id])
-  crewPlan   CrewPlan?   @relation(fields: [planId], references: [id])
-  crewPost   CrewPost?   @relation(fields: [postId], references: [id])
-  user       User?       @relation(fields: [userId], references: [id])
+  crew       Crew?       @relation(fields: [crewId], references: [id], onDelete: Cascade)
+  crewNotice CrewNotice? @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  crewPlan   CrewPlan?   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  crewPost   CrewPost?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   received   ReceivedAlarm[]
 
@@ -482,8 +482,8 @@ model ReceivedAlarm {
   status     Int        @default(0)
   alarmId    Int        @map("alarm_id")
   userId     Int        @map("user_id")
-  alarm      Alarm      @relation(fields: [alarmId], references: [id])
-  user       User       @relation(fields: [userId], references: [id])
+  alarm      Alarm      @relation(fields: [alarmId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([alarmId], map: "received_alarm_alarm_id_fkey")
   @@index([userId], map: "received_alarm_user_id_fkey")
@@ -495,7 +495,7 @@ model RefreshToken {
   token      String    @db.Text
   userId     Int       @map("user_id")
   modifiedAt DateTime? @updatedAt @map("modified_at")
-  user       User      @relation(fields: [userId], references: [id])
+  user       User      @relation(fields: [userId], references: [id]), onDelete: Cascade
 
   @@map("refresh_token")
 }

@@ -67,7 +67,7 @@ export const findCrewsByName = async (data) => {
       title: {
         contains: data.name, // 크루 명으로 필터링
       },
-      crewCapacity: data.capacity,
+      OR: data.OR,
     },
     orderBy: data.sort, // 지정된 정렬방식에 맞추어 정렬
     skip: 10 * (data.page - 1), //페이지네이션 구문
@@ -78,7 +78,7 @@ export const findCrewsByName = async (data) => {
       title: {
         contains: data.name, // 크루 명으로 필터링
       },
-      crewCapacity: data.capacity,
+      OR: data.OR,
     },
   });
   const result = {
@@ -237,7 +237,7 @@ export const findCrewsByOptions = async (data) => {
       id: {
         in: crewIdOfFilteredByStyle, // 최종 필터링 된 크루 ID 배열
       },
-      crewCapacity: data.capacity,
+      OR: data.OR,
     },
     orderBy: data.sort, // 지정받은 크루 정렬 방식
     skip: 10 * (data.page - 1), // 페이지네이션 구문
@@ -248,7 +248,7 @@ export const findCrewsByOptions = async (data) => {
       id: {
         in: crewIdOfFilteredByStyle, // 최종 필터링 된 크루 ID 배열
       },
-      crewCapacity: data.capacity,
+      OR: data.OR,
     },
   });
   const result = {
@@ -323,7 +323,7 @@ export const findCrewsByCategory = async (data) => {
     },
     where: {
       categoryId: data.category,
-      crewCapacity: data.capacity,
+      OR: data.OR,
     },
     orderBy: data.sort, // 지정받은 크루 정렬 방식
     skip: 10 * (data.page - 1), // 페이지네이션 구문
@@ -332,7 +332,7 @@ export const findCrewsByCategory = async (data) => {
   const crewCounts = await prisma.crew.count({
     where: {
       categoryId: data.category,
-      crewCapacity: data.capacity,
+      OR: data.OR,
     },
   });
   const result = {

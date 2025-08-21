@@ -68,7 +68,11 @@ export const crewDefaultSearch = async (data) => {
     }
   }
   // 최대 인원이 입력되지 않았을때 모든 크루가 검색되도록 필터 적용
-  if (data.capacity == null) data.capacity = { gt: 0 };
+  if (data.capacity == null)
+    data.OR = [
+      { crewCapacity: { gt: 0 } }, // 조건 1: capacity가 0보다 큼
+      { crewCapacity: null }, // 조건 2: capacity가 null임
+    ];
   // 레포지토리로부터 검색 결과 가져오기
   const crews = await findCrewsByName(data);
   // 결과값 양식에 맞추어 정형화
@@ -110,7 +114,11 @@ export const crewAdvancedSearch = async (data) => {
     }
   }
   // 최대 인원이 입력되지 않았을때 모든 크루가 검색되도록 필터 적용
-  if (data.capacity == null) data.capacity = { gt: 0 };
+  if (data.capacity == null)
+    data.OR = [
+      { crewCapacity: { gt: 0 } }, // 조건 1: capacity가 0보다 큼
+      { crewCapacity: null }, // 조건 2: capacity가 null임
+    ];
   // 레포지토리로부터 검색 결과 가져오기
   const crews = await findCrewsByOptions(data);
   // 결과값 양식에 맞추어 정형화
@@ -149,7 +157,11 @@ export const crewSearchByCategory = async (data) => {
     }
   }
   // 최대 인원이 입력되지 않았을때 모든 크루가 검색되도록 필터 적용
-  if (data.capacity == null) data.capacity = { gt: 0 };
+  if (data.capacity == null)
+    data.OR = [
+      { crewCapacity: { gt: 0 } }, // 조건 1: capacity가 0보다 큼
+      { crewCapacity: null }, // 조건 2: capacity가 null임
+    ];
   const crews = await findCrewsByCategory(data);
   const filteredItems = crews.crews ? formatCrewList(crews.crews) : [];
   const crewCounts = crews.crewCounts ? crews.crewCounts : 0;

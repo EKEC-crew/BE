@@ -143,6 +143,13 @@ export const isExistCrewMember = async ({ crewMemberId }) => {
             {
                 where: {
                     id: crewMemberId,
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true
+                        }
+                    }
                 }
             }
         )

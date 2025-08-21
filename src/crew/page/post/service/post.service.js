@@ -3,6 +3,7 @@ import * as postResponse from "../dto/response/post.response.dto.js"
 import * as postRepository from "../repository/post.repository.js"
 import * as baseError from "../../../../error.js"
 import * as s3Function from "../../../../utils/s3.js"
+import { eventEmitter } from '../../../../index.js';
 
 export const readPostsByCrew = async ({ crewId, page, size }) => {
 	try {
@@ -209,9 +210,14 @@ export const toggleCrewPostLike = async ({ userId, crewId, postId }) => {
 		if (!crewMember) {
 			throw new baseError.NotCrewMemberError("크루 멤버에 속하지 않은 유저입니다.", { userId });
 		}
+		const crewMemberId = crewMember.id;
 		const likeInfo = await postRepository.likeCrewPost({
-			crewMemberId: crewMember.id,
+			crewMemberId: crewMemberId,
 			postId,
+		})
+		eventEmitter.emit('POST_LIKED', {
+			targetId: { userId, postId },
+			userId: [isExistPost.crewMember.user.id]
 		})
 		return postResponse.likeCrewPostResponse(likeInfo);
 	} catch (err) {
@@ -272,7 +278,10 @@ export const createCrewPostComment = async ({ crewId, postId, userId, content, i
 			content,
 			isPublic
 		})
-
+		eventEmitter.emit('POST_COMMENTED', {
+			targetId: { userId, postId },
+			userId: [isExistPost.crewMember.user.id]
+		})
 		return postResponse.CrewCommentResponse(comment);
 	} catch (err) {
 		throw err;

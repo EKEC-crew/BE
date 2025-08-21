@@ -546,6 +546,11 @@ export const isExistPost = async ({ postId }) => {
 					crewMember: {
 						select: {
 							role: true,
+							user: {
+								select: {
+									id: true
+								}
+							}
 						}
 					}
 				}

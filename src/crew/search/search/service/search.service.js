@@ -73,6 +73,12 @@ export const crewDefaultSearch = async (data) => {
       { crewCapacity: { gt: 0 } }, // 조건 1: capacity가 0보다 큼
       { crewCapacity: null }, // 조건 2: capacity가 null임
     ];
+  else
+    data.OR = [
+      {
+        crewCapacity: data.capacity,
+      },
+    ];
   // 레포지토리로부터 검색 결과 가져오기
   const crews = await findCrewsByName(data);
   // 결과값 양식에 맞추어 정형화
@@ -119,6 +125,12 @@ export const crewAdvancedSearch = async (data) => {
       { crewCapacity: { gt: 0 } }, // 조건 1: capacity가 0보다 큼
       { crewCapacity: null }, // 조건 2: capacity가 null임
     ];
+  else
+    data.OR = [
+      {
+        crewCapacity: data.capacity,
+      },
+    ];
   // 레포지토리로부터 검색 결과 가져오기
   const crews = await findCrewsByOptions(data);
   // 결과값 양식에 맞추어 정형화
@@ -161,6 +173,12 @@ export const crewSearchByCategory = async (data) => {
     data.OR = [
       { crewCapacity: { gt: 0 } }, // 조건 1: capacity가 0보다 큼
       { crewCapacity: null }, // 조건 2: capacity가 null임
+    ];
+  else
+    data.OR = [
+      {
+        crewCapacity: data.capacity,
+      },
     ];
   const crews = await findCrewsByCategory(data);
   const filteredItems = crews.crews ? formatCrewList(crews.crews) : [];

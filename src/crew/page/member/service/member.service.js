@@ -1,6 +1,7 @@
 import * as baseError from "../../../../error.js";
 import * as memberResponse from "../dto/response/member.response.dto.js";
 import * as memberRepository from "../repository/member.repository.js";
+import { eventEmitter } from "../../../../index.js";
 
 export const readMembersByCrew = async ({ userId, crewId, page, size }) => {
     try {
@@ -91,6 +92,10 @@ export const kickCrewMember = async ({ userId, crewId, crewMemberId }) => {
             throw new baseError.PermissionDeniedError("권한이 없는 크루원입니다.");
         }
         const member = await memberRepository.removeMemberByCrewMemberId({ crewMemberId });
+        eventEmitter.emit('CREW_KICKED', {
+            targetId: { crewId },
+            userId: [isExistCrewMember.user.id]
+        });
         return memberResponse.CrewMemberResponse(member);
     } catch (err) {
         throw err;

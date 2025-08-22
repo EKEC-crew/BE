@@ -107,7 +107,7 @@ const updateStatusWithCrewCapacity = async (crewId, applyId, status) => {
             const maxCapacity = crew.crewCapacity;
 
             // 정원 초과 시 대기상태 유지 (status = 0)
-            if (currentMemberCount >= maxCapacity) {
+            if (maxCapacity !== null && currentMemberCount >= maxCapacity) {
                 const error = new Error('크루 정원이 가득 찼습니다. 대기상태로 유지됩니다.');
                 error.status = 400;
                 throw error;

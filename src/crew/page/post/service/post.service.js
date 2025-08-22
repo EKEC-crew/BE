@@ -216,7 +216,7 @@ export const toggleCrewPostLike = async ({ userId, crewId, postId }) => {
 			postId,
 		})
 		eventEmitter.emit('POST_LIKED', {
-			targetId: { userId, postId },
+			targetId: { userId, postId, crewId },
 			userId: [isExistPost.crewMember.user.id]
 		})
 		return postResponse.likeCrewPostResponse(likeInfo);
@@ -279,7 +279,7 @@ export const createCrewPostComment = async ({ crewId, postId, userId, content, i
 			isPublic
 		})
 		eventEmitter.emit('POST_COMMENTED', {
-			targetId: { userId, postId },
+			targetId: { userId, postId, crewId },
 			userId: [isExistPost.crewMember.user.id]
 		})
 		return postResponse.CrewCommentResponse(comment);

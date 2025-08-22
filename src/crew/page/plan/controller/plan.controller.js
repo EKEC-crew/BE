@@ -896,8 +896,10 @@ export const getUpcomingPlans = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const size = parseInt(req.query.size) || 5;
     const userId = req.payload?.id; // JWT 토큰에서 사용자 ID 추출 (선택적)
+    const { crewId } = req.params; // URL 파라미터에서 crewId 추출
 
     const result = await planService.CrewPlanService.getUpcomingPlans(
+      Number(crewId),
       page,
       size,
       userId

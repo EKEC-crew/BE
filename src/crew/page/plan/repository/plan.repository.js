@@ -293,100 +293,241 @@ export const CrewPlanRepository = {
     },
 
     // 사용자가 신청완료한 다가오는 일정 조회
-    findUpcomingPlansByUserId: async (userId, page = 1, size = 5) => {
+    findUpcomingPlansByUserId: async (crewId, userId, page = 1, size = 5) => {
       const skip = (page - 1) * size;
       // 한국 시간(KST, UTC+9)으로 오늘 날짜 설정
       const today = new Date();
       today.setHours(today.getHours() + 9); // UTC+9 (한국 시간)
       today.setHours(0, 0, 0, 0); // 오늘 날짜의 시작 (00:00:00)
 
-      //Promise.all : 여러 비동기 작업을 동시에 실행하고 모든 결과를 기다리는 메소드
-      const [totalCount, plans] = await Promise.all([
-        // 첫 번째 Promise: 전체 개수 조회
-        prisma.crewPlanRequest.count({
-          where: {
-            crewMember: {
-              userId: Number(userId)
-            },
-            status: 1, // 신청완료 상태
-            crewPlan: {
-              day: {
-                gte: today // 오늘 이후의 일정만(today: 한국시간 기준 오늘 날짜)
-              }
-            }
+      // 먼저 사용자의 CrewMember 정보를 조회하여 role 확인
+      const crewMember = await prisma.crewMember.findFirst({
+        where: {
+          userId: Number(userId),
+          crewId: Number(crewId) // 특정 크루에서의 멤버 정보만 조회
+        },
+        select: {
+          id: true,
+          role: true
+        }
+      });
+
+      if (!crewMember) {
+        // CrewMember가 없는 경우 빈 결과 반환
+        return {
+          plans: [],
+          pagination: {
+            totalElements: 0,
+            currentPage: page,
+            pageSize: size,
+            totalPages: 0,
+            hasNext: false,
+            hasPrevious: false
           }
-        }),
-        // 두 번째 Promise: 일정 목록 조회
-        prisma.crewPlanRequest.findMany({
-          where: {
-            crewMember: {
-              userId: Number(userId)
+        };
+      }
+
+      let totalCount, plans;
+
+      // 크루장(role = 2)인 경우: 직접 생성한 일정 + 신청한 일정 모두 조회
+      if (crewMember.role === 2) {
+        [totalCount, plans] = await Promise.all([
+          // 전체 개수 조회 (생성한 일정 + 신청한 일정)
+          prisma.crewPlan.count({
+            where: {
+              crewId: Number(crewId), // 특정 크루의 일정만 조회
+              OR: [
+                // 직접 생성한 일정
+                {
+                  crewMemberId: crewMember.id,
+                  day: {
+                    gte: today
+                  }
+                },
+                // 신청한 일정
+                {
+                  crewPlanRequest: {
+                    some: {
+                      crewMemberId: crewMember.id,
+                      status: 1
+                    }
+                  },
+                  day: {
+                    gte: today
+                  }
+                }
+              ]
+            }
+          }),
+          // 일정 목록 조회
+          prisma.crewPlan.findMany({
+            where: {
+              crewId: Number(crewId), // 특정 크루의 일정만 조회
+              OR: [
+                // 직접 생성한 일정
+                {
+                  crewMemberId: crewMember.id,
+                  day: {
+                    gte: today
+                  }
+                },
+                // 신청한 일정
+                {
+                  crewPlanRequest: {
+                    some: {
+                      crewMemberId: crewMember.id,
+                      status: 1
+                    }
+                  },
+                  day: {
+                    gte: today
+                  }
+                }
+              ]
             },
-            status: 1, // 신청완료 상태
-            crewPlan: {
-              day: {
-                gte: today // 오늘 이후의 일정만
+            orderBy: {
+              day: 'asc'
+            },
+            skip,
+            take: size,
+            select: {
+              id: true,
+              title: true,
+              day: true,
+              crew: {
+                select: {
+                  title: true
+                }
               }
             }
-          },
-          orderBy: {
-            crewPlan: {
-              day: 'asc' // 날짜순으로 정렬 (가까운 일정부터)
+          })
+        ]);
+
+        // 크루장의 경우 직접 조회한 일정 데이터를 그대로 사용
+        const processedPlans = plans.map(plan => {
+          const planDate = new Date(plan.day);
+          const todayDate = new Date();
+          todayDate.setHours(todayDate.getHours() + 9);
+          todayDate.setHours(0, 0, 0, 0);
+          planDate.setHours(0, 0, 0, 0);
+          
+          const daysUntil = Math.ceil((planDate - todayDate) / (1000 * 60 * 60 * 24));
+          
+          return {
+            id: plan.id,
+            crew_name: plan.crew.title,
+            title: plan.title,
+            day: plan.day,
+            daysUntil: daysUntil
+          };
+        });
+
+        const totalPages = Math.ceil(totalCount / size);
+        
+        return {
+          plans: processedPlans,
+          pagination: {
+            totalElements: totalCount,
+            currentPage: page,
+            pageSize: size,
+            totalPages: totalPages,
+            hasNext: page < totalPages,
+            hasPrevious: page > 1
+          }
+        };
+      } else {
+        // 크루원(role = 0) 또는 운영진(role = 1)인 경우: 기존 로직 사용
+        [totalCount, plans] = await Promise.all([
+          // 첫 번째 Promise: 전체 개수 조회
+          prisma.crewPlanRequest.count({
+            where: {
+              crewMember: {
+                userId: Number(userId),
+                crewId: Number(crewId) // 특정 크루의 멤버만 조회
+              },
+              status: 1, // 신청완료 상태
+              crewPlan: {
+                crewId: Number(crewId), // 특정 크루의 일정만 조회
+                day: {
+                  gte: today // 오늘 이후의 일정만(today: 한국시간 기준 오늘 날짜)
+                }
+              }
             }
-          },
-          skip,
-          take: size,
-          select: {
-            crewPlan: {
-              select: {
-                id: true,
-                title: true,
-                day: true,
-                crew: {
-                  select: {
-                    title: true
+          }),
+          // 두 번째 Promise: 일정 목록 조회
+          prisma.crewPlanRequest.findMany({
+            where: {
+              crewMember: {
+                userId: Number(userId),
+                crewId: Number(crewId) // 특정 크루의 멤버만 조회
+              },
+              status: 1, // 신청완료 상태
+              crewPlan: {
+                crewId: Number(crewId), // 특정 크루의 일정만 조회
+                day: {
+                  gte: today // 오늘 이후의 일정만
+                }
+              }
+            },
+            orderBy: {
+              crewPlan: {
+                day: 'asc' // 날짜순으로 정렬 (가까운 일정부터)
+              }
+            },
+            skip,
+            take: size,
+            select: {
+              crewPlan: {
+                select: {
+                  id: true,
+                  title: true,
+                  day: true,
+                  crew: {
+                    select: {
+                      title: true
+                    }
                   }
                 }
               }
             }
-          }
-        })
-      ]);
+          })
+        ]);
 
-      const totalPages = Math.ceil(totalCount / size);
-      
-      // 일정 데이터를 가공하여 daysUntil 계산
-      const processedPlans = plans.map(request => {
-        const plan = request.crewPlan;
-        const planDate = new Date(plan.day); // 일정 날짜
-        // 한국 시간(KST, UTC+9)으로 오늘 날짜 설정
-        const todayDate = new Date(); // 오늘 날짜
-        todayDate.setHours(todayDate.getHours() + 9); // UTC+9 (한국 시간)
-        todayDate.setHours(0, 0, 0, 0);
-        planDate.setHours(0, 0, 0, 0);
+        const totalPages = Math.ceil(totalCount / size);
         
-        const daysUntil = Math.ceil((planDate - todayDate) / (1000 * 60 * 60 * 24)); // 일정 날짜와 오늘날짜의 차이로 남은 날짜 계산 -> D-Day까지 몇일 남았는지 계산
+        // 일정 데이터를 가공하여 daysUntil 계산
+        const processedPlans = plans.map(request => {
+          const plan = request.crewPlan;
+          const planDate = new Date(plan.day); // 일정 날짜
+          // 한국 시간(KST, UTC+9)으로 오늘 날짜 설정
+          const todayDate = new Date(); // 오늘 날짜
+          todayDate.setHours(todayDate.getHours() + 9); // UTC+9 (한국 시간)
+          todayDate.setHours(0, 0, 0, 0);
+          planDate.setHours(0, 0, 0, 0);
+          
+          const daysUntil = Math.ceil((planDate - todayDate) / (1000 * 60 * 60 * 24)); // 일정 날짜와 오늘날짜의 차이로 남은 날짜 계산 -> D-Day까지 몇일 남았는지 계산
+          
+          return {
+            id: plan.id,
+            crew_name: plan.crew.title,
+            title: plan.title,
+            day: plan.day,
+            daysUntil: daysUntil
+          };
+        });
         
         return {
-          id: plan.id,
-          crew_name: plan.crew.title,
-          title: plan.title,
-          day: plan.day,
-          daysUntil: daysUntil
+          plans: processedPlans,
+          pagination: {
+            totalElements: totalCount,
+            currentPage: page,
+            pageSize: size,
+            totalPages: totalPages,
+            hasNext: page < totalPages,
+            hasPrevious: page > 1
+          }
         };
-      });
-      
-      return {
-        plans: processedPlans,
-        pagination: {
-          totalElements: totalCount,
-          currentPage: page,
-          pageSize: size,
-          totalPages: totalPages,
-          hasNext: page < totalPages,
-          hasPrevious: page > 1
-        }
-      };
+      }
     }
     
 }

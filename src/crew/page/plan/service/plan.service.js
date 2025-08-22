@@ -320,7 +320,7 @@ export const CrewPlanService = {
   },
 
   //다가오는 일정 리스트 조회 서비스
-  getUpcomingPlans: async (page = 1, size = 5, userId) => {
+  getUpcomingPlans: async (crewId, page = 1, size = 5, userId) => {
     if (!userId) {
       // 로그인하지 않은 사용자의 경우 빈 결과 반환
       return new planResponse.GetUpcomingPlansResponse(
@@ -338,6 +338,7 @@ export const CrewPlanService = {
 
     const result =
       await planRepository.CrewPlanRepository.findUpcomingPlansByUserId(
+        Number(crewId),
         Number(userId),
         page,
         size,
@@ -345,7 +346,7 @@ export const CrewPlanService = {
 
     return new planResponse.GetUpcomingPlansResponse(
       result.plans,
-      result.pagination,
+      result.pagination
     );
   },
 };
